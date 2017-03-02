@@ -234,7 +234,7 @@ validation_split = StratifiedShuffleSplit(n_splits=1, test_size=0.25, random_sta
 validation_split.split(x_train, y_train)
 
 
-# We can note a few things here.  First, we needed to include the response vector because we are doing a class-stratified split.  The functions StratifiedSplit and KFold can be applied by specifying only the design matrix, since they don't use information about the response.  Second, the object type that is returned here is a python generator.  In order to obtain a list of indices, we need to apply the python list() function, which forces python to actually execute the generator:
+# We can note a few things here.  First, we needed to include the response vector because we are doing a class-stratified split.  The functions ShuffleSplit and KFold can be applied by specifying only the design matrix, since they don't use information about the response.  Second, the object type that is returned here is a python generator.  In order to obtain a list of indices, we need to apply the python list() function, which forces python to actually execute the generator:
 
 # In[28]:
 
@@ -386,7 +386,7 @@ def random_search(clf, param_dist, n_iter_search, predictors, labels):
     report(rs.cv_results_)
 
 
-# Note that the effect cost function that is being compared is the average of the accuracy on the leave-out fold in a cross-validation scheme.  If you want to use this or a similar function for another problem, be sure to rewrite it to use the appropriate scoring function if you are using a different metric.
+# Note that the effective cost function that is being compared is the average of the accuracy on the leave-out fold in a cross-validation scheme.  If you want to use this or a similar function for another problem, be sure to rewrite it to use the appropriate scoring function if you are using a different metric.
 # 
 # This uses the python time function, so we need to import it.
 
@@ -437,7 +437,7 @@ rf_param =  {'n_estimators': scipy.stats.randint(50,400), 'max_depth': scipy.sta
 random_search(rf_clf, rf_param, 20, x_tune, y_tune)
 
 
-# This took around 4 minutes to run on a 5 year old 4-core machine. Grid search for 1000 points would have taken over 3 hours.  The best point resulted in a 94% accuracy on the tuning set and then next 2 best values were not far behind.
+# This took around 4 minutes to run on a 5 year old 4-core machine. A grid search over 1000 points would have taken over 3 hours.  The best point resulted in a 94% accuracy on the tuning set and then the 2 next best values were not far behind.
 # 
 # Now we want to probe 1d deviations away from the best value that we identified. I use the following function to do this:
 

@@ -13194,7 +13194,7 @@ Name: label, dtype: int64</pre>
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>We can note a few things here.  First, we needed to include the response vector because we are doing a class-stratified split.  The functions StratifiedSplit and KFold can be applied by specifying only the design matrix, since they don't use information about the response.  Second, the object type that is returned here is a python generator.  In order to obtain a list of indices, we need to apply the python list() function, which forces python to actually execute the generator:</p>
+<p>We can note a few things here.  First, we needed to include the response vector because we are doing a class-stratified split.  The functions ShuffleSplit and KFold can be applied by specifying only the design matrix, since they don't use information about the response.  Second, the object type that is returned here is a python generator.  In order to obtain a list of indices, we need to apply the python list() function, which forces python to actually execute the generator:</p>
 
 </div>
 </div>
@@ -13592,7 +13592,7 @@ $$ 1(a=b) = \begin{cases} 1, &  a=b, \\ 0, & a\neq b. \end{cases} .$$<p>Therefor
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Note that the effect cost function that is being compared is the average of the accuracy on the leave-out fold in a cross-validation scheme.  If you want to use this or a similar function for another problem, be sure to rewrite it to use the appropriate scoring function if you are using a different metric.</p>
+<p>Note that the effective cost function that is being compared is the average of the accuracy on the leave-out fold in a cross-validation scheme.  If you want to use this or a similar function for another problem, be sure to rewrite it to use the appropriate scoring function if you are using a different metric.</p>
 <p>This uses the python time function, so we need to import it.</p>
 
 </div>
@@ -13747,7 +13747,7 @@ Parameters: {&#39;max_features&#39;: 22, &#39;n_estimators&#39;: 265, &#39;max_d
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>This took around 4 minutes to run on a 5 year old 4-core machine. Grid search for 1000 points would have taken over 3 hours.  The best point resulted in a 94% accuracy on the tuning set and then next 2 best values were not far behind.</p>
+<p>This took around 4 minutes to run on a 5 year old 4-core machine. A grid search over 1000 points would have taken over 3 hours.  The best point resulted in a 94% accuracy on the tuning set and then the 2 next best values were not far behind.</p>
 <p>Now we want to probe 1d deviations away from the best value that we identified. I use the following function to do this:</p>
 
 </div>
