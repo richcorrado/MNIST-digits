@@ -11,5 +11,4 @@ MNIST_Digits-overview.py is the output of jupyter's "download as python" functio
 good results if run directly.  It has been included so that students can easily read the code and modify it 
 to run in their favorite python environment.
 
-Finally MNIST_Digits-overview.html is the output of jupyter's "download as html" function that would allow someone 
-without jupyter to follow the presentation in the notebook.`
+Finally MNIST_Digits-overview.html is the output of jupyter's "download as html" function that would allow someone without jupyter to follow the presentation in the notebook.  This file can be easily viewed in a browser at https://richcorrado.github.io/MNIST_Digits-overview.html.

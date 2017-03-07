@@ -120,7 +120,7 @@ pixel_mat(x)
 
 # Matplotlib conveniently provides a function to make a 2d plot of the entries of a matrix.  We can call this directly, since we won't be doing this often.  
 
-# In[10]:
+# In[8]:
 
 x = np.random.randint(0,42000)
 plt.matshow(pixel_mat(x), cmap=plt.cm.gray)
@@ -129,20 +129,100 @@ train_df['label'].iloc[x]
 
 
 # If you run this often enough, you should find that some of the handwritten digits can be challenging to recogonize with the human eye.  It is possible that a human would not achieve a 0% error rate over the entire dataset.
-# 
-# Furthermore, we see that there is a consistent padding of blank pixels around the images.  In practical terms, this means that some of our features simply take the value 0 with no variation over the training and/or test set.  Some machine learning algorithms with feature selection will learn to ignore these useless features, but others (including support vector machines and k-nearest neighbors) can be sensitive to the presence of these zero variation features.
+
+# ### Zero padding
+
+# As we ran the matshow commands,  we should also see that there is a consistent padding of blank pixels around the images.  In practical terms, this means that some of our features simply take the value 0 with no variation over the training and/or test set.  Some machine learning algorithms with feature selection will learn to ignore these useless features, but according to the LeCun web page, certain approaches were improved by the presence of these zero variation features.
 # 
 # Even if the learning algorithm does feature selection,  it can be the case that a feature from the training set that is selected by the model has zero variation over the test set.  This feature cannot be used to make predictions on the test examples and, in a sense, we might have wasted some of our learning budget on a useless feature.
 # 
 # For these reasons, we will store a list of columns that is always padding over either the training or test set, since we probably don't want to use them for learning purposes.  We will have an opportunity to experiment below to see if there is a measurable effect of including or dropping these features while using a given learning algorithm.
+# 
+# Let's look at the output of the following expression.
 
-# In[13]:
+# In[9]:
+
+train_df == 0
+
+
+# This is another useful feature of pandas: operations on dataframes return new dataframes instead of overwriting the old ones.  In a particular application, you will need to decide when to assign a new expression to the output of a pandas function or to overwrite the original dataframe.  Generally it's easier to recover from mistakes if your original data is still stored somewhere, but for a very large dataset, it's possible that memory constraints might become an issue.
+# 
+# Also note that, the expression above wasn't just a function applied to a dataframe, it was a conditional expression.  But we still obtained a new dataframe whose entries were the boolean result of the conditional statement applied to the individual cells.
+# 
+# Since the output of the conditional statement was a dataframe itself, we can use the pandas all() function to test if the conditional is true over every value of the index.   
+
+# In[16]:
+
+(train_df == 0).all()
+
+
+# This is another dataframe with a single row. Each True corresponds to a column that was zero for every row, which is exactly the type of zero padding that we were concerned about. 
+# 
+# Note that this is pixel-wise checking for zero variation features, as opposed to redrawing a minimal bounding box around all of the digit images.   What we're doing isn't necessarily appropriate for the case here where our features consist of the unrolled pixel data and we're not explicitly forcing the geometry of the image into our algorithm.  If our ML algorithm was a convolutional neural net, we would not want to delete pixels from the interior of the bounding box, since it would complicate the procedure of windowing over the geometry of the image.  However, in the case of CNNs we often have to introduce zero padding for the inner layers of a deep structure, so it's unlikely that we would bother removing the zero padding on the input features.
+# 
+# We can obtain the list of zero-variation column names using the columns() method:
+
+# In[17]:
+
+train_df.columns[(train_df == 0).all()].tolist()
+
+
+# We should also find the zero-variation columns in the test set and then put the combined results together in a list (using set() to get the unique elements in both the train and test lists).
+
+# In[18]:
 
 zero_cols = list(set(train_df.columns[(train_df == 0).all()].tolist() + test_df.columns[(test_df == 0).all()].tolist()))
 len(zero_cols)
 
 
-# This padding actually accounts for almost 12% of the columns.
+# This padding actually accounts for almost 12% of the original features.
+
+# ## Design Matrices
+
+# At this point, it's important to note that most of the scikit-learn functions expect our data to be in the form of numpy arrays rather than pandas dataframes. Fortunately pandas provides several functions to faciliate this.  
+# 
+# In machine learning terms, we want to define the design matrix for our data.  This is a 2d matrix where the row index corresponds to the observations, while the column index corresponds to the features.  In practice, this means that we need to identify the features we are including in our model, and ensure that they are represented in numerical form during our preprocessing. 
+# 
+# For our digit dataset here, the only column that does not correspond to a feature is the label column, which is actually our response variable.  The actual features are integer-valued pixel intensity values that are already numerical data types, so it is not necessary to do any preprocessing.  
+# 
+# Let's first define our response, which is the 'label' column of the train_df dataframe.  Pandas provides various ways to index and reference slices of a dataset, but the convenient method here is to specify the column name:
+
+# In[19]:
+
+train_df['label'].head(10)
+
+
+# So we see that train_df['label'] is a new dataframe obtained by restricting train_df to the single column named 'label'. We only used the head() function here to avoid having the output take up too much space.  It is also important to note that the index of this dataframe is obtained from that of the parent train_df.
+# 
+# Pandas allows us to convert a dataframe to a numpy array using the values() function.  Specifically, 
+
+# In[20]:
+
+train_df['label'].head(10).values
+
+
+# is a 1d array or vector. We can therefore define a numpy vector containing all of the response variables with the statement
+
+# In[21]:
+
+y_train = train_df['label'].values
+
+
+# For the design matrix, we want to drop the 'label' column, since it is inappropriate to teach our machine learning model to learn on the response variable.  In other datasets, we might have to drop additional columns that contain unique ids or other information that would be similarly inappropriate to include in our model.
+# 
+# We can use the pandas drop() function to drop rows or columns, by specifying the axis along which to drop slices.  For a row we would use axis=0, while for a column in the present case, we use axis=1.  As an example, compare 
+
+# In[22]:
+
+train_df.drop(['label'], axis=1).head(10)
+
+
+# to the output of train_df.head(10) that was given earlier in the notebook.  If we have additional columns to drop, we can replace ['label'] with a list of appropriate column names, i.e. ['col1', 'col2', ....].  To define the design matrix, we can combine this with the values() function:
+
+# In[23]:
+
+x_train = train_df.drop(['label'], axis=1).values
+
 
 # ## Creating Validation Sets
 
@@ -154,71 +234,20 @@ len(zero_cols)
 # 
 # The machine learning tools we'll be using in this notebook are primarily found in the scikit-learn python libraries. In particular, the tools for creating validation sets are found in the model_selection subkit.  For now we will import two functions:
 
-# In[16]:
+# In[25]:
 
 from sklearn.model_selection import StratifiedKFold, StratifiedShuffleSplit
 
 
-# Extensive information about these functions can be found in the scikit-learn documentation, but it's worthwile to explain them in a bit of detail here.  The function KFold provides an iterator that can be used to divide a dataset $S$ into $K$ subsets called "folds."  A validation procedure uses $k-1$ of folds as a training set, with the remaining fold held out as the validation set.  Cross-validation repeats this process over all $k$ different combinations of folds into training and validation sets.  Specifically, KFold provides the indices needed to split a numpy array or pandas dataframe into the training/validation pairs.  By using a switch, you can specify that KFold perform a random permutation of the original indices before performing the splits, which can be useful in trying to ensure that each fold represents a random sample of the population. 
+# Extensive information about these functions can be found in the scikit-learn documentation, but it's worthwile to explain them in a bit of detail here.  The function KFold provides an iterator that can be used to divide a dataset $S$ into $k$ subsets called "folds."  A validation procedure uses $k-1$ of folds as a training set, with the remaining fold held out as the validation set.  Cross-validation repeats this process over all $k$ different combinations of folds into training and validation sets.  Specifically, KFold provides the indices needed to split a numpy array or pandas dataframe into the training/validation pairs.  By using a switch, you can specify that KFold perform a random permutation of the original indices before performing the splits, which can be useful in trying to ensure that each fold represents a random sample of the population. 
 # 
 # StratifiedKFold is an implementation of KFold that takes as an additional argument a vector of target classes.  It attempts to ensure that each fold has a similar population density of each target class, avoiding imbalances.  We use it here because we have 10 classes of digits and want to preserve the relative frequency of them in all of our splits. 
 # 
-# ShuffleSplit is another iterator that allows us to specify the fraction of the dataset to split into a validation set.  It then randomly permutes the original indices and provides a split of indices that can be used to build the required sets.  We use this because we have precise control over the size of the validation set as opposed to KFold. StratifiedShuffleSplit is similarly an implementation that preserves class frequencies.
+# ShuffleSplit is another generator that allows us to specify the fraction of the dataset to split into a validation set.  It then randomly permutes the original indices and provides a split of indices that can be used to build the required sets.  We use this because we have precise control over the size of the validation set as opposed to KFold. StratifiedShuffleSplit is an implementation that preserves class frequencies.
 
-# ### Aside on Design Matrices
-
-# Before explicitly implementing these functions, it's important to note that most of the scikit-learn functions expect our data to be in the form of numpy arrays rather than pandas dataframes. Fortunately pandas provides several functions to faciliate this.  
-# 
-# In machine learning terms, we want to define the design matrix for our data.  This is a 2d matrix where the row index corresponds to the observations, while the column index corresponds to the features.  In practice, this means that we need to identify the features we are including in our model, and ensure that they are represented in numerical form during our preprocessing. 
-# 
-# For our digit dataset here, the only column that does not correspond to a feature is the label column, which is actually our response variable.  The actual features are integer-valued pixel intensity values that are already numerical data types, so it is not necessary to do any preprocessing.  
-# 
-# Let's first define our response, which is the 'label' column of the train_df dataframe.  Pandas provides various ways to index and reference slices of a dataset, but the convenient method here is to specify the column name:
-
-# In[17]:
-
-train_df['label'].head(10)
-
-
-# So we see that train_df['label'] is a new dataframe obtained by restricting train_df to the single column named 'label'. We only used the head() function here to avoid having the output take up too much space.  It is also important to note that the index of this dataframe is obtained from that of the parent train_df.
-# 
-# Pandas allows us to convert a dataframe to a numpy array using the values() function.  Specifically, 
-
-# In[18]:
-
-train_df['label'].head(10).values
-
-
-# is a 1d array or vector. We can therefore define a numpy vector containing all of the response variables with the statement
-
-# In[19]:
-
-y_train = train_df['label'].values
-
-
-# For the design matrix, we want to drop the 'label' column, since it is inappropriate to teach our machine learning model to learn on the response variable.  In other datasets, we might have to drop additional columns that contain unique ids or other information that would be similarly inappropriate to include in our model.
-# 
-# We can use the pandas drop() function to drop rows or columns, by specifying the axis along which to drop slices.  For a row we would use axis=0, while for a column in the present case, we use axis=1.  As an example, compare 
-
-# In[21]:
-
-train_df.drop(['label'], axis=1).head(10)
-
-
-# to the output of train_df.head(10) that was given earlier in the notebook.  If we have additional columns to drop, we can replace ['label'] with a list of appropriate column names, i.e. ['col1', 'col2', ....].  To define the design matrix, we can combine this with the values() function:
-
-# In[22]:
-
-x_train = train_df.drop(['label'], axis=1).values
-
-
-# ### Return to Creating Validation Sets
-
-# Now that we have a design matrix and response vector defined for the kaggle train dataset, we return to the issue of splitting the data into internal training and validation sets.
-# 
 # At the moment we will be using StratifiedShuffleSplit.  The first step is to define the object that we'll use to create our split:
 
-# In[23]:
+# In[27]:
 
 validation_split = StratifiedShuffleSplit(n_splits=1, test_size=0.25, random_state=46)
 
@@ -227,23 +256,23 @@ validation_split = StratifiedShuffleSplit(n_splits=1, test_size=0.25, random_sta
 # 
 # Finally, we have specified a seed for the random number generator using the random_state flag.  This will tend to ensure that our results are repeatable in future study or for other users of this notebook.
 # 
-# Having defined the iterator, the next step is to apply it to our design matrix and response vector: 
+# Having defined the splitting operation, the next step is to apply it to our design matrix and response vector: 
 
-# In[24]:
+# In[28]:
 
 validation_split.split(x_train, y_train)
 
 
 # We can note a few things here.  First, we needed to include the response vector because we are doing a class-stratified split.  The functions ShuffleSplit and KFold can be applied by specifying only the design matrix, since they don't use information about the response.  Second, the object type that is returned here is a python generator.  In order to obtain a list of indices, we need to apply the python list() function, which forces python to actually execute the generator:
 
-# In[28]:
+# In[29]:
 
 list(validation_split.split(x_train, y_train))
 
 
 # We actually get a list containing a tuple of numpy arrays. Had we specified n_splits > 1, this list would contain a tuple for every split. We can assign each array of indices to variable names using the declaration
 
-# In[29]:
+# In[30]:
 
 training_idx, validation_idx = list(validation_split.split(x_train, y_train))[0]
 
@@ -386,7 +415,7 @@ def random_search(clf, param_dist, n_iter_search, predictors, labels):
     report(rs.cv_results_)
 
 
-# Note that the effective cost function that is being compared is the average of the accuracy on the leave-out fold in a cross-validation scheme.  If you want to use this or a similar function for another problem, be sure to rewrite it to use the appropriate scoring function if you are using a different metric.
+# Note that the effect cost function that is being compared is the average of the accuracy on the leave-out fold in a cross-validation scheme.  If you want to use this or a similar function for another problem, be sure to rewrite it to use the appropriate scoring function if you are using a different metric.
 # 
 # This uses the python time function, so we need to import it.
 
@@ -437,7 +466,7 @@ rf_param =  {'n_estimators': scipy.stats.randint(50,400), 'max_depth': scipy.sta
 random_search(rf_clf, rf_param, 20, x_tune, y_tune)
 
 
-# This took around 4 minutes to run on a 5 year old 4-core machine. A grid search over 1000 points would have taken over 3 hours.  The best point resulted in a 94% accuracy on the tuning set and then the 2 next best values were not far behind.
+# This took around 4 minutes to run on a 5 year old 4-core machine. Grid search for 1000 points would have taken over 3 hours.  The best point resulted in a 94% accuracy on the tuning set and then next 2 best values were not far behind.
 # 
 # Now we want to probe 1d deviations away from the best value that we identified. I use the following function to do this:
 
