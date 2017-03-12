@@ -3,9 +3,33 @@
 
 # # MNIST Digit Classification
 
-# Richard Corrado <richcorrado@gmail.com> February 2017
+# Richard Corrado <richcorrado@gmail.com> February 2017 (updated 3/11/2017)
 
-# ## Overview
+# For the Fat Cat Fab Lab Machine Learning Meetup
+
+# ## Purpose
+
+# One goal of our Machine Learning meetup is to introduce people to machine learning tools and gain the background needed to start applying those tools to their own projects.  I hope that this notebook can serve as an practical introduction to some of the key issues that tend to be common to any machine learning problem.  
+# 
+# What this notebook does:
+# 
+# 1. Introduce the MNIST Digit dataset, a historically important database and benchmark for machine learning techniques, specifically in pattern and image recognition.
+# 
+# 2. Introduce pandas, which is the python toolkit that allows importing larget datasets, together with efficient tools for exploring and manipulating those data.
+# 
+# 3. Use pandas, numpy and scikit-learn to prepare data for use in scikit-learn machine learning tools.  In particular, we learn how to take data in a pandas dataframe and specify the design matrix and response vector.  We also learn about some of the tools available for splitting a dataset into training and validation sets, which is an important part of the statistical framework used in machine learning.
+# 
+# 4. Apply scikit-learn tools to a specific machine learning problem.  We specifically use the Random Forest method on the MNIST digits, but the techniques of Random Search, Grid Search, and Cross-Validation are ones that you will use almost anytime you are applying models to tidy data.
+# 
+# Many issues are not covered:
+# 
+# 1. Taking messy data and cleaning it.  The MNIST dataset is already "tidy",  since there are no missing data, or data that have to be reformatted before we can apply scikit-learn functions.  
+# 
+# 2. Data visualization and feature engineering.  We incorporate matplotlib to visualize the digits and do a little bit of data exploration, but less than one might expect in other types of datasets.
+# 
+# 3. Different types of machine learning algorithms. We only consider Random Forests, but the framework can be applied to linear models, neural networks, etc.
+
+# ## Overview of the MNIST Digit Dataset
 
 # The MNIST digit database is a very popular database for studying machine learning techniques, especially pattern-recognition methods.  There are many reasons for this, but in particular, a large amount of preprocessing has already been done in translating the images to a machine encoding consisting of greyscale pixel values.  Therefore the student/researcher can investigate further preprocessing, but can also directly apply machine learning techniques to a very clean dataset, without any preprocessing.   Furthermore, it is a standardized dataset that allows for comparison of results with published approaches and error rates. 
 # 
@@ -36,7 +60,7 @@
 # 
 # >The test data set, (test.csv), is the same as the training set, except that it does not contain the "label" column.
 
-# ## Exploring the Dataset
+# ## Exploring the Dataset - Pandas
 
 # We'll use various python toolkits in this notebook.  I will try to load these as we need them with a brief explanation, but how to install them on your local machine is beyond the discussion here.  We can use the google group thread <https://groups.google.com/forum/#!topic/fat-cat-kagglers/c4Pv5kYiJzQ> to solve any problems that arise with python/package installation issues.
 # 
@@ -53,19 +77,20 @@
 import numpy as np
 
 import pandas as pd
-pd.set_option('display.precision',20)
+pd.set_option('display.precision',5)
 pd.set_option('display.max_colwidth',100)
 
 import matplotlib.pylab as plt
 from matplotlib.pylab import rcParams
 from matplotlib import pyplot
 rcParams['figure.figsize'] = 12, 4
+# get_ipython().magic(u'matplotlib inline')
 get_ipython().magic(u'matplotlib inline')
 
 
-# We have included some options to display long floats and wider columns in pandas.  We also included a command to ensure that our plots appear inline in the notebook.
+# We have included some options to display floats with a bit more precision as well as wider columns in pandas.  We also included a command to ensure that our plots appear inline in the notebook.
 # 
-# I've saved the kaggle train and test csvs to a subdirectory called input.  We can load the data into pandas dataframes using:
+# The kaggle train and test data files are stored in Comma Separated Values format (CSV). I have saved these files to a subdirectory called input.  We can load the data into pandas dataframes using the command.
 
 # In[2]:
 
@@ -73,16 +98,20 @@ train_df = pd.read_csv("./input/train.csv")
 test_df = pd.read_csv("./input/test.csv")
 
 
-# For the purposes of this notebook, we'll probably only be working with the training data.
+# For the purposes of this notebook, we'll only be working with the training data.
 # 
-# We can get a quick look the format of the dataframe using:
+# Pandas has tools to import data from many different sources, including Excel, JSON, SQL. See the <a href="http://pandas.pydata.org/pandas-docs/stable/api.html#input-output">Pandas I/O API</a> for other options. 
+# 
+# We can get a quick look the format of the dataframe.  We use the head command to display only the first 10 lines of the dataframe.  We will touch later on some ways to refer to parts of a dataframe that can be used to restrict the display of very specific parts.
 
 # In[3]:
 
 train_df.head(10)
 
 
-# This should be compared with the description of the data given in the quoted text from the kaggle description.  Basically the 28x28 array of pixels has been unrolled into a 784-dimensional vector.
+# This should be compared with the description of the data given in the quoted text from the kaggle description.  Basically the 28x28 array of pixels has been unrolled into a 784-dimensional vector.  The pandas dataframe object stores this in a format that closely resembles a spreadsheet.  On the far left, there is an index displayed and along the top are the column names that were read in from the first line of the CSV file.
+# 
+# We notice that there are many 0s displayed.  We'll see shortly that this dataset is indeed fairly sparse.
 # 
 # Pandas provides a shape() function that lets us see the dimensions involved:
 
@@ -110,25 +139,72 @@ def pixel_mat(row):
     return pixel_mat
 
 
+# This function uses a few pandas methods that we'll be using very often and will explain in a bit more detail later. We drop the label column from the dataframe,  index a specified row and then use the values function to convert the dataframe into another data structure called a numpy array.   This numpy array is then reassembled into the 28x28 pixel matrix using the reshape command, and that object is returned by the function.
+# 
 # Let's run this function on a random row.  We'll use the numpy randint function here and below so that you can run the commands various times on different rows.
 
 # In[7]:
 
 x = np.random.randint(0,42000)
-pixel_mat(x)
+X = pixel_mat(x)
+X
 
 
-# Matplotlib conveniently provides a function to make a 2d plot of the entries of a matrix.  We can call this directly, since we won't be doing this often.  
+# This is the format of a typical numpy array, but it is a bit large to display well in the notebook.  If we drop all of the rows and columns that are all zeros, we can display the nonzero part of the matrix in a fairly compact form:
 
 # In[8]:
 
-x = np.random.randint(0,42000)
+X = X[~np.all(X == 0, axis=1)]
+X = X[:,~np.all(X == 0, axis=0)]
+print(X)
+
+
+# If you look carefully, you might be able to recognize the digit that's been drawn.  
+# 
+# We can get a better visualization of the digit by using matplotlib. Matplotlib conveniently provides a function to make a 2d plot of the entries of a matrix:
+
+# In[9]:
+
 plt.matshow(pixel_mat(x), cmap=plt.cm.gray)
+plt.title("Digit Label: %d" % train_df['label'].iloc[x])
 plt.show()
-train_df['label'].iloc[x]
 
 
-# If you run this often enough, you should find that some of the handwritten digits can be challenging to recogonize with the human eye.  It is possible that a human would not achieve a 0% error rate over the entire dataset.
+# Matshow is actually a wrapper for another matplotlib function called imshow that can be used to display other types of images.  In order to display many digits at once, we'll use imshow. 
+# 
+# The code below does the following:
+# 
+# 1. Chooses 16 random digits from the index of train_df. The index counter can be referenced by train_df.index. The numpy random.choice function can be used to select single entries from a list or array with uniform probability. We specify that we want to choose 16 and we want to do it without replacement, to avoid duplication.
+# 
+# 2. Use the matplotlib subplots function to generate 4 columns and 4 rows of subfigures.
+# 
+# 3. Loop over the cells of this collection filling in the cells with a plot of the 28x28 digit matrix.  Give the subplot a title corresponding to the known label of the digit.
+
+# In[10]:
+
+# generate a list of 16 random rows which are our digits
+rand_idx = np.random.choice(train_df.index, size=16, replace=False)
+# generate a 4x4 grid of subplots
+fig, axs = plt.subplots(nrows=4, ncols=4, figsize=(10,10))
+
+# define counter over rand_idx list elements
+i = 0
+# axs is a 4x4 array so we flatten it into a vector in order to loop over it
+for ax in axs.reshape(-1):
+    # Title is digit label, which can be found by referencing the label column of the row specified by rand_idx[i]
+    ax.set_title("Digit Label: %d" % train_df['label'].iloc[rand_idx[i]])
+    # pixel_mat(rand_idx[i]) is the pixel matrix. 
+    # The imshow flags are the ones that are used in the matshow wrapper
+    ax.imshow(pixel_mat(rand_idx[i]), cmap=plt.cm.gray, origin='upper', interpolation='nearest')
+    ax.axis('off')
+    i += 1
+# tight_layout gives more spacing between subplots    
+plt.tight_layout()   
+# Tell matplotlib to draw all of the previously generated objects
+plt.show()
+
+
+# If you run this often enough, you should find that some of the handwritten digits can be challenging to recognize with the human eye.  It is possible that a human would not achieve a 0% error rate over the entire dataset.
 
 # ### Zero padding
 
@@ -138,9 +214,9 @@ train_df['label'].iloc[x]
 # 
 # For these reasons, we will store a list of columns that is always padding over either the training or test set, since we probably don't want to use them for learning purposes.  We will have an opportunity to experiment below to see if there is a measurable effect of including or dropping these features while using a given learning algorithm.
 # 
-# Let's look at the output of the following expression.
+# We used some of the below methods earlier when displaying the pixel matrices.  We'll explain what was going on there in a bit more detail here.  First, let's look at the output of the following expression.
 
-# In[9]:
+# In[11]:
 
 train_df == 0
 
@@ -151,31 +227,104 @@ train_df == 0
 # 
 # Since the output of the conditional statement was a dataframe itself, we can use the pandas all() function to test if the conditional is true over every value of the index.   
 
-# In[16]:
+# In[12]:
 
 (train_df == 0).all()
 
 
 # This is another dataframe with a single row. Each True corresponds to a column that was zero for every row, which is exactly the type of zero padding that we were concerned about. 
 # 
+# N.B. Pandas actually stores one-dimensional indexed and labeled arrays in a data structure that it calls a Series. A pandas Series is very closely related to the python dictionary data structure, while a pandas DataFrame is analogous to a dictionary of Series objects.  See more at <http://pandas.pydata.org/pandas-docs/stable/dsintro.html>
+# 
 # Note that this is pixel-wise checking for zero variation features, as opposed to redrawing a minimal bounding box around all of the digit images.   What we're doing isn't necessarily appropriate for the case here where our features consist of the unrolled pixel data and we're not explicitly forcing the geometry of the image into our algorithm.  If our ML algorithm was a convolutional neural net, we would not want to delete pixels from the interior of the bounding box, since it would complicate the procedure of windowing over the geometry of the image.  However, in the case of CNNs we often have to introduce zero padding for the inner layers of a deep structure, so it's unlikely that we would bother removing the zero padding on the input features.
 # 
 # We can obtain the list of zero-variation column names using the columns() method:
 
-# In[17]:
+# In[13]:
 
 train_df.columns[(train_df == 0).all()].tolist()
 
 
 # We should also find the zero-variation columns in the test set and then put the combined results together in a list (using set() to get the unique elements in both the train and test lists).
 
-# In[18]:
+# In[14]:
 
 zero_cols = list(set(train_df.columns[(train_df == 0).all()].tolist() + test_df.columns[(test_df == 0).all()].tolist()))
 len(zero_cols)
 
 
 # This padding actually accounts for almost 12% of the original features.
+
+# ## Frequency Distribution of Digits, Sparsity of Features 
+
+# A data analysis question we might ask is whether we have equal numbers of each digit appearing in the dataset, or if some digits are favored over another?  This might affect our machine learning problem, because if a particular digit was very rare in the dataset, it might be relatively hard to learn how to distinguish that digit from the others.
+# 
+# To answer this question, we only need the label column from the train_df dataframe.  We can assign this to a new dataframe (actually Series as briefly mentioned above):
+
+# In[15]:
+
+label_df = train_df['label']
+label_df
+
+
+# Pandas provides a value_counts method, which we feed into sort_index to accomplish a sort on the labels:
+
+# In[16]:
+
+counts_df = label_df.value_counts().sort_index()
+counts_df
+
+
+# If we want the relative frequencies, we can specify that in the value_counts call using the normalize flag:
+
+# In[17]:
+
+freq_df = label_df.value_counts(normalize=True).sort_index()
+freq_df
+
+
+# Pandas also provides functions to compute mean and standard deviation over the columns or rows:
+
+# In[18]:
+
+print("Mean of digit frequency is: %f, standard deviation is: %f" % (freq_df.mean(), freq_df.std()))
+
+
+# Statistically speaking, the frequency  of 1's is a bit more than $2\sigma$ higher the mean, while that of 5's is almost $2\sigma$ lower than the mean.  It's hard to say at this point whether this is enough to cause problems, but we don't have the ability to change the dataset that we're given. 
+# 
+# Another thing that we have remarked on is that many values of the pixels are blank over the images. The reason for this is clear from the images themselves, but we can make some quantitative observations.
+# 
+# If we're interested in the general distribution of pixel intensity of all of the pixels, we can reshape the dataframe. First we drop the label column, then stack all of the pixels into a single column.  The output is actually a series, indexed by the original index as well as the pixel label:
+
+# In[19]:
+
+stack_df = train_df.drop('label', axis=1).stack()
+stack_df
+
+
+# We can then obtain a frequency for each possible value of the pixel count using the commands from before:
+
+# In[20]:
+
+stack_df.value_counts(normalize=True).sort_index()
+
+
+# We see that 80% of the pixel values have 0 intensity across the dataset.   If we want to bin the intensity values into statistical quantiles, we can do that.  For example, we can specify 4 bins of uniform size by hand using the cut function. This operates on an array, so we pass stack_df.values into it: 
+
+# In[21]:
+
+intensity_cuts = pd.cut(stack_df.values, 4)
+intensity_cuts
+
+
+# We can apply the value_counts function to this object:
+
+# In[22]:
+
+pd.value_counts(intensity_cuts, normalize=True).sort_index()
+
+
+# We see that 84% of the pixels are either 0 or low intensity, while only around 11% are high intensity. 
 
 # ## Design Matrices
 
@@ -187,7 +336,7 @@ len(zero_cols)
 # 
 # Let's first define our response, which is the 'label' column of the train_df dataframe.  Pandas provides various ways to index and reference slices of a dataset, but the convenient method here is to specify the column name:
 
-# In[19]:
+# In[23]:
 
 train_df['label'].head(10)
 
@@ -196,14 +345,14 @@ train_df['label'].head(10)
 # 
 # Pandas allows us to convert a dataframe to a numpy array using the values() function.  Specifically, 
 
-# In[20]:
+# In[24]:
 
 train_df['label'].head(10).values
 
 
 # is a 1d array or vector. We can therefore define a numpy vector containing all of the response variables with the statement
 
-# In[21]:
+# In[25]:
 
 y_train = train_df['label'].values
 
@@ -212,14 +361,14 @@ y_train = train_df['label'].values
 # 
 # We can use the pandas drop() function to drop rows or columns, by specifying the axis along which to drop slices.  For a row we would use axis=0, while for a column in the present case, we use axis=1.  As an example, compare 
 
-# In[22]:
+# In[26]:
 
 train_df.drop(['label'], axis=1).head(10)
 
 
 # to the output of train_df.head(10) that was given earlier in the notebook.  If we have additional columns to drop, we can replace ['label'] with a list of appropriate column names, i.e. ['col1', 'col2', ....].  To define the design matrix, we can combine this with the values() function:
 
-# In[23]:
+# In[27]:
 
 x_train = train_df.drop(['label'], axis=1).values
 
@@ -234,7 +383,7 @@ x_train = train_df.drop(['label'], axis=1).values
 # 
 # The machine learning tools we'll be using in this notebook are primarily found in the scikit-learn python libraries. In particular, the tools for creating validation sets are found in the model_selection subkit.  For now we will import two functions:
 
-# In[25]:
+# In[28]:
 
 from sklearn.model_selection import StratifiedKFold, StratifiedShuffleSplit
 
@@ -247,7 +396,7 @@ from sklearn.model_selection import StratifiedKFold, StratifiedShuffleSplit
 
 # At the moment we will be using StratifiedShuffleSplit.  The first step is to define the object that we'll use to create our split:
 
-# In[27]:
+# In[29]:
 
 validation_split = StratifiedShuffleSplit(n_splits=1, test_size=0.25, random_state=46)
 
@@ -258,28 +407,28 @@ validation_split = StratifiedShuffleSplit(n_splits=1, test_size=0.25, random_sta
 # 
 # Having defined the splitting operation, the next step is to apply it to our design matrix and response vector: 
 
-# In[28]:
+# In[30]:
 
 validation_split.split(x_train, y_train)
 
 
 # We can note a few things here.  First, we needed to include the response vector because we are doing a class-stratified split.  The functions ShuffleSplit and KFold can be applied by specifying only the design matrix, since they don't use information about the response.  Second, the object type that is returned here is a python generator.  In order to obtain a list of indices, we need to apply the python list() function, which forces python to actually execute the generator:
 
-# In[29]:
+# In[31]:
 
 list(validation_split.split(x_train, y_train))
 
 
 # We actually get a list containing a tuple of numpy arrays. Had we specified n_splits > 1, this list would contain a tuple for every split. We can assign each array of indices to variable names using the declaration
 
-# In[30]:
+# In[32]:
 
 training_idx, validation_idx = list(validation_split.split(x_train, y_train))[0]
 
 
 # Using these index lists, we can define our training and validation sets in a couple of ways.  The most direct way is to just truncate the design and response arrays via:
 
-# In[30]:
+# In[33]:
 
 x_training = x_train[training_idx]
 y_training = y_train[training_idx]
@@ -290,7 +439,7 @@ y_validation = y_train[validation_idx]
 
 # We can also use the iloc indexing method in pandas to define new datasets by restricting the train_df dataframe to the rows defined by the split:
 
-# In[32]:
+# In[34]:
 
 training_df = train_df.iloc[training_idx]
 validation_df = train_df.iloc[validation_idx]
@@ -302,7 +451,7 @@ validation_df = train_df.iloc[validation_idx]
 
 # As mentioned earlier,  running cross-validation over the full 31500 entries in the training dataset can be slow, so we will also define a smaller set of the training dataset over which cross-validation will be faster.  In this case, we use the train_size flag to specify 15% of the data (4725 rows):
 
-# In[33]:
+# In[35]:
 
 tuning_split = StratifiedShuffleSplit(n_splits=1, train_size=0.15, random_state=96)
 
@@ -450,7 +599,7 @@ def report(results, n_top=3):
 
 # The random_search function requires that we specify param_dist, which is a dictionary of hyperparameter names and the statistical distribution we should draw the values from.  These distributions can either be specified as an actual distribution from the scipy.stats library or as a discrete python list of values to be sampled uniformly.  In our case, we will use a uniform random distribution over a likely range of values:
 
-# In[47]:
+# In[46]:
 
 import scipy
 rf_param =  {'n_estimators': scipy.stats.randint(50,400), 'max_depth': scipy.stats.randint(2,20), 
@@ -461,16 +610,18 @@ rf_param =  {'n_estimators': scipy.stats.randint(50,400), 'max_depth': scipy.sta
 # 
 # We can then apply the random_search function to our classifer, specifying n_iter_search = 20 to sample 20 random points in the sample region.
 
-# In[48]:
+# In[47]:
 
 random_search(rf_clf, rf_param, 20, x_tune, y_tune)
 
 
 # This took around 4 minutes to run on a 5 year old 4-core machine. Grid search for 1000 points would have taken over 3 hours.  The best point resulted in a 94% accuracy on the tuning set and then next 2 best values were not far behind.
 # 
+# N.B. Because of the randomness in random search, it is unlikely that exactly the parameters n_estimators = 296, max_depth = 15, max_features = 31 that I obtained while writing this will be obtained by a rerunning of the random search code, such as occurs when I edit the notebook.  There will be occasional discrepencies between random outputs and the discussion in the text because of this.
+# 
 # Now we want to probe 1d deviations away from the best value that we identified. I use the following function to do this:
 
-# In[49]:
+# In[48]:
 
 from sklearn.model_selection import cross_val_score
 
@@ -494,7 +645,7 @@ def single_search(clf, params, predictors, labels):
 # 
 # Let's apply this to the max_features hyperparameter.
 
-# In[52]:
+# In[49]:
 
 rf_clf = RandomForestClassifier(n_estimators = 296, max_depth = 15, max_features = 31, n_jobs=-1, random_state = 32)
 rf_params = {'max_features': np.arange(5, 50, 5).tolist()}
@@ -509,7 +660,7 @@ rf_df.sort_values(['accuracy'])
 # 
 # With the accuracy metric, we are looking for a maximum. max_features = 31 identified by random search is definitely very close to a local max, but we should check out values > 45 to be sure: 
 
-# In[53]:
+# In[50]:
 
 rf_clf = RandomForestClassifier(n_estimators = 296, max_depth = 15, max_features = 31, n_jobs=-1, random_state = 32)
 rf_params = {'max_features': np.arange(30, 75, 5).tolist()}
@@ -520,7 +671,7 @@ rf_df.sort_values(['accuracy'])
 
 # We are unlikely to find a better max in this region, so let's just make a finer search around max_features = 31:
 
-# In[54]:
+# In[51]:
 
 rf_clf = RandomForestClassifier(n_estimators = 296, max_depth = 15, max_features = 31, n_jobs=-1, random_state = 32)
 rf_params = {'max_features': np.arange(30, 36, 1).tolist()}
@@ -533,7 +684,7 @@ rf_df.sort_values(['accuracy'])
 # 
 # As an exercise, we will continue the procedure with the remaining hyperparameters, remembering to update our best set of hyperparameters when appropriate:
 
-# In[56]:
+# In[52]:
 
 rf_clf = RandomForestClassifier(n_estimators = 296, max_depth = 15, max_features = 32, n_jobs=-1, random_state = 32)
 rf_params = {'max_depth': np.arange(5, 40, 5).tolist()}
@@ -544,7 +695,7 @@ rf_df.sort_values(['accuracy'])
 
 # Again I've purposely probed a very large neighborhood of max_depth = 15 to give an idea of how the cost function behaves.  In general, Random Forests let us grow very large trees without causing much overfitting, but we want to choose the best smaller value that leads to a good result with small computational overhead.  In this case we want to probe the region around max_depth = 15 more finely:
 
-# In[57]:
+# In[53]:
 
 rf_clf = RandomForestClassifier(n_estimators = 296, max_depth = 15, max_features = 32, n_jobs=-1, random_state = 32)
 rf_params = {'max_depth': np.arange(10, 21, 1).tolist()}
@@ -555,7 +706,7 @@ rf_df.sort_values(['accuracy'])
 
 # Once again, the original point identified by random search was excellent. We can't improve max_depth=15.  Let's check n_estimators:
 
-# In[58]:
+# In[54]:
 
 rf_clf = RandomForestClassifier(n_estimators = 296, max_depth = 15, max_features = 32, n_jobs=-1, random_state = 32)
 rf_params = {'n_estimators': np.arange(50, 550, 50).tolist()}
@@ -566,7 +717,7 @@ rf_df.sort_values(['accuracy'])
 
 # Here we seem to gain much less than 1 standard deviation worth of accuracy in adding 25% more trees. Let's just zoom in on the original n_estimators=296 point and look around at the new peak at 400:
 
-# In[59]:
+# In[55]:
 
 rf_clf = RandomForestClassifier(n_estimators = 296, max_depth = 15, max_features = 32, n_jobs=-1, random_state = 32)
 rf_params = {'n_estimators': np.arange(290, 301, 1).tolist()}
@@ -577,7 +728,7 @@ rf_df.sort_values(['accuracy'])
 
 # As a rule of thumb, you will almost never find a statistically significant change in CV cost over such a fine range of number of trees.  It's rarely necessary to search finer than a scale of 20 or maybe 10 trees per grid point.
 
-# In[60]:
+# In[56]:
 
 rf_clf = RandomForestClassifier(n_estimators = 296, max_depth = 15, max_features = 32, n_jobs=-1, random_state = 32)
 rf_params = {'n_estimators': np.arange(350, 460, 10).tolist()}
@@ -588,7 +739,7 @@ rf_df.sort_values(['accuracy'])
 
 # Going from 296 trees to 400 is not too bad computationally, so we will update our hyperparameters.  Let us see if the optimal values of the other hyperparameters has changed with the jump in number of trees.
 
-# In[61]:
+# In[57]:
 
 rf_clf = RandomForestClassifier(n_estimators = 400, max_depth = 15, max_features = 32, n_jobs=-1, random_state = 32)
 rf_params = {'max_features': np.arange(27, 36, 1).tolist()}
@@ -597,7 +748,7 @@ rf_df.plot(x = ['max_features'], y = ['accuracy'])
 rf_df.sort_values(['accuracy'])
 
 
-# In[63]:
+# In[58]:
 
 rf_clf = RandomForestClassifier(n_estimators = 400, max_depth = 15, max_features = 32, n_jobs=-1, random_state = 32)
 rf_params = {'max_depth': np.arange(10, 21, 1).tolist()}
@@ -610,7 +761,7 @@ rf_df.sort_values(['accuracy'])
 # 
 # Let us recap. Random Search found a point with CV accuracy $0.939\pm 0.012$ in 4 mins and another 30+ minutes of grid searching found a nearby point with CV accuracy of $0.942\pm 0.012$. Therefore the improvement was only a fraction of the statistical error in the cost.  This is very typical and for many applications random search alone is fine for choosing good hyperparameters.  
 
-# In[64]:
+# In[59]:
 
 rf_clf = RandomForestClassifier(n_estimators = 400, max_depth = 15, max_features = 32, random_state = 32)
 
@@ -621,7 +772,7 @@ rf_clf = RandomForestClassifier(n_estimators = 400, max_depth = 15, max_features
 # 
 # It is convenient to borrow the plotting function from <http://scikit-learn.org/stable/auto_examples/model_selection/plot_learning_curve.html#sphx-glr-auto-examples-model-selection-plot-learning-curve-py>:
 
-# In[65]:
+# In[60]:
 
 from sklearn.model_selection import learning_curve
 
@@ -655,7 +806,7 @@ def plot_learning_curve(estimator, title, X, y, ylim=None, cv=None,
     return plt
 
 
-# In[66]:
+# In[61]:
 
 plot_learning_curve(rf_clf, "RF Learning curve", x_training, y_training, n_jobs=-1)
 
@@ -666,7 +817,7 @@ plot_learning_curve(rf_clf, "RF Learning curve", x_training, y_training, n_jobs=
 
 # Training the model is done by calling the fit method to the classifier, in this case on the full training set.
 
-# In[68]:
+# In[62]:
 
 rf_clf.fit(x_training, y_training)
 
@@ -675,14 +826,14 @@ rf_clf.fit(x_training, y_training)
 # 
 # Predictions are done by calling the predict method, now over the validation design matrix:
 
-# In[69]:
+# In[63]:
 
 y_rf_pred = rf_clf.predict(x_validation)
 
 
 # The validation accuracy is obtained by comparing with the true class values stored as y_validation:
 
-# In[70]:
+# In[64]:
 
 accuracy_score(y_validation, y_rf_pred)
 
@@ -695,7 +846,7 @@ accuracy_score(y_validation, y_rf_pred)
 # 
 # Since we already defined training_df and validation_df, it is easy to drop columns and build numpy arrays from them:
 
-# In[71]:
+# In[65]:
 
 x_training_dropzeros = training_df.drop(zero_cols, axis=1).values
 
@@ -706,7 +857,7 @@ x_validation_dropzeros = validation_df.drop(zero_cols, axis=1).values
 # 
 # To build the tuning set, we can first make a tune_df dataframe:
 
-# In[73]:
+# In[66]:
 
 tune_df = training_df.iloc[tune_idx]
 
@@ -715,32 +866,34 @@ x_tune_dropzeros = tune_df.drop(zero_cols, axis=1).values
 
 # We'll use random search to find appropriate hyperparameters:
 
-# In[74]:
+# In[67]:
 
 random_search(rf_clf, rf_param, 20, x_tune_dropzeros, y_tune)
 
 
 # We can apparently sample less features at the splits, since we have removed useless features.
 
-# In[75]:
+# In[68]:
 
 rf_clf_dropzeros = RandomForestClassifier(n_estimators = 347, max_depth = 16, max_features = 25, random_state = 32)
 
 
-# In[78]:
+# In[69]:
 
 rf_clf_dropzeros.fit(x_training_dropzeros, y_training)
 y_rf_dropzeros_pred = rf_clf_dropzeros.predict(x_validation_dropzeros)
 accuracy_score(y_validation, y_rf_dropzeros_pred)
 
 
-# This is almost a 2% increase in validation accuracy, which is also almost 2% relative increase from 0.965. Note that this was due to intelligent preprocessing of the data, rather than any tuning of the model.
+# This is almost a 2% increase in validation accuracy, which is also almost a 2% relative increase from 0.965. Note that this was due to intelligent preprocessing of the data, rather than any tuning of the model.
+# 
+# The reason that the accuracy goes up has to do with the random sampling of features in the Random Forest method.  When we include zero-variance features, we're preventing the model from sampling good features at each split.
 
 # #### Flatten Greyscale
 
 # Another modification of the data that we can examine is the removal of the information of relative pixel intensity.  We can recast our design matrices to boolean and then back to an integer:
 
-# In[79]:
+# In[70]:
 
 x_training_flat = x_training_dropzeros.astype(bool)*1
 
@@ -749,17 +902,21 @@ x_validation_flat = x_validation_dropzeros.astype(bool)*1
 x_tune_flat = x_tune_dropzeros.astype(bool)*1
 
 
-# In[80]:
+# Note that we're working with the data in which we have dropped the zero-variation columns, since it gave us the best validation accuracy.  
+# 
+# We search for good hyperparameters:
+
+# In[71]:
 
 random_search(rf_clf, rf_param, 20, x_tune_flat, y_tune)
 
 
-# In[81]:
+# In[72]:
 
 rf_clf_flat = RandomForestClassifier(n_estimators = 332, max_depth = 14, max_features = 35, random_state = 32)
 
 
-# In[82]:
+# In[73]:
 
 rf_clf_flat.fit(x_training_flat, y_training)
 y_rf_flat_pred = rf_clf_flat.predict(x_validation_flat)
@@ -768,7 +925,17 @@ accuracy_score(y_validation, y_rf_flat_pred)
 
 # As we might have expected, the pixel intensity has a small effect on the quality of predictions. However, it is amusing that the effect is very close to the 2% that we gained by removing the useless features.
 
-# In[ ]:
+# ## Conclusion
 
-
-
+# Hopefully this exercise has given you good ideas of how to plan and execute your own machine learning projects, whether you find a dataset on kaggle or have a work project ahead.  In general, you will need to apply additional tools to any new dataset, especially if it came from a real-world source and has missing values, misencodings, etc., i.e. is "messy."
+# But the approach described here covers many important aspects such as:
+# 
+# 1. Using pandas to load the data into python and begin exploratory data analysis tools, including matplotlib plots.
+# 
+# 2. Converting dataframes into appropriate design matrix and response vectors for use in standard scikit-learn machine learning tools.
+# 
+# 3. Choosing a validation scheme and using scikit-learn functions to define training and validation sets that allow you to test different models against one another.
+# 
+# 4. Using cross-validation, random search and grid search to determine near-optimal values for the hyperparameters of a machine learning model.
+# 
+# 5. Executing training and validation steps for different models, to try to find out how transformations of the data and choice of models affects the quality of predictions.
