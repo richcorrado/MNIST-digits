@@ -925,6 +925,39 @@ accuracy_score(y_validation, y_rf_flat_pred)
 
 # As we might have expected, the pixel intensity has a small effect on the quality of predictions. However, it is amusing that the effect is very close to the 2% that we gained by removing the useless features.
 
+# ## Examining the Model's Mistakes
+
+# An important part of the validation procedure is to examine what types of errors the model is making.  Insights into the problem might gives us ideas on how to improve the model or further process the data in order to correct some of the errors.  
+# 
+# Let us determine the examples in the validation set  where the drop zeros model predictions were wrong. These correspond to the elements of y_validation that are not equal to the same entry in y_rf_dropzeros_pred.  The numpy where function returns a list of indices that satisfy a condition, so the indices corresponding to the errors are
+
+# In[76]:
+
+error_idx = np.where(y_validation != y_rf_dropzeros_pred)[0]
+error_idx
+
+
+# We can adapt the code that we used to visualize the digits to visualize the digits where the model gave the wrong prediction.  We'll choose 16 indices at random from our error_idx array and plot the image, together with the prediction and the correct label:
+
+# In[78]:
+
+rand_idx = np.random.choice(error_idx, size=16, replace=False)
+fig, axs = plt.subplots(nrows=4, ncols=4, figsize=(10,10))
+
+i = 0
+for ax in axs.reshape(-1):
+    ax.set_title("Pred: %d, True: %d" % (y_rf_dropzeros_pred[rand_idx[i]], y_validation[rand_idx[i]]))
+    ax.imshow(x_validation[rand_idx[i]].reshape(28,28), cmap=plt.cm.gray, origin='upper', interpolation='nearest')
+    ax.axis('off')
+    i += 1
+plt.tight_layout()    
+plt.show()
+
+
+# Typically, we'll find some cases where the handwriting is poor or the digit has a wierd orientation, but many of these cases don't present a true challenge to a human.  
+# 
+# In future examination of the MNIST digits, we'll try to see if different models have different amounts of success at improving the types of errors that Random Forest is making.
+
 # ## Conclusion
 
 # Hopefully this exercise has given you good ideas of how to plan and execute your own machine learning projects, whether you find a dataset on kaggle or have a work project ahead.  In general, you will need to apply additional tools to any new dataset, especially if it came from a real-world source and has missing values, misencodings, etc., i.e. is "messy."
