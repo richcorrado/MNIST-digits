@@ -11769,12 +11769,23 @@ div#notebook {
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>An introduction to the MNIST digit database and the classification problem using Random Forests can be found in the notebook MNIST_Digits-overview.ipynb at <a href="https://github.com/richcorrado/MNIST-digits">https://github.com/richcorrado/MNIST-digits</a>. A readable html version is at <a href="https://richcorrado.github.io/MNIST_Digits-overview.html">https://richcorrado.github.io/MNIST_Digits-overview.html</a>.   Our results there, which we'll consider baseline results for the purposes of this notebook were:</p>
-<p><table align="left"></p>
-<p><tr><th>Model</th><th>Accuracy</th></tr></p>
-<p><tr><td>Random Forest</td><td>0.964</td></tr></p>
-<p><tr><td>Random Forest (drop zero padding)</td><td>0.983</td></tr>
-&lt;/table&gt;
-<br><br><br><br><br></p>
+<table>
+<thead><tr>
+<th>Model</th>
+<th>Accuracy</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Random Forest</td>
+<td>0.964</td>
+</tr>
+<tr>
+<td>Random Forest (drop zero padding)</td>
+<td>0.983</td>
+</tr>
+</tbody>
+</table>
 <p>In this notebook, we'll be using TensorFlow to apply neural networks to the MNIST digits. In particular, we'll learn:</p>
 <ol>
 <li><p>How to use scikit-learn to perform a one-hot encoding of ordinal class labels, suitable for "one vs all" multiclass classification.</p>
