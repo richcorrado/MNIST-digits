@@ -11769,23 +11769,12 @@ div#notebook {
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>An introduction to the MNIST digit database and the classification problem using Random Forests can be found in the notebook MNIST_Digits-overview.ipynb at <a href="https://github.com/richcorrado/MNIST-digits">https://github.com/richcorrado/MNIST-digits</a>. A readable html version is at <a href="https://richcorrado.github.io/MNIST_Digits-overview.html">https://richcorrado.github.io/MNIST_Digits-overview.html</a>.   Our results there, which we'll consider baseline results for the purposes of this notebook were:</p>
-<table>
-<thead><tr>
-<th>Model</th>
-<th>Accuracy</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Random Forest</td>
-<td>0.964</td>
-</tr>
-<tr>
-<td>Random Forest (drop zero padding)</td>
-<td>0.983</td>
-</tr>
-</tbody>
-</table>
+<p><table align="left"></p>
+<p><tr><th>Model</th><th>Accuracy</th></tr></p>
+<p><tr><td>Random Forest</td><td>0.964</td></tr></p>
+<p><tr><td>Random Forest (drop zero padding)</td><td>0.983</td></tr>
+&lt;/table&gt;
+<br><br><br><br><br></p>
 <p>In this notebook, we'll be using TensorFlow to apply neural networks to the MNIST digits. In particular, we'll learn:</p>
 <ol>
 <li><p>How to use scikit-learn to perform a one-hot encoding of ordinal class labels, suitable for "one vs all" multiclass classification.</p>
@@ -11800,6 +11789,7 @@ div#notebook {
 </li>
 </ol>
 <p>We're going to be using the same datasets (saved as csv in an "input" directory) and validation splits, so we'll steal the code from the overview notebook to set everything up. We'll also import the other libraries that were used in that notebook that we'll also be using here.  We will make an effort to import and explain new tools as we need them.</p>
+<p>N.B. This notebook should run in 8GB of RAM.  If you have less than that, you will probably have to adjust the code for the convolutional neural network to compute even less features.</p>
 
 </div>
 </div>
@@ -12384,6 +12374,16 @@ $$ x_\text{scaled} = \frac{ x }{ \text{max}( |x_\text{min}|,|x_\text{max}|)} $$<
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
+<p>N.B. The MNIST data is actually standardized to the interval [0,255].  However, a general real-world dataset that you encounter will not be, so we made sure to cover the best practice in this notebook.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="TensorFlow">TensorFlow<a class="anchor-link" href="#TensorFlow">&#182;</a></h2>
 </div>
 </div>
@@ -12508,7 +12508,7 @@ $$ x_\text{scaled} = \frac{ x }{ \text{max}( |x_\text{min}|,|x_\text{max}|)} $$<
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Next, we have to specifying the weights for the (first) hidden layer. This is a tensor of dimension [n_feat, width], where width is the number of nodes in the hidden layer.</p>
+<p>Next, we have to specify the weights for the (first) hidden layer. This is a tensor of dimension [n_feat, width], where width is the number of nodes in the hidden layer.</p>
 <p>It's a good idea to setup some functions to initialize our weights to random values. In fact, we'll just import these from the tutuorial linked above, since they do exactly what we need.</p>
 
 </div>
@@ -12779,7 +12779,7 @@ $$ x_\text{scaled} = \frac{ x }{ \text{max}( |x_\text{min}|,|x_\text{max}|)} $$<
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>We're choosing a learning rate that is smaller than in the tutorial since we have scaled our features, so our weights will take smaller values than in the tutorial computation.</p>
+<p>We're choosing a learning rate that is smaller than in the tutorial since we have scaled our features, so our weights will tend to take smaller values than in the tutorial computation.</p>
 
 </div>
 </div>
@@ -12876,7 +12876,12 @@ $$ x_\text{scaled} = \frac{ x }{ \text{max}( |x_\text{min}|,|x_\text{max}|)} $$<
 <div class="prompt input_prompt">In&nbsp;[36]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">n_epoch</span> <span class="o">=</span> <span class="mi">50</span>
+<div class=" highlight hl-ipython2"><pre><span></span><span class="c1"># Number of epochs is approximately the number of times that we have passed the complete data set through </span>
+<span class="c1"># the training cycle. Because we are randomizing the batches, we can&#39;t guarantee that all data is sampled </span>
+<span class="c1"># during a single epoch.</span>
+<span class="n">n_epoch</span> <span class="o">=</span> <span class="mi">50</span>
+<span class="c1"># Adequacy of the value of n_epoch should be evaluated by computing appropriate metrics at checkpoints, so that </span>
+<span class="c1"># it will be apparent if more training cycles are required, or if the last training cycles were unecessary.</span>
 <span class="n">display_step</span> <span class="o">=</span> <span class="mi">5</span>
 
 <span class="c1"># initialize variables</span>
@@ -12884,6 +12889,7 @@ $$ x_\text{scaled} = \frac{ x }{ \text{max}( |x_\text{min}|,|x_\text{max}|)} $$<
 
 <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
 <span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_epoch</span><span class="p">):</span>
+    <span class="c1"># init average cost </span>
     <span class="n">avg_cost</span> <span class="o">=</span> <span class="mf">0.</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">total_batch</span><span class="p">):</span>
         <span class="c1"># make stratified minibatch split</span>
@@ -13295,7 +13301,7 @@ out_channels is the number of features for the layer to output. <BR></p>
 flattens the filter into a tensor W of shape [filter_height $*$ filter_width $*$ in_channels, output_channels].<BR> 
 computes the matrix product  X.W, which is a tensor of shape [batch, out_height, out_width, output_channels].</p>
 <p>We specify the filter by defining a weight tensor of the appropriate shape.  For a 5x5 window, the weights will have shape [5, 5, 1, n_features_out], where n_features_out is the number of features we want the CNN layer to compute. We will compute 8 features in this first layer, due to memory constraints.</p>
-<p>We also have to decide the stride for the layer,  which is the amount we shift the window between samplings.  If we just shift the window by one pixel in either direction for samplings, the stride tensor should be [1, 1, 1, 1].</p>
+<p>We also have to decide the stride for the layer,  which is the amount we shift the window between samplings. We specify the stride using a vector containing the information [batch, horizontal_stride, vertical_stride, in_channels]. Stride is constrained to sample one batch input and one input channel at a time, so the stride vector must be given in the form [1, horizontal_stride, vertical_stride, 1]. If we just shift the window by one pixel in either direction for samplings, the stride tensor should be [1, 1, 1, 1].</p>
 <p>Finally, if we were to just sample 5x5  windows on a 28x28 pixel image, the output would be a 24x24 image. Further CNN and pooling layers would shrink this down even further to the point where we can't apply CNN anymore.  The solution to this is to pad the image with blank pixels in the output to, in our case, keep the output as a 28x28 image, no matter what other transformation we apply to it.  The layers take an argument to specify the type of padding, if any, that we want to apply.</p>
 <p>Putting all of this together, the layer we want is specified by:</p>
 
@@ -13573,16 +13579,6 @@ computes the matrix product  X.W, which is a tensor of shape [batch, out_height,
 </div>
 
 </div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>Because of the randomization, we need to make at least total_batch passes through the data to see all of the data in the tuning set.  We'll make n_epoch additional passes through the training. Using some code from <a href="https://github.com/aymericdamien/TensorFlow-Examples/blob/master/examples/3_NeuralNetworks/multilayer_perceptron.py">aymericdamien</a> and <a href="https://github.com/sjchoi86/tensorflow-101/blob/master/notebooks/mlp_mnist_simple.ipynb">sjchoi86</a>, we have a training cycle:</p>
-
-</div>
-</div>
-</div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 <div class="prompt input_prompt">In&nbsp;[54]:</div>
@@ -13675,7 +13671,7 @@ VALIDATION ACCURACY: 0.989
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>At 99% accuracy, this is our best model so far.  Some incremental gains can be made by increasing the number of features computed in the CNN layers and the fully connected layer.  On my particular hardware, running on CPU along, I run into memory issues if I try to make the model capacity any larger.</p>
+<p>At 99% accuracy, this is our best model so far.  Some incremental gains can be made by increasing the number of features computed in the CNN layers and the fully connected layer.  On my particular hardware, running on CPU alone (i.e., no GPU processing), I run into memory issues if I try to make the model capacity any larger.</p>
 
 </div>
 </div>
@@ -14468,7 +14464,7 @@ AKBAwwwAAAAF/z/U/pYHVykk1gAAAABJRU5ErkJggg==
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>It is likely that several of these would be challenging for a human to identify with 100% accuracy, while others are quite obvious.   In some cases, it is easy to see what features (that the neural network probably used to decide that the image more closely resembled a different digit than the true one.</p>
+<p>It is likely that several of these would be challenging for a human to identify with 100% accuracy, while others are quite obvious.   In some cases, it is easy to see what features that the neural network probably used to decide that the image more closely resembled a different digit than the true one.</p>
 <p>For instance, for the following digit image, the CNN predicted "9" vs the true value of 4.</p>
 
 </div>
