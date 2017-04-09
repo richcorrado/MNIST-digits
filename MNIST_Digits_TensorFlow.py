@@ -3,15 +3,11 @@
 
 # # MNIST Digit Classification with TensorFlow
 
-# Richard Corrado <richcorrado@gmail.com> March 2017
+# Richard Corrado <richcorrado@gmail.com> April 2017
+# 
+# For the Fat Cat Fab Lab Machine Learning Meetup
 
-# An introduction to the MNIST digit database and the classification problem using Random Forests can be found in the notebook MNIST_Digits-overview.ipynb at <https://github.com/richcorrado/MNIST-digits>. A readable html version is at <https://richcorrado.github.io/MNIST_Digits-overview.html>.   Our results there, which we'll consider baseline results for the purposes of this notebook were:
-# <table align="left">
-# <tr><th>Model</th><th>Accuracy</th></tr>
-# <tr><td>Random Forest</td><td>0.964</td></tr>
-# <tr><td>Random Forest (drop zero padding)</td><td>0.983</td></tr>
-# </table>
-# <br><br><br><br><br>
+# An introduction to the MNIST digit database and the classification problem using Random Forests can be found in the notebook MNIST_Digits-overview.ipynb at <https://github.com/richcorrado/MNIST-digits>. A readable html version is at <https://richcorrado.github.io/MNIST_Digits-overview.html>.   
 # 
 # In this notebook, we'll be using TensorFlow to apply neural networks to the MNIST digits. In particular, we'll learn:
 # 
@@ -25,7 +21,17 @@
 # 
 # 5. How to run the TensorFlow session to train the model, compute metrics and make predictions.
 # 
-# We're going to be using the same datasets (saved as csv in an "input" directory) and validation splits, so we'll steal the code from the overview notebook to set everything up. We'll also import the other libraries that were used in that notebook that we'll also be using here.  We will make an effort to import and explain new tools as we need them.
+# Along the way, we'll 
+# 
+# * Implement Logistic Regression in TensorFlow.
+# 
+# * Understand Feedforward Neural Networks as generalization of Linear Models and how to use them for classification.
+# 
+# * Understand dropout regularization of NNs.
+# 
+# * Understand the basics of Convolutional and Max Pooling NN layers and why they're useful. 
+# 
+# * Examine the examples that have been misclassified and explore some reasons for that.
 # 
 # N.B. This notebook should run in 8GB of RAM.  If you have less than that, you will probably have to adjust the code for the convolutional neural network to compute even less features.
 
@@ -48,93 +54,156 @@ from time import time
 import scipy
 
 
-# Load dataset.  Again, we'll only be using the kaggle train dataset in this notebook.
+# In the overview notebook, we used the data from the kaggle playground site.  In this notebook, we will use the full MNIST data from the csvs at https://pjreddie.com/projects/mnist-in-csv/. These files can be obtained there or as `mnist_train.csv` and `mnist_test.csv` from the input subdirectory of the github containing this file. These files do not have a header row, so we create column names.
 
 # In[2]:
 
-train_df = pd.read_csv("./input/train.csv")
-test_df = pd.read_csv("./input/test.csv")
+column_names = ['label']
+
+for i in range(0,784):
+    column_names.append("pixel" + str(i))
+    
+train_df = pd.read_csv("./input/mnist_train.csv", header=None, names=column_names)
+test_df = pd.read_csv("./input/mnist_test.csv", header=None, names=column_names)
 
 
-# The data consist of handwritten digits that have been processed by recording the greyscale intensity of a 28x28 array of pixels. These pixel intensity matrices have been unrolled into a vector of 784 features.  Details are in the overview notebook.  Here we reproduce the code to select 16 random images from the training data and display them:
+# There are a few reasons for changing the dataset.  One, the overview notebook was designed to give more of an overview of machine learning practices.  It made sense to introduce the reader to kaggle as another tool for learning.  However, in this notebook, we're going to be studying some neural networks, which typically benefit from  increasing the number of training examples.  So it is better to study the complete MNIST training data and test against the benchmark test set instead of creating a separate validation set and decreasing the training set further. 
+# 
+# N.B. The reader is encouraged to create a separate training/validation set from the official train set for, e.g. optimizing hyperparameters.  On a fast computer, it might be better to use cross-validation over the official train set for this.
+# 
+# The data consist of handwritten digits that have been processed by recording the greyscale intensity of a 28x28 array of pixels. These pixel intensity matrices have been unrolled into a vector of 784 features.  Details are in the overview notebook.  Here we provide a function to reshape the pixel vector into a 28x28 matrix and another function to plot the digits corresponding to a specified list of row indices.
 
 # In[3]:
 
 # recover the 28x28 matrix from a row of train_df
-def pixel_mat(row):
+def pixel_mat(row, df=train_df):
     # we're working with train_df so we want to drop the label column
-    vec = train_df.drop('label', axis=1).iloc[row].values
+    vec = df.drop('label', axis=1).iloc[row].values
     # numpy provides the reshape() function to reorganize arrays into specified shapes
     pixel_mat = vec.reshape(28,28)
     return pixel_mat
 
-# generate a list of 16 random rows which are our digits
-rand_idx = np.random.choice(train_df.index, size=16, replace=False)
-# generate a 4x4 grid of subplots
-fig, axs = plt.subplots(nrows=4, ncols=4, figsize=(10,10))
 
-# define counter over rand_idx list elements
-i = 0
-# axs is a 4x4 array so we flatten it into a vector in order to loop over it
-for ax in axs.reshape(-1):
-    # Title is digit label, which can be found by referencing the label column of the row specified by rand_idx[i]
-    ax.set_title("Digit Label: %d" % train_df['label'].iloc[rand_idx[i]])
-    # pixel_mat(rand_idx[i]) is the pixel matrix. 
-    # The imshow flags are the ones that are used in the matshow wrapper
-    ax.imshow(pixel_mat(rand_idx[i]), cmap=plt.cm.gray, origin='upper', interpolation='nearest')
-    ax.axis('off')
-    i += 1
-# tight_layout gives more spacing between subplots    
-plt.tight_layout()   
-# Tell matplotlib to draw all of the previously generated objects
-plt.show()
+def plot_digits(list_input, df=train_df):
+    # generate a 4xn grid of subplots, 4 is the number of columns that will reasonably display in typical
+    # overhead projector resolution at the size we're making the images 
+    list_len = len(list_input)
+    ncols = 4
+    nrows =  (list_len / 4) + (1 * (list_len % 4 != 0)) # add an extra row if list_len !div by 4
+    fig, axs = plt.subplots(nrows=nrows, ncols=ncols, figsize=(10,10))
 
 
-# In the overview, we noted that many features correspond to zero padding, i.e., these pixels are always blank over either the training or test datasets.  These are the list of zero variation features.  We probably won't use them in this notebook, but they are included so that you can utilize them in your own explorations.
+    # axs is a 2d array so we flatten it into a vector in order to loop over it
+    for i, ax in enumerate(axs.reshape(-1)):
+        if i < list_len:   # don't generate ax titles for unused subplots
+            # Title is digit label, which can be found by referencing the label column of the row specified by rand_idx[i]
+            ax.set_title("Digit Label: %d" % df['label'].iloc[list_input[i]])
+            # pixel_mat(rand_idx[i]) is the pixel matrix. 
+            # The imshow flags are the ones that are used in the matshow wrapper
+            ax.imshow(pixel_mat(list_input[i], df=df), cmap=plt.cm.gray, origin='upper', interpolation='nearest')
+            ax.axis('off')
+    # tight_layout gives more spacing between subplots    
+    plt.tight_layout()   
+    # Tell matplotlib to draw all of the previously generated objects
+    plt.show()
+
 
 # In[4]:
 
-zero_cols = list(set(train_df.columns[(train_df == 0).all()].tolist() + test_df.columns[(test_df == 0).all()].tolist()))
-len(zero_cols)
+# generate a list of 16 random rows which are our digits
+rand_idx = np.random.choice(train_df.index, size=16, replace=False)
+plot_digits(rand_idx)
 
 
-# We generate the same (using random seeds) training, validation and tuning sets as in the overview notebook.
+# We generate design matrics and response vectors directly from the dataframes
 
 # In[5]:
 
-y_train = train_df['label'].values
 x_train = train_df.drop(['label'], axis=1).values
+print(x_train.shape)
+y_train = train_df['label'].values
+print(y_train.shape)
 
+x_test = test_df.drop(['label'], axis=1).values
+print(x_test.shape)
+y_test = test_df['label'].values
+print(y_test.shape)
+
+
+# ## Random Forest Benchmarks
+# 
+# In the overview notebook, we applied random forests in scikit-learn to the digit classification problem.  Here we will reproduce those results on the larger dataset in order to establish a baseline for the neural network models we'll study shortly.
 
 # In[6]:
 
-validation_split = StratifiedShuffleSplit(n_splits=1, test_size=0.25, random_state=46)
+from sklearn.ensemble import RandomForestClassifier
+rf_clf = RandomForestClassifier(n_jobs=-1, random_state = 32)
 
-training_idx, validation_idx = list(validation_split.split(x_train, y_train))[0]
 
-training_df = train_df.iloc[training_idx]
-validation_df = train_df.iloc[validation_idx]
-
-x_training = training_df.drop(['label'], axis=1).values
-y_training = training_df['label'].values
-
-x_validation = validation_df.drop(['label'], axis=1).values
-y_validation = validation_df['label'].values
-
+# We will determine appropriate hyperparameters using 10-fold cross-validation using the StratifiedKFold function that preserves class frequencies in the splits.
 
 # In[7]:
 
-tuning_split = StratifiedShuffleSplit(n_splits=1, train_size=0.15, random_state=96)
+kfold = StratifiedKFold(n_splits=10, random_state=7)
 
-tune_idx = list(tuning_split.split(x_training, y_training))[0][0]
 
-x_tune = x_training[tune_idx]
-y_tune = y_training[tune_idx]
+# Furthermore, we will use a random search scheme, since, in the overview notebook, that gave excellent results in much less time than grid search. We will use a similar parameter distribution
 
+# In[8]:
+
+rf_param =  {'n_estimators': scipy.stats.randint(150,400), 'max_depth': scipy.stats.randint(12,28), 
+             'max_features': scipy.stats.randint(15,40)}
+
+from sklearn.model_selection import RandomizedSearchCV
+rs = RandomizedSearchCV(rf_clf, param_distributions=rf_param, scoring = 'accuracy',
+                                   n_jobs=-1, n_iter=30, cv=kfold) 
+
+
+# Twenty iterations of cross-validation over the entire dataset would take a huge amount of time, so we will create a 10% split into a tuning set, using StratifiedShuffleSplit to preserve class frequencies.   This is a crutch that one must often rely when dealing with larger datasets.  We hope that an optimal set of parameters for a sample of our dataset is close to the optimal set of parameters for the entire dataset.   
+
+# In[9]:
+
+tuning_split = StratifiedShuffleSplit(n_splits=1, train_size=0.10, random_state=96)
+tune_idx = list(tuning_split.split(x_train, y_train))[0][0]
+
+x_tune = x_train[tune_idx]
+y_tune = y_train[tune_idx]
+
+
+# In[10]:
+
+get_ipython().magic(u'time rs.fit(x_tune, y_tune)')
+
+
+# This finds a best candidate in around 4 minutes.   Random search over the entire dataset would take around an hour.
+# 
+# We can return the best estimator :
+
+# In[11]:
+
+rf_clf_rs = rs.best_estimator_ 
+rf_clf_rs
+
+
+# Then fit the full training data and predict on the test set:
+
+# In[12]:
+
+rf_clf_rs.fit(x_train, y_train)
+y_rf_pred = rf_clf_rs.predict(x_test)
+
+
+# In[13]:
+
+from sklearn.metrics import accuracy_score
+accuracy_score(y_test, y_rf_pred)
+
+
+# This is on par with the result in the overview notebook.  The extra 0.5% of accuracy can be explained by the increase in the size of the training data (see the learning curve computed in that notebook). 
 
 # ## One-hot Encoding of the Class Labels
 
-# In this dataset, the class labels are encoded as integers 0-9.  This posed no difficulty, as many scikit-learn classification models are designed to properly treat the multiclass problem using this type of encoding.  However, TensorFlow (TF) is designed to allow very low-level design of models. Therefore, it is necessary to provide the framework to treat multiclass classification as part of the TF computation graph.   
+# In this dataset, the class labels are encoded as integers 0-9.  This posed no difficulty in our random forest benchmark, as many scikit-learn classification models are designed to properly treat the multiclass problem using this type of encoding.  However, TensorFlow (TF) is designed to allow very low-level design of models. Therefore, it is necessary to provide the framework to treat multiclass classification as part of the TF computation graph.   
 # 
 # In preparation for this, we will encode the class labels as 10d vectors rather than as integers,
 # 
@@ -148,31 +217,31 @@ y_tune = y_training[tune_idx]
 # 
 # To accomplish this encoding easily, we can use the OneHotEncoder or LabelBinarizer from scikit-learn. Since we are dealing with class labels, we will use LabelBinarizer.  This uses the fit, then predict/transform, methods common to the scikit-learn functions.
 
-# In[8]:
+# In[14]:
 
 from sklearn.preprocessing import LabelBinarizer
 
 
-# In[9]:
+# In[15]:
 
 lb = LabelBinarizer()
 
 
-# In[10]:
+# In[16]:
 
 lb.fit(y_train)
 
 
 # We can see explictly how the labels are transformed by applying the transformation to:
 
-# In[11]:
+# In[17]:
 
 range(10)
 
 
 # whose elements are mapped to 
 
-# In[12]:
+# In[18]:
 
 lb.transform(range(10))
 
@@ -181,12 +250,10 @@ lb.transform(range(10))
 # 
 # We apply the transformation to all of our response vectors:
 
-# In[13]:
+# In[19]:
 
 y_train_oh = lb.transform(y_train)
-y_training_oh = lb.transform(y_training)
-y_validation_oh = lb.transform(y_validation)
-y_tune_oh = lb.transform(y_tune)
+y_test_oh = lb.transform(y_test)
 
 
 # ## Standardizing the Data
@@ -229,52 +296,43 @@ y_tune_oh = lb.transform(y_tune)
 # 
 # The MNIST data is relatively sparse, since 80% of the pixels are blank, so it is a good idea to use a rescaling that preserves the sparseness.  Since the pixel intensities are always nonnegative, it really doesn't matter whether we use MinMaxScaler or MaxAbsScaler, but we'll use MaxAbsScaler to emphasize that it preserves sparsity in the general case.
 
-# In[14]:
+# In[20]:
 
 from sklearn.preprocessing import MaxAbsScaler
 
 
 # The proper way to use these scaling functions is to fit them on just the training data, then separately transform the training and validation sets.  This is so that we don't introduce any bias in the training data by using properties of our validation data.  First we assign an object to the function,
 
-# In[15]:
+# In[21]:
 
 training_scaler = MaxAbsScaler()
 
 
 # We fit this to x_training,
 
-# In[16]:
+# In[22]:
 
-training_scaler.fit(x_training)
+training_scaler.fit(x_train)
 
 
 # Then transform the associated data sets.
 
-# In[17]:
+# In[23]:
 
-x_training_scaled = training_scaler.transform(x_training)
-x_validation_scaled = training_scaler.transform(x_validation)
+x_train_scaled = training_scaler.transform(x_train)
+x_test_scaled = training_scaler.transform(x_test)
 
 
 # We can compare the nonzero values of the scaled data to the unscaled data to see how this worked:
 
-# In[18]:
+# In[24]:
 
-x_training_scaled[np.where(x_training_scaled != 0)]
-
-
-# In[19]:
-
-x_training[np.where(x_training != 0)]
+x_train_scaled[np.where(x_train_scaled != 0)]
 
 
-# The scaling functions also provide a fit_transform method to train on and then transform the training data in one step. We can apply this to our tuning data, since that doesn't have an associated validation set.
+# In[25]:
 
-# In[20]:
-
-tuning_scaler = MaxAbsScaler()
-
-x_tune_scaled = tuning_scaler.fit_transform(x_tune)
+x_train[np.where(x_train != 0)]
 
 
 # N.B. The MNIST data is actually standardized to the interval [0,255].  However, a general real-world dataset that you encounter will not be, so we made sure to cover the best practice in this notebook.
@@ -309,6 +367,10 @@ x_tune_scaled = tuning_scaler.fit_transform(x_tune)
 # 
 # 7. Prediction is also accomplished via sess.run, now using the new data and specifying the output variable or an appropriate function thereof.
 # 
+# A visualization of a training session is:
+# 
+# ![TF training session](tf_session.png)
+# 
 # A complication of the TF methodology is that during design of the computational graph, it is not too easy to remove or redefine parts of the graph that we've already defined. If we want to change an earlier step of the graph, it can be simplest to just delete the old graph with the command tf.reset_default_graph() and start over.
 
 # ## Logistic Regression
@@ -319,7 +381,7 @@ x_tune_scaled = tuning_scaler.fit_transform(x_tune)
 # 
 # We will begin by importing TensorFlow and starting an interactive session.
 
-# In[21]:
+# In[26]:
 
 import tensorflow as tf
 sess = tf.InteractiveSession()
@@ -329,7 +391,7 @@ sess = tf.InteractiveSession()
 # 
 # We know that we have 784 features/columns in our design matrix.  However, we have training and validation sets with different number of examples/rows.  TF allows us to introduce placeholder variables with size None to facilitate feeding data sets of different sizes into the same computational graph:
 
-# In[22]:
+# In[27]:
 
 n_feat = 784
 x = tf.placeholder(tf.float32, shape=[None, n_feat])
@@ -337,7 +399,7 @@ x = tf.placeholder(tf.float32, shape=[None, n_feat])
 
 # We'll also specify a placeholder for our target output values. We transformed these to one-hot 10d vectors.
 
-# In[23]:
+# In[28]:
 
 n_class = 10
 y_true = tf.placeholder(tf.int32, shape=[None, n_class])
@@ -355,7 +417,7 @@ y_true = tf.placeholder(tf.int32, shape=[None, n_class])
 # 
 # To implement this in TF, we specify a layer to compute the linear model above.  We have to specify the weights $\mathbf{W}$, which correspond to a tensor of shape [n_feat, n_class] and the biases, which are a vector of shape [n_class].  We use the Variable() class to define both with zero initial values:
 
-# In[24]:
+# In[29]:
 
 W = tf.Variable(tf.zeros([n_feat, n_class]))
 b = tf.Variable(tf.zeros([n_class]))
@@ -365,21 +427,21 @@ b = tf.Variable(tf.zeros([n_class]))
 # 
 # To complete the definition of the layer, we specify the linear model for the logits:
 
-# In[25]:
+# In[30]:
 
 z_out = tf.add(tf.matmul(x, W), b)
 
 
 # We use the TF function matmul to multiply Tensors and add to add them.  We could also have used "+", since TF overloads that operator to properly handle Tensor objects.  The object z_out defined by this statement is created as a Tensor and cast into the shape and data type appropriate from the operation:
 
-# In[26]:
+# In[31]:
 
 z_out
 
 
 # We can call this layer, the **output layer**, since it returns an array that is in 1-1 correspondence with the model prediction. At this point, we could apply the softmax function to obtain the class probabilities and then define a **cost function** using the cross-entropy.  However, since this is a very common step, TF includes a version of the cross-entropy function that accepts the logits as inputs:
 
-# In[27]:
+# In[32]:
 
 cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels=y_true, logits=z_out))
 
@@ -390,7 +452,7 @@ cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels=y_true, log
 # 
 # which can be considered as a 1d tensor of shape [# of examples]. We can verify this explicitly by calling:
 
-# In[28]:
+# In[33]:
 
 tf.nn.softmax_cross_entropy_with_logits(labels=y_true, logits=z_out)
 
@@ -399,7 +461,7 @@ tf.nn.softmax_cross_entropy_with_logits(labels=y_true, logits=z_out)
 # 
 # In addition to the cost function, we can define appropriate **metrics** to be computed when we run the TF session. In this case, we can compute the accuracy score by the two step expression:
 
-# In[29]:
+# In[34]:
 
 corr = tf.equal(tf.argmax(z_out, 1), tf.argmax(y_true, 1))    
 accr = tf.reduce_mean(tf.cast(corr, "float"))
@@ -411,9 +473,9 @@ accr = tf.reduce_mean(tf.cast(corr, "float"))
 # 
 # Next, we have to specify an **optimizer** operation, which we'll choose to be a simple gradient descent.
 
-# In[30]:
+# In[35]:
 
-learning_rate = 0.002
+learning_rate = 0.001
 optimizer = tf.train.GradientDescentOptimizer(learning_rate).minimize(cost)
 
 
@@ -431,41 +493,41 @@ optimizer = tf.train.GradientDescentOptimizer(learning_rate).minimize(cost)
 # 
 # To get a handle on this, let's look at the size of our training set:
 
-# In[31]:
+# In[36]:
 
-n_samp = x_training_scaled.shape[0]
+n_samp = x_train_scaled.shape[0]
 n_samp
 
 
 # With a minibatch size of 100, we can compute the number of minibatches to cycle over in an epoch:
 
-# In[32]:
+# In[37]:
 
 n_batch = 100.
 total_batch = int(n_samp / n_batch)
 total_batch
 
 
-# We want to construct a scheme where we split the training data into 315 unique minibatches, so that we see every training example exactly once in a minimum number of passes.  We expect that the scheme will work best if the minibatches are both randomized and have approximately the same distribution of classes as the training set itself.  We can accomplish this using StratifiedKFold, where we use the "test" partition in each fold as the minibatch. 
+# We want to construct a scheme where we split the training data into 600 unique minibatches, so that we see every training example exactly once in a minimum number of passes.  We expect that the scheme will work best if the minibatches are both randomized and have approximately the same distribution of classes as the training set itself.  We can accomplish this using StratifiedKFold, where we use the "test" partition in each fold as the minibatch. 
 # 
 # An appropriate implementation is:
 
-# In[33]:
+# In[38]:
 
 skfold = StratifiedKFold(n_splits=total_batch, shuffle=True, random_state=428)
 
 
 # We are finally ready to define the full training scheme:
 
-# In[34]:
+# In[39]:
 
 # Number of epochs to train over. Should be large enough for convergence.  If it is too large, at worst the model
 # might overfit, at best we waste computing time.
-n_epoch = 200
+n_epoch = 500
 
 # In order to monitor training progress, as well as tune n_epoch, we will computing appropriate 
 # metrics at checkpoints
-display_step = 20
+display_step = 50
 
 # initialize variables
 sess.run(tf.global_variables_initializer())
@@ -482,10 +544,10 @@ for epoch in range(n_epoch):
     # One loop over the folds is a single epoch.
     # Note also that we use the ordinal class labels in y_training because StratifiedKFold wouldn't work with the
     # one-hot encoding
-    for fold, (dummy_idx, batch_idx) in enumerate(skfold.split(x_training_scaled, y_training)):
+    for fold, (dummy_idx, batch_idx) in enumerate(skfold.split(x_train_scaled, y_train)):
         # extract design matrix and response array for minibatch
         # here we can use the one-hot response array
-        x_batch, y_batch = x_training_scaled[batch_idx], y_training_oh[batch_idx]
+        x_batch, y_batch = x_train_scaled[batch_idx], y_train_oh[batch_idx]
         # run backprop and feedforward
         # we assign the cost per example to c
         # Note the feed_dict contains the minibatch data
@@ -496,27 +558,27 @@ for epoch in range(n_epoch):
     # Display logs per epoch step
     if epoch % display_step == 0:
         # return epoch and average cost
-        print("Epoch: %04d" % epoch, "cost = %04f" % avg_cost)
+        print("Epoch: %.4d" % epoch, "cost = %.4f" % avg_cost, "time = %.2f" % (time() - start))
         # compute accuracy on full training set
-        train_acc = sess.run(accr, feed_dict={x: x_training_scaled, y_true: y_training_oh})
+        train_acc = sess.run(accr, feed_dict={x: x_train_scaled, y_true: y_train_oh})
         print ("TRAIN ACCURACY: %.3f" % (train_acc))
         # compute accuracy on full validation set
-        test_acc = sess.run(accr, feed_dict={x: x_validation_scaled, y_true: y_validation_oh})
-        print ("VALIDATION ACCURACY: %.3f" % (test_acc))
+        test_acc = sess.run(accr, feed_dict={x: x_test_scaled, y_true: y_test_oh})
+        print ("TEST ACCURACY: %.3f" % (test_acc))
 
 # After the full training cycle, return more logs
-train_acc = sess.run(accr, feed_dict={x: x_training_scaled, y_true: y_training_oh})      
-test_acc = sess.run(accr, feed_dict={x: x_validation_scaled, y_true: y_validation_oh})
+train_acc = sess.run(accr, feed_dict={x: x_train_scaled, y_true: y_train_oh})      
+test_acc = sess.run(accr, feed_dict={x: x_test_scaled, y_true: y_test_oh})
 print("Optimization finished in %.2f seconds!" % (time() - start)) 
 print ("TRAIN ACCURACY: %.3f" % (train_acc))
-print ("VALIDATION ACCURACY: %.3f" % (test_acc))   
+print ("TEST ACCURACY: %.3f" % (test_acc))   
 
 
-# It is possible that we would get slightly more accuracy by increasing the training epochs.  However, at 91% accuracy, we are far behind our Random Forest results, so it's clear that no amount of extra training is going to make logistic regression competitive.  For that we will move on to neural networks in the next section.
+# It appears that we would get slightly more accuracy by increasing the training epochs.  However, at 91.9% accuracy, we are far behind our Random Forest result of 97%, so it's clear that no amount of extra training is going to make logistic regression competitive.  For that we will move on to neural networks in the next section.
 # 
 # Before moving on, we close the TF session.
 
-# In[35]:
+# In[40]:
 
 sess.close()
 
@@ -592,7 +654,7 @@ sess.close()
 # 
 # Let us build this single hidden layer neural network in TensorFlow, We will start by clearing the previous graph and starting a new interactive session.
 
-# In[36]:
+# In[41]:
 
 tf.reset_default_graph()
 sess = tf.InteractiveSession()
@@ -600,7 +662,7 @@ sess = tf.InteractiveSession()
 
 # Our input and output are defined exactly as before:
 
-# In[37]:
+# In[42]:
 
 n_feat = 784
 x = tf.placeholder(tf.float32, shape=[None, n_feat])
@@ -615,7 +677,7 @@ y_true = tf.placeholder(tf.int32, shape=[None, n_class])
 # 
 # In fact, we'll just import these from the tutuorial we linked to earlier, since they do exactly what we need.
 
-# In[38]:
+# In[43]:
 
 def weight_variable(shape):
   initial = tf.truncated_normal(shape, stddev=0.1)
@@ -630,7 +692,7 @@ def bias_variable(shape):
 # 
 # We will start with a hidden layer with 1024 nodes, fully connected to the input layer:
 
-# In[39]:
+# In[44]:
 
 width1 = 1024
 W_1 = weight_variable([n_feat, width1])
@@ -638,14 +700,14 @@ W_1 = weight_variable([n_feat, width1])
 
 # Similarly, we want to define a bias for each node.  
 
-# In[40]:
+# In[45]:
 
 b_1 = bias_variable([width1])
 
 
 # At the nodes, we'll apply ReLU, via:
 
-# In[41]:
+# In[46]:
 
 h_1 = tf.nn.relu(tf.add(tf.matmul(x, W_1), b_1))
 
@@ -654,7 +716,7 @@ h_1 = tf.nn.relu(tf.add(tf.matmul(x, W_1), b_1))
 # 
 # Next, we'll introduce a dropout application as a regularization of the model.  As in the tutorial, we'll introduce a placeholder for the probability to keep the output during dropout.  This way we can use dropout during training, but turn it off easily when we run our predictions on the validation set.
 
-# In[42]:
+# In[47]:
 
 keep_prob = tf.placeholder(tf.float32)
 h_1_drop = tf.nn.dropout(h_1, keep_prob)
@@ -662,7 +724,7 @@ h_1_drop = tf.nn.dropout(h_1, keep_prob)
 
 # Finally, the output layer will produce a vector for our 10 possible digit classes.  We introduce more weights and biases, now with the size [width1, n_class]:
 
-# In[43]:
+# In[48]:
 
 W_out = weight_variable([width1, n_class])
 b_out = bias_variable([n_class])
@@ -672,7 +734,7 @@ z_out = tf.add(tf.matmul(h_1_drop, W_out), b_out)
 
 # Once again, we don't apply any activation function at the output layer (this is "linear activation").  We'll use the same TF function to compute the cross-entropy directly from the logits. If we need to later, we can apply argmax  to get the most probable label, or the softmax function to obtain the probabilities for all of the classes.  We will also use the same accuracy score metric as in the logistic regression example.
 
-# In[44]:
+# In[49]:
 
 cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels=y_true, logits=z_out))
 corr = tf.equal(tf.argmax(z_out, 1), tf.argmax(y_true, 1))    
@@ -681,23 +743,23 @@ accr = tf.reduce_mean(tf.cast(corr, "float"))
 
 # Next, we have to define an optimizer. In this case, we should note that the GradientDescentOptimizer that we used before took a long time to converge, and we might not have even trained long enough for it to completely converge.  Therefore, we'll choose to use the AdamOptimizer this time.  Adam is a form of gradient descent that uses several techniques to adapt the updates based on the rates at which the cost function and it's derivatives are changing.  It is expected to have faster convergence at the cost of additional computational overhead for each step. 
 
-# In[45]:
+# In[50]:
 
-learning_rate = 0.001
+learning_rate = 0.0001
 optimizer = tf.train.AdamOptimizer(learning_rate).minimize(cost)
 
 
 # We will train the model by slightly modifying the previous training code to include the dropout hyperparameter.
 
-# In[46]:
+# In[51]:
 
 # Number of epochs to train over. Should be large enough for convergence.  If it is too large, at worst the model
 # might overfit, at best we waste computing time.
-n_epoch = 50
+n_epoch = 150
 
 # In order to monitor training progress, as well as tune n_epoch, we will computing appropriate 
 # metrics at checkpoints
-display_step = 5
+display_step = 15
 
 # initialize variables
 sess.run(tf.global_variables_initializer())
@@ -714,10 +776,10 @@ for epoch in range(n_epoch):
     # One loop over the folds is a single epoch.
     # Note also that we use the ordinal class labels in y_training because StratifiedKFold wouldn't work with the
     # one-hot encoding
-    for fold, (dummy_idx, batch_idx) in enumerate(skfold.split(x_training_scaled, y_training)):
+    for fold, (dummy_idx, batch_idx) in enumerate(skfold.split(x_train_scaled, y_train)):
         # extract design matrix and response array for minibatch
         # here we can use the one-hot response array
-        x_batch, y_batch = x_training_scaled[batch_idx], y_training_oh[batch_idx]
+        x_batch, y_batch = x_train_scaled[batch_idx], y_train_oh[batch_idx]
         # run backprop and feedforward
         # we assign the cost per example to c
         # Note the feed_dict contains the minibatch data
@@ -728,53 +790,59 @@ for epoch in range(n_epoch):
     # Display logs per epoch step
     if epoch % display_step == 0:
         # return epoch and average cost
-        print("Epoch: %04d" % epoch, "cost = %04f" % avg_cost)
+        print("Epoch: %.4d" % epoch, "cost = %.4f" % avg_cost, "time = %.2f" % (time() - start))
         # compute accuracy on full training set
-        train_acc = sess.run(accr, feed_dict={x: x_training_scaled, y_true: y_training_oh, keep_prob: 1.})
+        train_acc = sess.run(accr, feed_dict={x: x_train_scaled, y_true: y_train_oh, keep_prob: 1.})
         print ("TRAIN ACCURACY: %.3f" % (train_acc))
         # compute accuracy on full validation set
-        test_acc = sess.run(accr, feed_dict={x: x_validation_scaled, y_true: y_validation_oh, keep_prob: 1.})
-        print ("VALIDATION ACCURACY: %.3f" % (test_acc))
+        test_acc = sess.run(accr, feed_dict={x: x_test_scaled, y_true: y_test_oh, keep_prob: 1.})
+        print ("TEST ACCURACY: %.3f" % (test_acc))
 
 # After the full training cycle, return more logs
-train_acc = sess.run(accr, feed_dict={x: x_training_scaled, y_true: y_training_oh, keep_prob: 1.})      
-test_acc = sess.run(accr, feed_dict={x: x_validation_scaled, y_true: y_validation_oh, keep_prob: 1.})
+train_acc = sess.run(accr, feed_dict={x: x_train_scaled, y_true: y_train_oh, keep_prob: 1.})      
+test_acc = sess.run(accr, feed_dict={x: x_test_scaled, y_true: y_test_oh, keep_prob: 1.})
 print("Optimization finished in %.2f seconds!" % (time() - start)) 
 print ("TRAIN ACCURACY: %.3f" % (train_acc))
-print ("VALIDATION ACCURACY: %.3f" % (test_acc))   
+print ("TEST ACCURACY: %.3f" % (test_acc))   
 
 
-# At around 98% accuracy, this model is on par with our best Random Forest result.  We also note that it learns quickly and then the validation accuracy fluctuates essentially due to the randomness of the batch updates.
+# At around 98.5% accuracy, this model is a 1.5% improvement in accuracy over our Random Forest result of 97%.  It might be possible to improve the results of this model by adjusting the parameters.   Basically the width of the hidden layer, the learning rate, the minibatch size, etc. (even the choice of activation functions!) should all be viewed as hyperparameters that should be tuned to improve the accuracy of the model.  TensorFlow doesn't provide a very simple way to do this, though we could write appropriate code to help out.
 # 
-# It might be possible to improve the results of this model by adjusting the parameters.   Basically the width of the hidden layer, the learning rate, the minibatch size, etc. (even the choice of activation functions!) should all be viewed as hyperparameters that should be tuned to improve the accuracy of the model.  TensorFlow doesn't provide a very simple way to do this, though we could write appropriate code to help out.
+# In this particular case, the learning rate has been chosen small enough that the cost is always decreasing.  It is possible that additional training epochs could make a very small increase in performance.
 # 
-# Instead, we'll look at adding an additional hidden layer to see how that affects the accuracy.  
+# Instead, we'll look at adding an additional hidden layer to see how that affects the accuracy. 
 # 
-# We will close the TF session, so that we can start a new one in the next section.
+# Before closing the TF session, let's save the class probabilities predicted by this model:
 
-# In[47]:
+# In[52]:
+
+class_prob_singlayer = sess.run(tf.nn.softmax(z_out), 
+                          feed_dict={x: x_test_scaled, y_true: y_test_oh, keep_prob: 1.})
+
+
+# In[53]:
 
 sess.close()
 
 
 # ## Multilayer Perceptron
 
-# We will quickly execute a two-layer perceptron here and then move on to more complicated (and deep) networks.  The command reset_default_graph should reset the graph so that we can start fresh.
+# We will quickly execute a two-layer perceptron here and then move on to more complicated (and deep) networks.  The command reset_default_graph will reset the graph so that we can start fresh.
 
-# In[48]:
+# In[54]:
 
 tf.reset_default_graph()
 sess = tf.InteractiveSession()
 
 
-# In[49]:
+# In[55]:
 
 n_feat = 784
 x = tf.placeholder(tf.float32, shape=[None, n_feat])
 n_class = 10
 y_true = tf.placeholder(tf.int32, shape=[None, n_class])
 
-width1 = 512 
+width1 = 1024 
 W_1 = weight_variable([n_feat, width1])
 b_1 = bias_variable([width1])
 h_1 = tf.nn.relu(tf.add(tf.matmul(x, W_1), b_1))
@@ -782,7 +850,7 @@ h_1 = tf.nn.relu(tf.add(tf.matmul(x, W_1), b_1))
 keep_prob = tf.placeholder(tf.float32)
 h_1_drop = tf.nn.dropout(h_1, keep_prob)
 
-width2 = 512 
+width2 = 1024 
 W_2 = weight_variable([width1, width2])
 b_2 = bias_variable([width2])
 h_2 = tf.nn.relu(tf.add(tf.matmul(h_1_drop, W_2), b_2))
@@ -796,7 +864,7 @@ z_out = tf.add(tf.matmul(h_2_drop, W_out), b_out)
 
 cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels=y_true, logits=z_out))
 
-learning_rate = 0.001
+learning_rate = 0.0001
 optimizer = tf.train.AdamOptimizer(learning_rate).minimize(cost)
 
 corr = tf.equal(tf.argmax(z_out, 1), tf.argmax(y_true, 1))    
@@ -805,15 +873,15 @@ accr = tf.reduce_mean(tf.cast(corr, "float"))
 
 # The hidden layer sizes were chosen in order that the training runs in a reasonably short amount of time.
 
-# In[50]:
+# In[56]:
 
 # Number of epochs to train over. Should be large enough for convergence.  If it is too large, at worst the model
 # might overfit, at best we waste computing time.
-n_epoch = 60
+n_epoch = 150
 
 # In order to monitor training progress, as well as tune n_epoch, we will computing appropriate 
 # metrics at checkpoints
-display_step = 5
+display_step = 15
 
 # initialize variables
 sess.run(tf.global_variables_initializer())
@@ -830,10 +898,10 @@ for epoch in range(n_epoch):
     # One loop over the folds is a single epoch.
     # Note also that we use the ordinal class labels in y_training because StratifiedKFold wouldn't work with the
     # one-hot encoding
-    for fold, (dummy_idx, batch_idx) in enumerate(skfold.split(x_training_scaled, y_training)):
+    for fold, (dummy_idx, batch_idx) in enumerate(skfold.split(x_train_scaled, y_train)):
         # extract design matrix and response array for minibatch
         # here we can use the one-hot response array
-        x_batch, y_batch = x_training_scaled[batch_idx], y_training_oh[batch_idx]
+        x_batch, y_batch = x_train_scaled[batch_idx], y_train_oh[batch_idx]
         # run backprop and feedforward
         # we assign the cost per example to c
         # Note the feed_dict contains the minibatch data
@@ -844,28 +912,32 @@ for epoch in range(n_epoch):
     # Display logs per epoch step
     if epoch % display_step == 0:
         # return epoch and average cost
-        print("Epoch: %04d" % epoch, "cost = %04f" % avg_cost)
+        print("Epoch: %.4d" % epoch, "cost = %.4f" % avg_cost, "time = %.2f" % (time() - start))
         # compute accuracy on full training set
-        train_acc = sess.run(accr, feed_dict={x: x_training_scaled, y_true: y_training_oh, keep_prob: 1.})
+        train_acc = sess.run(accr, feed_dict={x: x_train_scaled, y_true: y_train_oh, keep_prob: 1.})
         print ("TRAIN ACCURACY: %.3f" % (train_acc))
         # compute accuracy on full validation set
-        test_acc = sess.run(accr, feed_dict={x: x_validation_scaled, y_true: y_validation_oh, keep_prob: 1.})
-        print ("VALIDATION ACCURACY: %.3f" % (test_acc))
+        test_acc = sess.run(accr, feed_dict={x: x_test_scaled, y_true: y_test_oh, keep_prob: 1.})
+        print ("TEST ACCURACY: %.3f" % (test_acc))
 
 # After the full training cycle, return more logs
-train_acc = sess.run(accr, feed_dict={x: x_training_scaled, y_true: y_training_oh, keep_prob: 1.})      
-test_acc = sess.run(accr, feed_dict={x: x_validation_scaled, y_true: y_validation_oh, keep_prob: 1.})
+train_acc = sess.run(accr, feed_dict={x: x_train_scaled, y_true: y_train_oh, keep_prob: 1.})      
+test_acc = sess.run(accr, feed_dict={x: x_test_scaled, y_true: y_test_oh, keep_prob: 1.})
 print("Optimization finished in %.2f seconds!" % (time() - start)) 
 print("For width1 = %d, width2 = %d, n_epoch = %d,"       % (width1, width2, n_epoch))
 print ("TRAIN ACCURACY: %.3f" % (train_acc))
-print ("VALIDATION ACCURACY: %.3f" % (test_acc))        
+print ("TEST ACCURACY: %.3f" % (test_acc))        
 
 
-# At around 98% this is on par with our wide single layer model. Again, it is possible that better tunings would improve the result.
-# 
-# It would also be interesting to test these models after dropping the zero padding.  For now, though, we will try out a convolutional deep network.
+# This is essentially the same result as for our single layer model. The addition of a second layer doesn't seem to have been a significant improvement in test accuracy, but this model does take nearly twice as long to train as the single layer model. Again, it is possible that better tunings would improve the result. For now, though, we will try out a convolutional deep network.
 
-# In[51]:
+# In[57]:
+
+class_prob_twolayer = sess.run(tf.nn.softmax(z_out), 
+                          feed_dict={x: x_test_scaled, y_true: y_test_oh, keep_prob: 1.})
+
+
+# In[58]:
 
 sess.close()
 
@@ -892,14 +964,14 @@ sess.close()
 # 
 # Let's pick out random sets of 6s, 8s, and 9s from the training data:
 
-# In[52]:
+# In[59]:
 
 sixes_idx = np.random.choice(train_df[train_df['label']==6].index, size=4, replace=False)
 eights_idx = np.random.choice(train_df[train_df['label']==8].index, size=4, replace=False)
 nines_idx = np.random.choice(train_df[train_df['label']==9].index, size=4, replace=False)
 
 
-# In[53]:
+# In[60]:
 
 # generate a 3x4 grid of subplots
 fig, axs = plt.subplots(nrows=3, ncols=4, figsize=(10,10))
@@ -926,7 +998,7 @@ plt.show()
 
 # Let's imagine looking at these images through a window of the pixels in the upper half of the image.
 
-# In[54]:
+# In[61]:
 
 # recover the upper 14x28 block from the 28x28 matrix 
 def upper_pixel_mat(row):
@@ -961,7 +1033,7 @@ plt.show()
 
 # Similarly look through a window in the lower half:
 
-# In[55]:
+# In[62]:
 
 # recover the lower 14x28 block from the 28x28 matrix 
 def lower_pixel_mat(row):
@@ -1025,11 +1097,11 @@ plt.show()
 # 
 # We have seen that many of the handwritten digits do contain many features in common, but they tend to be slightly displaced from digit to digit. As an example, consider these 4s:
 
-# In[56]:
+# In[134]:
 
 plt.figure(1)
-plt.imshow(pixel_mat(33093), cmap=plt.cm.gray, origin='upper', interpolation='nearest')
-plt.imshow(pixel_mat(9662)-1, cmap=plt.cm.Blues, origin='upper', interpolation='nearest', alpha=0.5)
+plt.imshow(pixel_mat(9), cmap=plt.cm.gray, origin='upper', interpolation='nearest')
+plt.imshow(pixel_mat(59943)-1, cmap=plt.cm.Blues, origin='upper', interpolation='nearest', alpha=0.5)
    
 plt.show()
 
@@ -1045,7 +1117,7 @@ plt.show()
 # 
 # Let us use TensorFlow to put a network together that uses convolutional, pooling and conventional feedforward layers. This will be our first example of a **deep network**.
 
-# In[57]:
+# In[64]:
 
 tf.reset_default_graph()
 sess = tf.InteractiveSession()
@@ -1053,7 +1125,7 @@ sess = tf.InteractiveSession()
 
 # The network will have the same input and output layers as before.
 
-# In[58]:
+# In[65]:
 
 n_feat = 784
 x = tf.placeholder(tf.float32, shape=[None, n_feat])
@@ -1069,7 +1141,7 @@ y_true = tf.placeholder(tf.int32, shape=[None, n_class])
 # 
 # Therefore, to apply the first convolutional layer, we need to reshape our input as follows:
 
-# In[59]:
+# In[66]:
 
 x_image = tf.reshape(x, [-1,28,28,1])
 
@@ -1086,7 +1158,7 @@ x_image = tf.reshape(x, [-1,28,28,1])
 # flattens the filter into a tensor W of shape [filter_height $*$ filter_width $*$ in_channels, output_channels].<BR> 
 # computes the matrix product  X.W, which is a tensor of shape [batch, out_height, out_width, output_channels].
 # 
-# We specify the filter by defining a weight tensor of the appropriate shape.  For a 5x5 window, the weights will have shape [5, 5, 1, n_features_out], where n_features_out is the number of features we want the CNN layer to compute. We will compute 16 features in this first layer, due to memory constraints. 
+# We specify the filter by defining a weight tensor of the appropriate shape.  For a 5x5 window, the weights will have shape [5, 5, 1, n_features_out], where n_features_out is the number of features we want the CNN layer to compute. We will compute 32 features in this first layer. 
 # 
 # We also have to decide the stride for the layer,  which is the amount we shift the window between samplings. We specify the stride using a vector containing the information [batch, horizontal_stride, vertical_stride, in_channels]. Stride is constrained to sample one batch input and one input channel at a time, so the stride vector must be given in the form [1, horizontal_stride, vertical_stride, 1]. If we just shift the window by one pixel in either direction for samplings, the stride tensor should be [1, 1, 1, 1].
 # 
@@ -1096,9 +1168,9 @@ x_image = tf.reshape(x, [-1,28,28,1])
 # 
 # Putting all of this together, the layer we want is specified by:
 
-# In[60]:
+# In[67]:
 
-n_convfeat1 = 16
+n_convfeat1 = 32
 
 W_conv1 = weight_variable([5, 5, 1, n_convfeat1])
 b_conv1 = bias_variable([n_convfeat1])
@@ -1107,12 +1179,12 @@ CNN1 = tf.nn.conv2d(x_image, W_conv1, strides=[1, 1, 1, 1], padding='SAME')
 h_conv1 = tf.nn.relu(tf.add(CNN1, b_conv1))
 
 
-# In[61]:
+# In[68]:
 
 h_conv1
 
 
-# As promised, the output of this layer is a 28x28 "image" with 8 features per pixel. 
+# As promised, the output of this layer is a 28x28 "image" with 32 features per pixel. 
 # 
 # The next layer will be a pooling layer.  We will follow the tutorial and use max pooling via the op tf.nn.max_pool. Max pooling reports the maximum output for a given feature in a specified area, which this op expects to be a rectangle.   More specifically, the input has shape
 # [batch, height, width, channels] and the window is also specified according to these dimensions. 
@@ -1123,23 +1195,23 @@ h_conv1
 # 
 # We specify this pooling layer via:
 
-# In[62]:
+# In[69]:
 
 h_pool1 = tf.nn.max_pool(h_conv1, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME')
 
 
-# In[63]:
+# In[70]:
 
 h_pool1
 
 
-# This is a 14x14 image with the same 8 features outputted by the CNN.  
+# This is a 14x14 image with the same 32 features outputted by the CNN.  
 # 
-# Again following the tutuorial, we wish to introduce additional CNN and pooling layers.  We will choose the CNN to be 5x5 with unit stride and compute 16 features (again due to memory constraints), while we'll apply another instance of 2x2 max pooling with stride 2.  The output will be a 7x7 image with 16 features.
+# Again following the tutuorial, we wish to introduce additional CNN and pooling layers.  We will again choose the CNN to be 5x5 with unit stride and apply another instance of 2x2 max pooling with stride 2.  The output will be a 7x7 image. Note that the output of the first pooling layer had $14*14*32 = 6272$ features per image.  In order to retain this information after the 2nd pooling layer, we should compute $6272/(7*7) = 128$ features in the 2nd convolutional layer.
 
-# In[64]:
+# In[71]:
 
-n_convfeat2 = 16
+n_convfeat2 = 128
 
 W_conv2 = weight_variable([5, 5, n_convfeat1, n_convfeat2])
 b_conv2 = bias_variable([n_convfeat2])
@@ -1151,11 +1223,11 @@ h_pool2 = tf.nn.max_pool(h_conv2, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padd
 h_pool2
 
 
-# Our fully connected single layer NN was working pretty well so we will include one as the next layer. We will choose a width of 512 to keep the total memory usage of the full network reasonalbe.  We will flatten the 7x7 image into a pixel vector to make the computations more convenient.
+# Our fully connected single layer NN was working pretty well so we will include one as the next layer. We have 6272 total features coming in, so we might expect a very wide layer will give the best results.  We'll choose a width of 3072 which will come with a significant price in training time.  We will flatten the 7x7 image into a pixel vector to make the computations more convenient.
 
-# In[65]:
+# In[72]:
 
-width1 = 512
+width1 = 3072
 
 W_1 = weight_variable([7 * 7 * n_convfeat2, width1])
 b_1 = bias_variable([width1])
@@ -1167,7 +1239,7 @@ h_1 = tf.nn.relu(tf.add(tf.matmul(h_pool2_flat, W_1), b_1))
 
 # As before,  we'll introduce a dropout layer.
 
-# In[66]:
+# In[73]:
 
 keep_prob = tf.placeholder(tf.float32)
 h_1_drop = tf.nn.dropout(h_1, keep_prob)
@@ -1175,7 +1247,7 @@ h_1_drop = tf.nn.dropout(h_1, keep_prob)
 
 # And output layer.
 
-# In[67]:
+# In[74]:
 
 W_out = weight_variable([width1, n_class])
 b_out = bias_variable([n_class])
@@ -1183,27 +1255,43 @@ b_out = bias_variable([n_class])
 z_out = tf.add(tf.matmul(h_1_drop, W_out), b_out)
 
 
-# The rest of the choices will also be the same.
+# The cost, metric and optimizer choices will also be the same.
 
-# In[68]:
+# In[75]:
 
 cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels=y_true, logits=z_out))
 corr = tf.equal(tf.argmax(z_out, 1), tf.argmax(y_true, 1))    
 accr = tf.reduce_mean(tf.cast(corr, "float"))
 
-learning_rate = 0.001
+learning_rate = 0.0001
 optimizer = tf.train.AdamOptimizer(learning_rate).minimize(cost)
 
 
-# In[69]:
+# The convolutional layers turn out to be quite memory intensive.  To allow us to run in around 8 GB of memory, in addition to the minibatch training, we will also need to compute the accuracy metrics in minibatches. 
+
+# In[76]:
+
+n_batch = 200.
+int_batch = int(n_batch)
+
+n_samp_train = x_train_scaled.shape[0]
+n_samp_test = x_test_scaled.shape[0]
+
+train_batch = int(n_samp_train / n_batch)
+test_batch = int(n_samp_test / n_batch)
+
+skfold = StratifiedKFold(n_splits=train_batch, shuffle=True, random_state=428)
+
+
+# In[77]:
 
 # Number of epochs to train over. Should be large enough for convergence.  If it is too large, at worst the model
 # might overfit, at best we waste computing time.
-n_epoch = 40
+n_epoch = 150
 
 # In order to monitor training progress, as well as tune n_epoch, we will computing appropriate 
 # metrics at checkpoints
-display_step = 5
+display_step = 15
 
 # initialize variables
 sess.run(tf.global_variables_initializer())
@@ -1220,10 +1308,10 @@ for epoch in range(n_epoch):
     # One loop over the folds is a single epoch.
     # Note also that we use the ordinal class labels in y_training because StratifiedKFold wouldn't work with the
     # one-hot encoding
-    for fold, (dummy_idx, batch_idx) in enumerate(skfold.split(x_training_scaled, y_training)):
+    for fold, (dummy_idx, batch_idx) in enumerate(skfold.split(x_train_scaled, y_train)):
         # extract design matrix and response array for minibatch
         # here we can use the one-hot response array
-        x_batch, y_batch = x_training_scaled[batch_idx], y_training_oh[batch_idx]
+        x_batch, y_batch = x_train_scaled[batch_idx], y_train_oh[batch_idx]
         # run backprop and feedforward
         # we assign the cost per example to c
         # Note the feed_dict contains the minibatch data
@@ -1234,70 +1322,107 @@ for epoch in range(n_epoch):
     # Display logs per epoch step
     if epoch % display_step == 0:
         # return epoch and average cost
-        print("Epoch: %04d" % epoch, "cost = %04f" % avg_cost)
-        # compute accuracy on full training set
-        train_acc = sess.run(accr, feed_dict={x: x_training_scaled, y_true: y_training_oh, keep_prob: 1.})
+        print("Epoch: %.4d" % epoch, "cost = %.4f" % avg_cost, "time = %.2f" % (time() - start))
+        # compute accuracy on full training set, in batches
+        train_acc = 0
+        for i in range(0, n_samp_train, int_batch):
+            x_batch, y_batch = x_train_scaled[i:i + int_batch], y_train_oh[i:i + int_batch]
+            acc = sess.run(accr,
+                            feed_dict={x: x_batch,
+                                y_true: y_batch, keep_prob: 1.})
+            train_acc += acc / train_batch
         print ("TRAIN ACCURACY: %.3f" % (train_acc))
-        # compute accuracy on full validation set
-        test_acc = sess.run(accr, feed_dict={x: x_validation_scaled, y_true: y_validation_oh, keep_prob: 1.})
-        print ("VALIDATION ACCURACY: %.3f" % (test_acc))
+        # compute accuracy on full validation set, in batches
+        test_acc = 0
+        for i in range(0, n_samp_test, int_batch):
+            x_batch, y_batch = x_test_scaled[i:i + int_batch], y_test_oh[i:i + int_batch]
+            acc = sess.run(accr,
+                            feed_dict={x: x_batch,
+                                y_true: y_batch, keep_prob: 1.})
+            test_acc += acc / test_batch
+        print ("TEST ACCURACY: %.3f" % (test_acc))
 
 # After the full training cycle, return more logs
-train_acc = sess.run(accr, feed_dict={x: x_training_scaled, y_true: y_training_oh, keep_prob: 1.})      
-test_acc = sess.run(accr, feed_dict={x: x_validation_scaled, y_true: y_validation_oh, keep_prob: 1.})
+# compute accuracy on full training set, in batches
+train_acc = 0
+for i in range(0, n_samp_train, int_batch):
+    x_batch, y_batch = x_train_scaled[i:i + int_batch], y_train_oh[i:i + int_batch]
+    acc = sess.run(accr,
+                    feed_dict={x: x_batch,
+                        y_true: y_batch, keep_prob: 1.})
+    train_acc += acc / train_batch
+# compute accuracy on full validation set, in batches
+test_acc = 0
+for i in range(0, n_samp_test, int_batch):
+    x_batch, y_batch = x_test_scaled[i:i + int_batch], y_test_oh[i:i + int_batch]
+    acc = sess.run(accr,
+                    feed_dict={x: x_batch,
+                        y_true: y_batch, keep_prob: 1.})
+    test_acc += acc / test_batch
+    
 print("Optimization finished in %.2f seconds!" % (time() - start)) 
 print("For n_convfeat1 = %d, n_convfeat2 = %d, width1 = %d, n_epoch = %d,"       % (n_convfeat1, n_convfeat2, width1, n_epoch))
 print ("TRAIN ACCURACY: %.3f" % (train_acc))
-print ("VALIDATION ACCURACY: %.3f" % (test_acc))   
+print ("TEST ACCURACY: %.3f" % (test_acc))   
 
 
-# At 99% accuracy, this is our best model so far.  Some incremental gains can be made by increasing the number of features computed in the CNN layers and the fully connected layer.  The particular values here were conservatively chosen so that this notebook could be run comfortably with 8 GB of RAM.  
+# These layers compute many more features than those in the previous feedforward models and we can see that each epoch of deep feedforward and backprop training is taking over 4 minutes. Total training time was around 10 hrs. At 99.2% accuracy, this is our best model so far.  
+# 
+# We should note that by epoch 135, the cost function has started to increase, so the learning rate is a bit too large compared to the number of epochs. However, the dip in the test accuracy at epoch 120 could be a sign of overfitting.  With so many features computed, it might be appropriate to use additional regularization techniques such as weight decay.
+# 
+# Finally, we'll note that models with far fewer features, such as n_convfeat1 = 12, n_convfeat2 = 12, width1 = 512 have similar accuracy for a fraction of the training time.
+
+# In[78]:
+
+class_prob_cnn = sess.run(tf.nn.softmax(z_out), 
+                           feed_dict={x: x_test_scaled, y_true: y_test_oh, keep_prob: 1.})
+
+
+# In[ ]:
+
+sess.close()
+
 
 # ### Analysis of Errors
 
-# It might be useful to take a closer look at the examples in the validation set where our CNN got the wrong answer.  To obtain the output class probabilities for the validation set, we can run: 
+# It might be useful to take a closer look at the examples in the validation set where our CNN got the wrong answer. 
+# 
+# First, lets check a random sample of the class probabilites:
 
-# In[70]:
+# In[79]:
 
-y_pred_prob = sess.run(tf.nn.softmax(z_out), feed_dict={x: x_validation_scaled, y_true: y_validation_oh, keep_prob: 1.})
-
-
-# We can can check a random sample:
-
-# In[71]:
-
-idxs = np.random.randint(0, len(y_pred_prob), 5)
-y_pred_prob[idxs]
+idxs = np.random.randint(0, len(class_prob_cnn), 5)
+class_prob_cnn[idxs]
 
 
 # We can use argmax to compute the most probable prediction for each example:
 
-# In[72]:
+# In[80]:
 
-y_pred = np.argmax(y_pred_prob, 1)
-y_pred
+y_pred_cnn = np.argmax(class_prob_cnn, 1)
+y_pred_cnn
 
 
 # These are to be compared with the list of true labels from y_validation, which we can reobtain by also applying argmax:
 
-# In[73]:
+# In[81]:
 
-y_act = np.argmax(y_validation_oh, 1)
+y_act = np.argmax(y_test_oh, 1)
 y_act
 
 
 # Another useful numpy function is argsort, which returns the indices that would sort an array, from smallest element to largest. In our case, it is more convenient to sort from largest to smallest, in which case we can specify np.argsort(-vec). In the case of our class probability vectors, the first entry in argsort(-vec) will be the argmax, while the next will be the 2nd most probable class, then the 3rd and so on.  It can be useful to know if the true label was given a relatively high probability if the most probable model class was incorrect. For example, we can consider
 
-# In[74]:
+# In[82]:
 
-print(y_pred_prob[idxs])
-print(np.argsort(-y_pred_prob[idxs]))
-print(np.argmax(y_pred_prob[idxs], 1))
+print(class_prob_cnn[idxs])
+print(np.argsort(-class_prob_cnn[idxs]))
+print(np.argmax(class_prob_cnn[idxs], 1))
 
 
 # It is also interesting to look at the confusion matrix:
 
-# In[75]:
+# In[83]:
 
 from sklearn.metrics import confusion_matrix
 
@@ -1309,7 +1434,7 @@ def plot_confusion_matrix(cm, classes,
                           cmap=plt.cm.Blues):
     plt.imshow(cm, interpolation='nearest', cmap=cmap)
     plt.title(title)
-    plt.colorbar()
+    #plt.colorbar()
     tick_marks = np.arange(len(classes))
     plt.xticks(tick_marks, classes, rotation=45)
     plt.yticks(tick_marks, classes)
@@ -1325,42 +1450,40 @@ def plot_confusion_matrix(cm, classes,
     plt.xlabel('Predicted label')
 
 
-# In[76]:
+# In[86]:
 
-conf_mat = confusion_matrix(y_act, y_pred)
+conf_mat = confusion_matrix(y_act, y_pred_cnn)
 
-plt.figure()
-plot_confusion_matrix(conf_mat, classes=range(10), title='Confusion matrix, without normalization')
+plt.figure(figsize=(6,6))
+plot_confusion_matrix(conf_mat, classes=range(10), title='CNN confusion matrix')
 plt.show()
 
 
 # The model does well, as expected from the accuracy score.  Some observations, though the statistics of errors is based on small samples:
 # 
-# * 1s are interpreted as 7s, as we might have expected.
-# * 3s are confused with 5s, but not vice-versa.
-# * 4s tend to get confused with 9s.
-# * 6s get confused with 5s, which is a bit expected.
-# * 7s get confused a bit with 1s, 4s, and 9s.
-# * 8s are confused with 5s and 9s, but not vice-versa.
-# * 9s are confused with 4s, 5s and 7s.  This is somewhat understandable.
+# * 4s tend to get confused with 9s, and vice -versa.
+# * 5s get confused with 3s, but not vice-versa.
+# * 7s get confused with 2s and 9s a bit more than other digits. 
+# * 8s are confused with 0s, but not vice-versa.
+# * 9s are confused with 1s, 4s and 5s.  
 # 
 # We will examine a couple examples where the model was confused between 4s and 9s a bit later.
 # 
 # In order to compare with the features in the corresponding design matrix, x_validation, we can use the numpy where function to obtain the indices for the events where the prediction was different from the true value:
 
-# In[77]:
+# In[88]:
 
-error_idx = np.where(y_pred != y_act)[0]
+error_idx = np.where(y_pred_cnn != y_act)[0]
 
 
-# In[78]:
+# In[89]:
 
 error_idx
 
 
 # We can then adapt the code from the overview notebook and display a random set of digit images from the error set:
 
-# In[79]:
+# In[90]:
 
 rand_idx = np.random.choice(error_idx, size=20, replace=False)
 fig, axs = plt.subplots(nrows=5, ncols=4, figsize=(10,10))
@@ -1372,7 +1495,7 @@ for ax in axs.reshape(-1):
 # this is the true class label
     true_y = y_act[idx]
     # this is the vector of model class probabilities
-    prob_y = y_pred_prob[idx]
+    prob_y = class_prob_cnn[idx]
     # this is the most probable class
     top_pred = np.argmax(prob_y)
     # this is probability of the top class
@@ -1387,24 +1510,29 @@ for ax in axs.reshape(-1):
     
     ax.set_title("True: %d \n Pred: %d (%.2f), %d (%.2f)" % 
                  (true_y, top_pred, prob_top, sec_choice, prob_sec))
-    ax.imshow(x_validation[idx].reshape(28,28), cmap=plt.cm.gray, origin='upper', interpolation='nearest')
+    ax.imshow(x_test[idx].reshape(28,28), cmap=plt.cm.gray, origin='upper', interpolation='nearest')
     ax.axis('off')
     i += 1
 plt.tight_layout()    
 plt.show()
 
 
+# In[93]:
+
+rand_idx[7]
+
+
 # It is likely that several of these would be challenging for a human to identify with 100% accuracy, while others are quite obvious.   In some cases, it is easy to see what features that the neural network probably used to decide that the image more closely resembled a different digit than the true one.
 # 
 # For instance, for the following digit image, the CNN predicted "9" vs the true value of 4.
 
-# In[80]:
+# In[92]:
 
-idx = 3453
+idx = 1242
 # this is the true class label
 true_y = y_act[idx]
 # this is the vector of model class probabilities
-prob_y = y_pred_prob[idx]
+prob_y = class_prob_cnn[idx]
 # this is the most probable class
 top_pred = np.argmax(prob_y)
 # this is probability of the top class
@@ -1416,28 +1544,28 @@ sec_choice = arg_sort[1]
 # this is the probability of the 2nd choice class
 prob_sec = prob_y[sec_choice]
     
-plt.imshow(x_validation[idx].reshape(28,28), cmap=plt.cm.gray, origin='upper', interpolation='nearest') 
+plt.imshow(x_test[idx].reshape(28,28), cmap=plt.cm.gray, origin='upper', interpolation='nearest') 
 plt.title("True: %d \n Pred: %d (%.2f), %d (%.2f)" % 
                  (true_y, top_pred, prob_top, sec_choice, prob_sec))
 plt.show()
 
 
-# In this case, a human might not decide that this is a 4, at least not with total confidence. The vertical stem on the right of the digit rises to a height slightly less than the loopy hook on the left. The left hook is also pronouncedly curved, very nearly meeting the right stem. Finally the lower part of the loop meets the stem at an acute angle, rather than a perpendicular.  These features are more closely associated with a 9 than a 4. In fact, the model's 2nd choice is an 4, with around a 1 in 10^4 probability assigned.
+# In this case, a human would probably decide this was a 4 quite easily.  It is possible that the curvature at 2 of the 3 corners of the loop has confused the model. However the straight long edges make it hard for a human to confuse this with a 9.  The model's 2nd choice is an 4, with a probability of 8% assigned.
 
-# In[81]:
+# In[95]:
 
-y_pred_prob[3453]
+class_prob_cnn[1242]
 
 
 # For the converse identification problem, we can look at the following example:
 
-# In[86]:
+# In[96]:
 
-idx = 2403
+idx = 3985
 # this is the true class label
 true_y = y_act[idx]
 # this is the vector of model class probabilities
-prob_y = y_pred_prob[idx]
+prob_y = class_prob_cnn[idx]
 # this is the most probable class
 top_pred = np.argmax(prob_y)
 # this is probability of the top class
@@ -1449,7 +1577,7 @@ sec_choice = arg_sort[1]
 # this is the probability of the 2nd choice class
 prob_sec = prob_y[sec_choice]
     
-plt.imshow(x_validation[idx].reshape(28,28), cmap=plt.cm.gray, origin='upper', interpolation='nearest') 
+plt.imshow(x_test[idx].reshape(28,28), cmap=plt.cm.gray, origin='upper', interpolation='nearest') 
 plt.title("True: %d \n Pred: %d (%.2f), %d (%.2f)" % 
                  (true_y, top_pred, prob_top, sec_choice, prob_sec))
 plt.show()
@@ -1457,10 +1585,154 @@ plt.show()
 
 # In this case, we have a  stubby, bent stem on the right that doesn't rise to the height of the left part of the digit.  The bottom of the loop meets the stem at almost 90 degrees, instead of the acute angle typically associated with a 9. The upper part of the loop also misses the top of the stem by a large margin.  These features probably explain why the CNN thought this was a 4.  In fact 9 was the 2nd choice, though with a < 1% probability.
 # 
-# As an exercise, you should see if you can find similar features in other misclassified examples that could help explain why the model failed.
+# We will plot all errors, by prediction below.
+
+# In[113]:
+
+def plot_digits_bypred(digit):
+    # generate a 4xn grid of subplots, 4 is the number of columns that will reasonably display in typical
+    # overhead projector resolution at the size we're making the images 
+    pred_dig = digit
+    pred_dig_idx = error_idx[np.where(y_pred_cnn[error_idx] == pred_dig)[0].tolist()]
+    list_len = len(pred_dig_idx)
+    ncols = 4
+    nrows =  (list_len / 4) + (1 * (list_len % 4 != 0)) # add an extra row if list_len !div by 4
+    fig, axs = plt.subplots(nrows=nrows, ncols=ncols, figsize=(10,10))
+
+
+    # axs is a 2d array so we flatten it into a vector in order to loop over it
+    for i, ax in enumerate(axs.reshape(-1)):
+        if i < list_len:   # don't generate ax titles for unused subplots
+            # cycle through the elements of rand_idx
+            idx = pred_dig_idx[i]
+            # this is the true class label
+            true_y = y_act[idx]
+            # this is the vector of model class probabilities
+            prob_y = class_prob_cnn[idx]
+            # this is the most probable class
+            top_pred = np.argmax(prob_y)
+            # this is probability of the top class
+            prob_top = prob_y[top_pred]
+            # argsort the prob. vector
+            arg_sort = np.argsort(-prob_y)
+            # this is the 2nd choice class 
+            sec_choice = arg_sort[1]
+            # this is the probability of the 2nd choice class
+            prob_sec = prob_y[sec_choice]
+            ax.set_title("True: %d \n Pred: %d (%.2f), %d (%.2f)" % 
+                         (true_y, top_pred, prob_top, sec_choice, prob_sec))
+            ax.imshow(x_test[idx].reshape(28,28), cmap=plt.cm.gray, origin='upper', interpolation='nearest')
+            ax.axis('off')
+      
+    plt.tight_layout()    
+    plt.show()
+
+
+# In[114]:
+
+plot_digits_bypred(0)
+
+
+# In[115]:
+
+plot_digits_bypred(1)
+
+
+# In[116]:
+
+plot_digits_bypred(2)
+
+
+# In[117]:
+
+plot_digits_bypred(3)
+
+
+# In[118]:
+
+plot_digits_bypred(4)
+
+
+# In[119]:
+
+plot_digits_bypred(5)
+
+
+# In[120]:
+
+plot_digits_bypred(6)
+
+
+# In[121]:
+
+plot_digits_bypred(7)
+
+
+# In[122]:
+
+plot_digits_bypred(8)
+
+
+# In[123]:
+
+plot_digits_bypred(9)
+
+
+# ## Ensemble of NNs
+# 
+# Recall that we saved the prediction probabilities from the three networks:
+
+# In[125]:
+
+y_pred_singlayer = np.argmax(class_prob_singlayer, 1)
+y_pred_twolayer = np.argmax(class_prob_twolayer, 1)
+
+print("Single Layer accuracy score: %f" % accuracy_score(y_pred_singlayer, y_act))
+print("Two-Layer accuracy score: %f" % accuracy_score(y_pred_twolayer, y_act))
+print("CNN accuracy score: %f" % accuracy_score(y_pred_cnn, y_act))
+
+
+# To motivate ensemble methods, suppose that we have $n$ independent measurements $X_1, \ldots, X_n$ drawns from a normal distribution with mean $\mu$ and variance $\sigma^2$.  The sample mean is the expected value of the mean $\bar{X}$,
+# $$ \begin{split} E(\bar{X}) & = E\left( \frac{1}{n} (X_1 + \cdots + X_n) \right)\\
+# & = \frac{1}{n} \bigl(E(X_1) + \cdots + E(X_n)\bigr) \\
+# & = \frac{1}{n} ( n \mu ) = \mu .\end{split} $$
+# 
+# The variance of the sample mean is
+# $$ \begin{split} \text{Var}(\bar{X}) & = \text{Var}\left( \frac{1}{n} (X_1 + \cdots + X_n) \right)\\
+# & = \frac{1}{n^2} \bigl(\text{Var}(X_1) + \cdots + \text{Var}(X_n)\bigr) \\
+# & = \frac{1}{n^2} ( n \sigma^2 )  \\
+# & = \frac{\sigma^2}{n}.\end{split} $$
+# This leads to the notion that we can reduce the variance in a sample mean by increasing the size of the sample.
+# 
+# Ensemble methods in machine learning work on the same principal, though typically model predictions are not completely independent because they are being made with the same input data.  Nevertheless, we expect that the variance of the mean of $n$ predictions $\hat{y}_i$ will be something like
+# $$ \text{Var}(\bar{\hat{y}})  = \frac{1}{k} \text{Var}(\hat{y})$$
+# for some $ 1 < k < n$.   By averaging the results of several models, we should be able to reduce the variance of the predictions and obtain a more accurate result.
+# 
+# In fact, the Random Forest model leverages this feature of ensembles to great effect.
+# 
+# Let us examine this by taking a simple average of the predicted class probabilities for our fully-connected networks:
+
+# In[129]:
+
+class_prob_ensemble = (class_prob_singlayer + class_prob_twolayer) / 2
+y_pred_ensemble = np.argmax(class_prob_ensemble, 1)
+
+print("Single Layer accuracy score: %f" % accuracy_score(y_pred_singlayer, y_act))
+print("Two-Layer accuracy score: %f" % accuracy_score(y_pred_twolayer, y_act))
+print("Ensemble accuracy score: %f" % accuracy_score(y_pred_ensemble, y_act))
+
+
+# We see that the accuracy of the ensemble is very slightly better than the accuracy of either of the models taken alone, as promised. We will return to ensemble methods in the future.
+# 
+# It turns out that the CNN results are so much better than the fully-connected networks that the ensemble results of the 3 networks is still worse than that of the CNN alone.  
 
 # ## Conclusions
 
 # In this notebook, we learned how to use TensorFlow to construct machine learning models using very low-level tools.  TF allows us to define models in much more detail than scikit-learn, but at the cost of requiring quite a bit of expertise about how those models work in theory and are constructed in practice.
 # 
-# We also learned how to apply neural networks, including the multilevel perceptron and the convolutional neural networks to the MNIST digit problem.  We saw that they lead to improvements of almost 1% in validation accuracy vs our best Random Forest result.
+# We also learned how to apply neural networks, including the multilevel perceptron and the convolutional neural networks to the MNIST digit problem.  We saw that they lead to improvements of over 2% in validation accuracy vs our Random Forest result.
+
+# In[ ]:
+
+
+
