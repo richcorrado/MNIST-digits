@@ -33,7 +33,7 @@
 # 
 # * Examine the examples that have been misclassified and explore some reasons for that.
 # 
-# N.B. This notebook should run in 8GB of RAM.  If you have less than that, you will probably have to adjust the code for the convolutional neural network to compute even less features.
+# N.B. This notebook should run in 8GB of RAM.  If you have less than that, you will probably have to adjust the minibatch size to 50 or 100. If still having problems, adjust the code for the convolutional neural network to compute less features.
 
 # In[1]:
 
@@ -386,6 +386,9 @@ x_train[np.where(x_train != 0)]
 import tensorflow as tf
 sess = tf.InteractiveSession()
 
+# set random seed
+tf.set_random_seed(464)
+
 
 # The first part of the computational graph will generally be the specification of an **input layer**.  The purpose of the input layer is to provide a data structure into which we'll feed our design matrix when we run the session.
 # 
@@ -475,7 +478,7 @@ accr = tf.reduce_mean(tf.cast(corr, "float"))
 
 # In[35]:
 
-learning_rate = 0.001
+learning_rate = 0.01
 optimizer = tf.train.GradientDescentOptimizer(learning_rate).minimize(cost)
 
 
@@ -499,18 +502,20 @@ n_samp = x_train_scaled.shape[0]
 n_samp
 
 
-# With a minibatch size of 100, we can compute the number of minibatches to cycle over in an epoch:
+# With a minibatch size of 50, we can compute the number of minibatches to cycle over in an epoch:
 
 # In[37]:
 
-n_batch = 100.
+n_batch = 50.
 total_batch = int(n_samp / n_batch)
 total_batch
 
 
 # We want to construct a scheme where we split the training data into 600 unique minibatches, so that we see every training example exactly once in a minimum number of passes.  We expect that the scheme will work best if the minibatches are both randomized and have approximately the same distribution of classes as the training set itself.  We can accomplish this using StratifiedKFold, where we use the "test" partition in each fold as the minibatch. 
 # 
-# An appropriate implementation is:
+# Note:  TF also includes the function tf.train.shuffle_batch to implement batch processing.  It doesn't allow for stratifying class labels, but is an option to consider.
+# 
+# An appropriate implementation of StratifiedKFold is:
 
 # In[38]:
 
@@ -523,11 +528,11 @@ skfold = StratifiedKFold(n_splits=total_batch, shuffle=True, random_state=428)
 
 # Number of epochs to train over. Should be large enough for convergence.  If it is too large, at worst the model
 # might overfit, at best we waste computing time.
-n_epoch = 500
+n_epoch = 200
 
 # In order to monitor training progress, as well as tune n_epoch, we will computing appropriate 
 # metrics at checkpoints
-display_step = 50
+display_step = 25
 
 # initialize variables
 sess.run(tf.global_variables_initializer())
@@ -574,7 +579,7 @@ print ("TRAIN ACCURACY: %.3f" % (train_acc))
 print ("TEST ACCURACY: %.3f" % (test_acc))   
 
 
-# It appears that we would get slightly more accuracy by increasing the training epochs.  However, at 91.9% accuracy, we are far behind our Random Forest result of 97%, so it's clear that no amount of extra training is going to make logistic regression competitive.  For that we will move on to neural networks in the next section.
+# It appears that we would get slightly more accuracy by increasing the training epochs.  However, at 92.5% accuracy, we are far behind our Random Forest result of 97%, so it's clear that no amount of extra training is going to make logistic regression competitive.  For that we will move on to neural networks in the next section.
 # 
 # Before moving on, we close the TF session.
 
@@ -658,6 +663,9 @@ sess.close()
 
 tf.reset_default_graph()
 sess = tf.InteractiveSession()
+
+# set random seed
+tf.set_random_seed(464)
 
 
 # Our input and output are defined exactly as before:
@@ -745,7 +753,7 @@ accr = tf.reduce_mean(tf.cast(corr, "float"))
 
 # In[50]:
 
-learning_rate = 0.0001
+learning_rate = 0.001
 optimizer = tf.train.AdamOptimizer(learning_rate).minimize(cost)
 
 
@@ -755,11 +763,11 @@ optimizer = tf.train.AdamOptimizer(learning_rate).minimize(cost)
 
 # Number of epochs to train over. Should be large enough for convergence.  If it is too large, at worst the model
 # might overfit, at best we waste computing time.
-n_epoch = 150
+n_epoch = 130 + 1
 
 # In order to monitor training progress, as well as tune n_epoch, we will computing appropriate 
 # metrics at checkpoints
-display_step = 15
+display_step = 10
 
 # initialize variables
 sess.run(tf.global_variables_initializer())
@@ -793,24 +801,38 @@ for epoch in range(n_epoch):
         print("Epoch: %.4d" % epoch, "cost = %.4f" % avg_cost, "time = %.2f" % (time() - start))
         # compute accuracy on full training set
         train_acc = sess.run(accr, feed_dict={x: x_train_scaled, y_true: y_train_oh, keep_prob: 1.})
-        print ("TRAIN ACCURACY: %.3f" % (train_acc))
+        print ("TRAIN ACCURACY: %.4f" % (train_acc))
         # compute accuracy on full validation set
         test_acc = sess.run(accr, feed_dict={x: x_test_scaled, y_true: y_test_oh, keep_prob: 1.})
-        print ("TEST ACCURACY: %.3f" % (test_acc))
+        print ("TEST ACCURACY: %.4f" % (test_acc))
 
 # After the full training cycle, return more logs
 train_acc = sess.run(accr, feed_dict={x: x_train_scaled, y_true: y_train_oh, keep_prob: 1.})      
 test_acc = sess.run(accr, feed_dict={x: x_test_scaled, y_true: y_test_oh, keep_prob: 1.})
 print("Optimization finished in %.2f seconds!" % (time() - start)) 
-print ("TRAIN ACCURACY: %.3f" % (train_acc))
-print ("TEST ACCURACY: %.3f" % (test_acc))   
+print ("TRAIN ACCURACY: %.4f" % (train_acc))
+print ("TEST ACCURACY: %.4f" % (test_acc))   
 
 
-# At around 98.5% accuracy, this model is a 1.5% improvement in accuracy over our Random Forest result of 97%.  It might be possible to improve the results of this model by adjusting the parameters.   Basically the width of the hidden layer, the learning rate, the minibatch size, etc. (even the choice of activation functions!) should all be viewed as hyperparameters that should be tuned to improve the accuracy of the model.  TensorFlow doesn't provide a very simple way to do this, though we could write appropriate code to help out.
+# At 98.6% accuracy, this model is a 1.6% improvement in accuracy over our Random Forest result of 97%.  Each training epoch has taken around 15s, for a total training time of around one-half hour.
 # 
-# In this particular case, the learning rate has been chosen small enough that the cost is always decreasing.  It is possible that additional training epochs could make a very small increase in performance.
+# It might be possible to improve the results of this model by adjusting the parameters.  The width of the hidden layer, the learning rate, the minibatch size, etc. (even the choice of activation functions!) should all be viewed as hyperparameters that should be tuned to improve the accuracy of the model.  In future discussions, we will investigate some effects of hyperparameter tuning in neural networks.  Some issues to be concerned about:
 # 
-# Instead, we'll look at adding an additional hidden layer to see how that affects the accuracy. 
+# 1. Width and depth of the network determines the **capacity** of the network, in information-theory terms.  Counting independent weight and bias parameters leads to some number $P$ of independent coefficients that must be optimized during training.  If the training data has $N$ examples and $F$ features, then we can think of $NF$ as an upper bound on the number of coefficients we can determine.   Since features can be interdependent or correlated, and examples can overlap, the actual bound $B \leq NF$ is highly dependent on the data.   
+#     * If $B < P$, then the system is underdetermined.  In such a case, **overfitting** is a serious concern and regularization, techniques, like dropout, become very important.
+#     * If $B > P$, then the model might not have enough capacity to generalize well.  
+#     * Adjusting the width and/or depth of the network and examining (cross-)validation error can help to find an optimum capacity for the model.
+# 
+# 2. If the learning rate is too small, there can be several consequences, including:
+#     * The training will take a longer time than necessary, consuming time and other resources we could have used more efficiently.
+#     * We could end up in a local minimum and the step we make in parameter space is not large enough to get us out.
+#     * In our model here, we see that, e.g., at epoch 50, the cost function has actually increased.  This could be a sign that the learning rate is too large.
+#     
+# 3. If the minibatch size is too small, the corresponding step during gradient descent will also be relatively small. We might get stuck in a local minimum.
+# 
+# 4. If the number of training cycles is too small, then we will not have used the training data to maximum effectiveness.  If the number of training cycles is too large, we either waste time or allow the model to overfit.  As a regularization technique, putting a limit on the number of training cycles is called **early stopping**.
+# 
+# For now, we'll look at adding an additional hidden layer to see how that affects the accuracy. 
 # 
 # Before closing the TF session, let's save the class probabilities predicted by this model:
 
@@ -833,6 +855,9 @@ sess.close()
 
 tf.reset_default_graph()
 sess = tf.InteractiveSession()
+
+# set random seed
+tf.set_random_seed(464)
 
 
 # In[55]:
@@ -864,7 +889,7 @@ z_out = tf.add(tf.matmul(h_2_drop, W_out), b_out)
 
 cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels=y_true, logits=z_out))
 
-learning_rate = 0.0001
+learning_rate = 0.0005
 optimizer = tf.train.AdamOptimizer(learning_rate).minimize(cost)
 
 corr = tf.equal(tf.argmax(z_out, 1), tf.argmax(y_true, 1))    
@@ -877,11 +902,11 @@ accr = tf.reduce_mean(tf.cast(corr, "float"))
 
 # Number of epochs to train over. Should be large enough for convergence.  If it is too large, at worst the model
 # might overfit, at best we waste computing time.
-n_epoch = 150
+n_epoch = 160 + 1
 
 # In order to monitor training progress, as well as tune n_epoch, we will computing appropriate 
 # metrics at checkpoints
-display_step = 15
+display_step = 10
 
 # initialize variables
 sess.run(tf.global_variables_initializer())
@@ -915,21 +940,23 @@ for epoch in range(n_epoch):
         print("Epoch: %.4d" % epoch, "cost = %.4f" % avg_cost, "time = %.2f" % (time() - start))
         # compute accuracy on full training set
         train_acc = sess.run(accr, feed_dict={x: x_train_scaled, y_true: y_train_oh, keep_prob: 1.})
-        print ("TRAIN ACCURACY: %.3f" % (train_acc))
+        print ("TRAIN ACCURACY: %.4f" % (train_acc))
         # compute accuracy on full validation set
         test_acc = sess.run(accr, feed_dict={x: x_test_scaled, y_true: y_test_oh, keep_prob: 1.})
-        print ("TEST ACCURACY: %.3f" % (test_acc))
+        print ("TEST ACCURACY: %.4f" % (test_acc))
 
 # After the full training cycle, return more logs
 train_acc = sess.run(accr, feed_dict={x: x_train_scaled, y_true: y_train_oh, keep_prob: 1.})      
 test_acc = sess.run(accr, feed_dict={x: x_test_scaled, y_true: y_test_oh, keep_prob: 1.})
 print("Optimization finished in %.2f seconds!" % (time() - start)) 
 print("For width1 = %d, width2 = %d, n_epoch = %d,"       % (width1, width2, n_epoch))
-print ("TRAIN ACCURACY: %.3f" % (train_acc))
-print ("TEST ACCURACY: %.3f" % (test_acc))        
+print ("TRAIN ACCURACY: %.4f" % (train_acc))
+print ("TEST ACCURACY: %.4f" % (test_acc))        
 
 
-# This is essentially the same result as for our single layer model. The addition of a second layer doesn't seem to have been a significant improvement in test accuracy, but this model does take nearly twice as long to train as the single layer model. Again, it is possible that better tunings would improve the result. For now, though, we will try out a convolutional deep network.
+# At 98.7% test accuracy, this model is only slightly better than the result of our single layer model. This model also takes much longer to train. Each epoch takes nearly twice as long and we needed more of them to reach an optimum result, for a total training time over twice as long as the single layer model. 
+# 
+# Again, it is possible that better tunings would improve the result. For instance, at 70 and several later epochs, the cost function has increased, indicating that adjustments to the learning rate should be tested.  However, we will pass to the discussion of convolutional neural networks.
 
 # In[57]:
 
@@ -1097,7 +1124,7 @@ plt.show()
 # 
 # We have seen that many of the handwritten digits do contain many features in common, but they tend to be slightly displaced from digit to digit. As an example, consider these 4s:
 
-# In[134]:
+# In[63]:
 
 plt.figure(1)
 plt.imshow(pixel_mat(9), cmap=plt.cm.gray, origin='upper', interpolation='nearest')
@@ -1121,6 +1148,9 @@ plt.show()
 
 tf.reset_default_graph()
 sess = tf.InteractiveSession()
+
+# set random seed
+tf.set_random_seed(464)
 
 
 # The network will have the same input and output layers as before.
@@ -1158,7 +1188,7 @@ x_image = tf.reshape(x, [-1,28,28,1])
 # flattens the filter into a tensor W of shape [filter_height $*$ filter_width $*$ in_channels, output_channels].<BR> 
 # computes the matrix product  X.W, which is a tensor of shape [batch, out_height, out_width, output_channels].
 # 
-# We specify the filter by defining a weight tensor of the appropriate shape.  For a 5x5 window, the weights will have shape [5, 5, 1, n_features_out], where n_features_out is the number of features we want the CNN layer to compute. We will compute 32 features in this first layer. 
+# We specify the filter by defining a weight tensor of the appropriate shape.  For a 5x5 window, the weights will have shape [5, 5, 1, n_features_out], where n_features_out is the number of features we want the CNN layer to compute. We will compute 4 features in this first layer. 
 # 
 # We also have to decide the stride for the layer,  which is the amount we shift the window between samplings. We specify the stride using a vector containing the information [batch, horizontal_stride, vertical_stride, in_channels]. Stride is constrained to sample one batch input and one input channel at a time, so the stride vector must be given in the form [1, horizontal_stride, vertical_stride, 1]. If we just shift the window by one pixel in either direction for samplings, the stride tensor should be [1, 1, 1, 1].
 # 
@@ -1170,7 +1200,7 @@ x_image = tf.reshape(x, [-1,28,28,1])
 
 # In[67]:
 
-n_convfeat1 = 32
+n_convfeat1 = 4
 
 W_conv1 = weight_variable([5, 5, 1, n_convfeat1])
 b_conv1 = bias_variable([n_convfeat1])
@@ -1205,13 +1235,13 @@ h_pool1 = tf.nn.max_pool(h_conv1, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padd
 h_pool1
 
 
-# This is a 14x14 image with the same 32 features outputted by the CNN.  
+# This is a 14x14 image with the same 4 features outputted by the CNN.  
 # 
-# Again following the tutuorial, we wish to introduce additional CNN and pooling layers.  We will again choose the CNN to be 5x5 with unit stride and apply another instance of 2x2 max pooling with stride 2.  The output will be a 7x7 image. Note that the output of the first pooling layer had $14*14*32 = 6272$ features per image.  In order to retain this information after the 2nd pooling layer, we should compute $6272/(7*7) = 128$ features in the 2nd convolutional layer.
+# Again following the tutuorial, we wish to introduce additional CNN and pooling layers.  We will again choose the CNN to be 5x5 with unit stride and apply another instance of 2x2 max pooling with stride 2.  The output will be a 7x7 image. Note that the output of the first pooling layer had $14*14*4 = 784$ features per image. This is precisely equal to the number of input features.  In order to retain this information after the 2nd pooling layer, we should compute $784/(7*7) = 16$ features in the 2nd convolutional layer.
 
 # In[71]:
 
-n_convfeat2 = 128
+n_convfeat2 = 16
 
 W_conv2 = weight_variable([5, 5, n_convfeat1, n_convfeat2])
 b_conv2 = bias_variable([n_convfeat2])
@@ -1223,11 +1253,11 @@ h_pool2 = tf.nn.max_pool(h_conv2, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padd
 h_pool2
 
 
-# Our fully connected single layer NN was working pretty well so we will include one as the next layer. We have 6272 total features coming in, so we might expect a very wide layer will give the best results.  We'll choose a width of 3072 which will come with a significant price in training time.  We will flatten the 7x7 image into a pixel vector to make the computations more convenient.
+# Our fully connected single layer NN was working pretty well so we will include one as the next layer. We have 784 total features coming in, so we might expect a layer of a similar width will give the best results.  We'll choose a width of 512 which will save some training time.  We will flatten the 7x7 image into a pixel vector to make the computations more convenient.
 
 # In[72]:
 
-width1 = 3072
+width1 = 512
 
 W_1 = weight_variable([7 * 7 * n_convfeat2, width1])
 b_1 = bias_variable([width1])
@@ -1271,7 +1301,7 @@ optimizer = tf.train.AdamOptimizer(learning_rate).minimize(cost)
 
 # In[76]:
 
-n_batch = 200.
+n_batch = 50.
 int_batch = int(n_batch)
 
 n_samp_train = x_train_scaled.shape[0]
@@ -1287,11 +1317,11 @@ skfold = StratifiedKFold(n_splits=train_batch, shuffle=True, random_state=428)
 
 # Number of epochs to train over. Should be large enough for convergence.  If it is too large, at worst the model
 # might overfit, at best we waste computing time.
-n_epoch = 150
+n_epoch = 100 + 1
 
 # In order to monitor training progress, as well as tune n_epoch, we will computing appropriate 
 # metrics at checkpoints
-display_step = 15
+display_step = 10
 
 # initialize variables
 sess.run(tf.global_variables_initializer())
@@ -1317,7 +1347,7 @@ for epoch in range(n_epoch):
         # Note the feed_dict contains the minibatch data
         _, c = sess.run([optimizer, cost], feed_dict={x: x_batch, y_true: y_batch, keep_prob: 0.5})
         # Compute average cost
-        avg_cost += c / total_batch
+        avg_cost += c / train_batch
         
     # Display logs per epoch step
     if epoch % display_step == 0:
@@ -1331,7 +1361,7 @@ for epoch in range(n_epoch):
                             feed_dict={x: x_batch,
                                 y_true: y_batch, keep_prob: 1.})
             train_acc += acc / train_batch
-        print ("TRAIN ACCURACY: %.3f" % (train_acc))
+        print ("TRAIN ACCURACY: %.4f" % (train_acc))
         # compute accuracy on full validation set, in batches
         test_acc = 0
         for i in range(0, n_samp_test, int_batch):
@@ -1340,7 +1370,7 @@ for epoch in range(n_epoch):
                             feed_dict={x: x_batch,
                                 y_true: y_batch, keep_prob: 1.})
             test_acc += acc / test_batch
-        print ("TEST ACCURACY: %.3f" % (test_acc))
+        print ("TEST ACCURACY: %.4f" % (test_acc))
 
 # After the full training cycle, return more logs
 # compute accuracy on full training set, in batches
@@ -1362,15 +1392,22 @@ for i in range(0, n_samp_test, int_batch):
     
 print("Optimization finished in %.2f seconds!" % (time() - start)) 
 print("For n_convfeat1 = %d, n_convfeat2 = %d, width1 = %d, n_epoch = %d,"       % (n_convfeat1, n_convfeat2, width1, n_epoch))
-print ("TRAIN ACCURACY: %.3f" % (train_acc))
-print ("TEST ACCURACY: %.3f" % (test_acc))   
+print ("TRAIN ACCURACY: %.4f" % (train_acc))
+print ("TEST ACCURACY: %.4f" % (test_acc))   
 
 
-# These layers compute many more features than those in the previous feedforward models and we can see that each epoch of deep feedforward and backprop training is taking over 4 minutes. Total training time was around 10 hrs. At 99.2% accuracy, this is our best model so far.  
+# Each epoch of deep and backprop training is taking around 30s, which is 2x that of the two layer model and 4x that of the single layer model. Total training time is about one hour. At 99.3% accuracy, this is our best model so far.  
 # 
-# We should note that by epoch 135, the cost function has started to increase, so the learning rate is a bit too large compared to the number of epochs. However, the dip in the test accuracy at epoch 120 could be a sign of overfitting.  With so many features computed, it might be appropriate to use additional regularization techniques such as weight decay.
+# Finally, we'll note that a model with far more features:
 # 
-# Finally, we'll note that models with far fewer features, such as n_convfeat1 = 12, n_convfeat2 = 12, width1 = 512 have similar accuracy for a fraction of the training time.
+# ```
+# Optimization finished in 37388.73 seconds!
+# For n_convfeat1 = 32, n_convfeat2 = 128, width1 = 3072, n_epoch = 150,
+# TRAIN ACCURACY: 1.000
+# TEST ACCURACY: 0.992
+# ```
+# 
+# took around 10 hours to train and had worse performance.  It is possible that this was due to overfitting.
 
 # In[78]:
 
@@ -1378,7 +1415,7 @@ class_prob_cnn = sess.run(tf.nn.softmax(z_out),
                            feed_dict={x: x_test_scaled, y_true: y_test_oh, keep_prob: 1.})
 
 
-# In[ ]:
+# In[79]:
 
 sess.close()
 
@@ -1389,7 +1426,7 @@ sess.close()
 # 
 # First, lets check a random sample of the class probabilites:
 
-# In[79]:
+# In[80]:
 
 idxs = np.random.randint(0, len(class_prob_cnn), 5)
 class_prob_cnn[idxs]
@@ -1397,7 +1434,7 @@ class_prob_cnn[idxs]
 
 # We can use argmax to compute the most probable prediction for each example:
 
-# In[80]:
+# In[81]:
 
 y_pred_cnn = np.argmax(class_prob_cnn, 1)
 y_pred_cnn
@@ -1405,7 +1442,7 @@ y_pred_cnn
 
 # These are to be compared with the list of true labels from y_validation, which we can reobtain by also applying argmax:
 
-# In[81]:
+# In[82]:
 
 y_act = np.argmax(y_test_oh, 1)
 y_act
@@ -1413,7 +1450,7 @@ y_act
 
 # Another useful numpy function is argsort, which returns the indices that would sort an array, from smallest element to largest. In our case, it is more convenient to sort from largest to smallest, in which case we can specify np.argsort(-vec). In the case of our class probability vectors, the first entry in argsort(-vec) will be the argmax, while the next will be the 2nd most probable class, then the 3rd and so on.  It can be useful to know if the true label was given a relatively high probability if the most probable model class was incorrect. For example, we can consider
 
-# In[82]:
+# In[83]:
 
 print(class_prob_cnn[idxs])
 print(np.argsort(-class_prob_cnn[idxs]))
@@ -1422,7 +1459,7 @@ print(np.argmax(class_prob_cnn[idxs], 1))
 
 # It is also interesting to look at the confusion matrix:
 
-# In[83]:
+# In[84]:
 
 from sklearn.metrics import confusion_matrix
 
@@ -1450,7 +1487,7 @@ def plot_confusion_matrix(cm, classes,
     plt.xlabel('Predicted label')
 
 
-# In[86]:
+# In[85]:
 
 conf_mat = confusion_matrix(y_act, y_pred_cnn)
 
@@ -1461,133 +1498,27 @@ plt.show()
 
 # The model does well, as expected from the accuracy score.  Some observations, though the statistics of errors is based on small samples:
 # 
-# * 4s tend to get confused with 9s, and vice -versa.
-# * 5s get confused with 3s, but not vice-versa.
-# * 7s get confused with 2s and 9s a bit more than other digits. 
-# * 8s are confused with 0s, but not vice-versa.
-# * 9s are confused with 1s, 4s and 5s.  
+# * 5s are misclassified as 3s.
+# * 8s are misclassified as 9s.  
+# * 9s are misclassified as 1s, 4s, 5s, and 7s.
 # 
-# We will examine a couple examples where the model was confused between 4s and 9s a bit later.
+# We will look at all examples where the model was confused and then look at a couple in detail.
 # 
 # In order to compare with the features in the corresponding design matrix, x_validation, we can use the numpy where function to obtain the indices for the events where the prediction was different from the true value:
 
-# In[88]:
+# In[86]:
 
 error_idx = np.where(y_pred_cnn != y_act)[0]
 
 
-# In[89]:
+# In[87]:
 
 error_idx
 
 
-# We can then adapt the code from the overview notebook and display a random set of digit images from the error set:
+# We will plot all errors, ordered by most probable class label:
 
-# In[90]:
-
-rand_idx = np.random.choice(error_idx, size=20, replace=False)
-fig, axs = plt.subplots(nrows=5, ncols=4, figsize=(10,10))
-
-i = 0
-for ax in axs.reshape(-1):
-    # cycle through the elements of rand_idx
-    idx = rand_idx[i]
-# this is the true class label
-    true_y = y_act[idx]
-    # this is the vector of model class probabilities
-    prob_y = class_prob_cnn[idx]
-    # this is the most probable class
-    top_pred = np.argmax(prob_y)
-    # this is probability of the top class
-    prob_top = prob_y[top_pred]
-    # argsort the prob. vector
-    arg_sort = np.argsort(-prob_y)
-    # this is the 2nd choice class 
-    sec_choice = arg_sort[1]
-    # this is the probability of the 2nd choice class
-    prob_sec = prob_y[sec_choice]
-    
-    
-    ax.set_title("True: %d \n Pred: %d (%.2f), %d (%.2f)" % 
-                 (true_y, top_pred, prob_top, sec_choice, prob_sec))
-    ax.imshow(x_test[idx].reshape(28,28), cmap=plt.cm.gray, origin='upper', interpolation='nearest')
-    ax.axis('off')
-    i += 1
-plt.tight_layout()    
-plt.show()
-
-
-# In[93]:
-
-rand_idx[7]
-
-
-# It is likely that several of these would be challenging for a human to identify with 100% accuracy, while others are quite obvious.   In some cases, it is easy to see what features that the neural network probably used to decide that the image more closely resembled a different digit than the true one.
-# 
-# For instance, for the following digit image, the CNN predicted "9" vs the true value of 4.
-
-# In[92]:
-
-idx = 1242
-# this is the true class label
-true_y = y_act[idx]
-# this is the vector of model class probabilities
-prob_y = class_prob_cnn[idx]
-# this is the most probable class
-top_pred = np.argmax(prob_y)
-# this is probability of the top class
-prob_top = prob_y[top_pred]
-# argsort the prob. vector
-arg_sort = np.argsort(-prob_y)
-# this is the 2nd choice class 
-sec_choice = arg_sort[1]
-# this is the probability of the 2nd choice class
-prob_sec = prob_y[sec_choice]
-    
-plt.imshow(x_test[idx].reshape(28,28), cmap=plt.cm.gray, origin='upper', interpolation='nearest') 
-plt.title("True: %d \n Pred: %d (%.2f), %d (%.2f)" % 
-                 (true_y, top_pred, prob_top, sec_choice, prob_sec))
-plt.show()
-
-
-# In this case, a human would probably decide this was a 4 quite easily.  It is possible that the curvature at 2 of the 3 corners of the loop has confused the model. However the straight long edges make it hard for a human to confuse this with a 9.  The model's 2nd choice is an 4, with a probability of 8% assigned.
-
-# In[95]:
-
-class_prob_cnn[1242]
-
-
-# For the converse identification problem, we can look at the following example:
-
-# In[96]:
-
-idx = 3985
-# this is the true class label
-true_y = y_act[idx]
-# this is the vector of model class probabilities
-prob_y = class_prob_cnn[idx]
-# this is the most probable class
-top_pred = np.argmax(prob_y)
-# this is probability of the top class
-prob_top = prob_y[top_pred]
-# argsort the prob. vector
-arg_sort = np.argsort(-prob_y)
-# this is the 2nd choice class 
-sec_choice = arg_sort[1]
-# this is the probability of the 2nd choice class
-prob_sec = prob_y[sec_choice]
-    
-plt.imshow(x_test[idx].reshape(28,28), cmap=plt.cm.gray, origin='upper', interpolation='nearest') 
-plt.title("True: %d \n Pred: %d (%.2f), %d (%.2f)" % 
-                 (true_y, top_pred, prob_top, sec_choice, prob_sec))
-plt.show()
-
-
-# In this case, we have a  stubby, bent stem on the right that doesn't rise to the height of the left part of the digit.  The bottom of the loop meets the stem at almost 90 degrees, instead of the acute angle typically associated with a 9. The upper part of the loop also misses the top of the stem by a large margin.  These features probably explain why the CNN thought this was a 4.  In fact 9 was the 2nd choice, though with a < 1% probability.
-# 
-# We will plot all errors, by prediction below.
-
-# In[113]:
+# In[88]:
 
 def plot_digits_bypred(digit):
     # generate a 4xn grid of subplots, 4 is the number of columns that will reasonably display in typical
@@ -1623,116 +1554,130 @@ def plot_digits_bypred(digit):
                          (true_y, top_pred, prob_top, sec_choice, prob_sec))
             ax.imshow(x_test[idx].reshape(28,28), cmap=plt.cm.gray, origin='upper', interpolation='nearest')
             ax.axis('off')
+        if i >= list_len:
+            fig.delaxes(ax)
       
     plt.tight_layout()    
     plt.show()
 
 
-# In[114]:
+# In[89]:
 
 plot_digits_bypred(0)
 
 
-# In[115]:
+# In[90]:
 
 plot_digits_bypred(1)
 
 
-# In[116]:
+# In[91]:
 
 plot_digits_bypred(2)
 
 
-# In[117]:
+# In[92]:
 
 plot_digits_bypred(3)
 
 
-# In[118]:
+# In[93]:
 
 plot_digits_bypred(4)
 
 
-# In[119]:
+# In[94]:
 
 plot_digits_bypred(5)
 
 
-# In[120]:
+# In[95]:
 
 plot_digits_bypred(6)
 
 
-# In[121]:
+# In[96]:
 
 plot_digits_bypred(7)
 
 
-# In[122]:
+# In[97]:
 
 plot_digits_bypred(8)
 
 
-# In[123]:
+# In[98]:
 
 plot_digits_bypred(9)
 
 
-# ## Ensemble of NNs
+# It is likely that several of these would be challenging for a human to identify with 100% accuracy, while others are quite obvious.   In some cases, it is easy to see what features that the neural network probably used to decide that the image more closely resembled a different digit than the true one.
 # 
-# Recall that we saved the prediction probabilities from the three networks:
+# For instance, for the following digit image, the CNN predicted "3" vs the true value of 5.
 
-# In[125]:
+# In[99]:
 
-y_pred_singlayer = np.argmax(class_prob_singlayer, 1)
-y_pred_twolayer = np.argmax(class_prob_twolayer, 1)
-
-print("Single Layer accuracy score: %f" % accuracy_score(y_pred_singlayer, y_act))
-print("Two-Layer accuracy score: %f" % accuracy_score(y_pred_twolayer, y_act))
-print("CNN accuracy score: %f" % accuracy_score(y_pred_cnn, y_act))
-
-
-# To motivate ensemble methods, suppose that we have $n$ independent measurements $X_1, \ldots, X_n$ drawns from a normal distribution with mean $\mu$ and variance $\sigma^2$.  The sample mean is the expected value of the mean $\bar{X}$,
-# $$ \begin{split} E(\bar{X}) & = E\left( \frac{1}{n} (X_1 + \cdots + X_n) \right)\\
-# & = \frac{1}{n} \bigl(E(X_1) + \cdots + E(X_n)\bigr) \\
-# & = \frac{1}{n} ( n \mu ) = \mu .\end{split} $$
-# 
-# The variance of the sample mean is
-# $$ \begin{split} \text{Var}(\bar{X}) & = \text{Var}\left( \frac{1}{n} (X_1 + \cdots + X_n) \right)\\
-# & = \frac{1}{n^2} \bigl(\text{Var}(X_1) + \cdots + \text{Var}(X_n)\bigr) \\
-# & = \frac{1}{n^2} ( n \sigma^2 )  \\
-# & = \frac{\sigma^2}{n}.\end{split} $$
-# This leads to the notion that we can reduce the variance in a sample mean by increasing the size of the sample.
-# 
-# Ensemble methods in machine learning work on the same principal, though typically model predictions are not completely independent because they are being made with the same input data.  Nevertheless, we expect that the variance of the mean of $n$ predictions $\hat{y}_i$ will be something like
-# $$ \text{Var}(\bar{\hat{y}})  = \frac{1}{k} \text{Var}(\hat{y})$$
-# for some $ 1 < k < n$.   By averaging the results of several models, we should be able to reduce the variance of the predictions and obtain a more accurate result.
-# 
-# In fact, the Random Forest model leverages this feature of ensembles to great effect.
-# 
-# Let us examine this by taking a simple average of the predicted class probabilities for our fully-connected networks:
-
-# In[129]:
-
-class_prob_ensemble = (class_prob_singlayer + class_prob_twolayer) / 2
-y_pred_ensemble = np.argmax(class_prob_ensemble, 1)
-
-print("Single Layer accuracy score: %f" % accuracy_score(y_pred_singlayer, y_act))
-print("Two-Layer accuracy score: %f" % accuracy_score(y_pred_twolayer, y_act))
-print("Ensemble accuracy score: %f" % accuracy_score(y_pred_ensemble, y_act))
+idx = 2035
+# this is the true class label
+true_y = y_act[idx]
+# this is the vector of model class probabilities
+prob_y = class_prob_cnn[idx]
+# this is the most probable class
+top_pred = np.argmax(prob_y)
+# this is probability of the top class
+prob_top = prob_y[top_pred]
+# argsort the prob. vector
+arg_sort = np.argsort(-prob_y)
+# this is the 2nd choice class 
+sec_choice = arg_sort[1]
+# this is the probability of the 2nd choice class
+prob_sec = prob_y[sec_choice]
+    
+plt.imshow(x_test[idx].reshape(28,28), cmap=plt.cm.gray, origin='upper', interpolation='nearest') 
+plt.title("True: %d \n Pred: %d (%.2f), %d (%.2f)" % 
+                 (true_y, top_pred, prob_top, sec_choice, prob_sec))
+plt.show()
 
 
-# We see that the accuracy of the ensemble is very slightly better than the accuracy of either of the models taken alone, as promised. We will return to ensemble methods in the future.
-# 
-# It turns out that the CNN results are so much better than the fully-connected networks that the ensemble results of the 3 networks is still worse than that of the CNN alone.  
+# In this case, a human would probably tend to guess 5, but without complete certainty.  Because of the slant of the 5 to the right, the lower half of the digit looks quite like an upright 3.  The stroke at the top of the digit has enough of a left tail to resemble a 3.  Also the slant of the digit again makes this tail meet at an angle that reproduces a half loop associated with a 3.  The model's 2nd choice was 5, with a probability of 10% assigned.
+
+# For the converse identification problem, we can look at the following example:
+
+# In[113]:
+
+idx = 1901
+# this is the true class label
+true_y = y_act[idx]
+# this is the vector of model class probabilities
+prob_y = class_prob_cnn[idx]
+# this is the most probable class
+top_pred = np.argmax(prob_y)
+# this is probability of the top class
+prob_top = prob_y[top_pred]
+# argsort the prob. vector
+arg_sort = np.argsort(-prob_y)
+# this is the 2nd choice class 
+sec_choice = arg_sort[1]
+# this is the probability of the 2nd choice class
+prob_sec = prob_y[sec_choice]
+    
+plt.imshow(x_test[idx].reshape(28,28), cmap=plt.cm.gray, origin='upper', interpolation='nearest') 
+plt.title("True: %d \n Pred: %d (%.2f), %d (%.2f)" % 
+                 (true_y, top_pred, prob_top, sec_choice, prob_sec))
+plt.show()
+
+
+# Here a human might guess 4 fairly often as well.  The loop of the 9 is broken.  The bottom of the loop and the lower stem make a right angle, like most 4s.  
+
+# In[115]:
+
+100 * class_prob_cnn[idx]
+
+
+# The correct choice of 9 was 2nd with a  0.03% probability, which was far behind the first choice.
 
 # ## Conclusions
 
 # In this notebook, we learned how to use TensorFlow to construct machine learning models using very low-level tools.  TF allows us to define models in much more detail than scikit-learn, but at the cost of requiring quite a bit of expertise about how those models work in theory and are constructed in practice.
 # 
-# We also learned how to apply neural networks, including the multilevel perceptron and the convolutional neural networks to the MNIST digit problem.  We saw that they lead to improvements of over 2% in validation accuracy vs our Random Forest result.
-
-# In[ ]:
-
-
-
+# We also learned how to apply neural networks, including the multilevel perceptron and convolutional neural networks to the MNIST digit problem.  We saw that they lead to improvements of over 2% in validation accuracy vs our Random Forest result.
