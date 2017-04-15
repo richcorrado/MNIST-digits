@@ -33,7 +33,7 @@
 # 
 # * Examine the examples that have been misclassified and explore some reasons for that.
 # 
-# N.B. This notebook should run in 8GB of RAM.  If you have less than that, you will probably have to adjust the minibatch size to 50 or 100. If still having problems, adjust the code for the convolutional neural network to compute less features.
+# N.B. This notebook should run in 8GB of RAM.  If you have less than that, or are otherwise having memory problems, adjust the code for the convolutional neural network to compute less features.  
 
 # In[1]:
 
@@ -79,28 +79,33 @@ test_df = pd.read_csv("./input/mnist_test.csv", header=None, names=column_names)
 def pixel_mat(row, df=train_df):
     # we're working with train_df so we want to drop the label column
     vec = df.drop('label', axis=1).iloc[row].values
-    # numpy provides the reshape() function to reorganize arrays into specified shapes
+    # numpy provides the reshape() function to reorganize arrays into 
+    # specified shapes
     pixel_mat = vec.reshape(28,28)
     return pixel_mat
 
 
 def plot_digits(list_input, df=train_df):
-    # generate a 4xn grid of subplots, 4 is the number of columns that will reasonably display in typical
+    # generate a 4xn grid of subplots, 4 is the number of columns that will 
+    # reasonably display in typical
     # overhead projector resolution at the size we're making the images 
     list_len = len(list_input)
     ncols = 4
-    nrows =  (list_len / 4) + (1 * (list_len % 4 != 0)) # add an extra row if list_len !div by 4
+    nrows =  (list_len / 4) + (1 * (list_len % 4 != 0)) # add an extra row 
+                                                        # if list_len !div by 4
     fig, axs = plt.subplots(nrows=nrows, ncols=ncols, figsize=(10,10))
 
 
     # axs is a 2d array so we flatten it into a vector in order to loop over it
     for i, ax in enumerate(axs.reshape(-1)):
         if i < list_len:   # don't generate ax titles for unused subplots
-            # Title is digit label, which can be found by referencing the label column of the row specified by rand_idx[i]
+            # Title is digit label, which can be found by referencing the label 
+            # column of the row specified by rand_idx[i]
             ax.set_title("Digit Label: %d" % df['label'].iloc[list_input[i]])
             # pixel_mat(rand_idx[i]) is the pixel matrix. 
             # The imshow flags are the ones that are used in the matshow wrapper
-            ax.imshow(pixel_mat(list_input[i], df=df), cmap=plt.cm.gray, origin='upper', interpolation='nearest')
+            ax.imshow(pixel_mat(list_input[i], df=df), cmap=plt.cm.gray, 
+                      origin='upper', interpolation='nearest')
             ax.axis('off')
     # tight_layout gives more spacing between subplots    
     plt.tight_layout()   
@@ -115,7 +120,7 @@ rand_idx = np.random.choice(train_df.index, size=16, replace=False)
 plot_digits(rand_idx)
 
 
-# We generate design matrics and response vectors directly from the dataframes
+# We generate design matrices and response vectors directly from the dataframes
 
 # In[5]:
 
@@ -151,12 +156,14 @@ kfold = StratifiedKFold(n_splits=10, random_state=7)
 
 # In[8]:
 
-rf_param =  {'n_estimators': scipy.stats.randint(150,400), 'max_depth': scipy.stats.randint(12,28), 
+rf_param =  {'n_estimators': scipy.stats.randint(150,400), 
+             'max_depth': scipy.stats.randint(12,28), 
              'max_features': scipy.stats.randint(15,40)}
 
 from sklearn.model_selection import RandomizedSearchCV
-rs = RandomizedSearchCV(rf_clf, param_distributions=rf_param, scoring = 'accuracy',
-                                   n_jobs=-1, n_iter=30, cv=kfold) 
+rs = RandomizedSearchCV(rf_clf, param_distributions=rf_param, 
+                        scoring = 'accuracy', n_jobs=-1, 
+                        n_iter=30, cv=kfold) 
 
 
 # Twenty iterations of cross-validation over the entire dataset would take a huge amount of time, so we will create a 10% split into a tuning set, using StratifiedShuffleSplit to preserve class frequencies.   This is a crutch that one must often rely when dealing with larger datasets.  We hope that an optimal set of parameters for a sample of our dataset is close to the optimal set of parameters for the entire dataset.   
@@ -175,7 +182,7 @@ y_tune = y_train[tune_idx]
 get_ipython().magic(u'time rs.fit(x_tune, y_tune)')
 
 
-# This finds a best candidate in around 4 minutes.   Random search over the entire dataset would take around an hour.
+# This finds a best candidate in around 10 minutes.   Random search over the entire dataset would take around 1.5 hours.
 # 
 # We can return the best estimator :
 
@@ -207,9 +214,9 @@ accuracy_score(y_test, y_rf_pred)
 # 
 # In preparation for this, we will encode the class labels as 10d vectors rather than as integers,
 # 
-# $$ 0 \longrightarrow \begin{pmatrix} 1 \\ 0 \\ \vdots \\ 0 \end{pmatrix},
-#  1 \longrightarrow \begin{pmatrix} 0 \\ 1 \\ \vdots  \\ 0 \end{pmatrix}, \ldots
-#   9 \longrightarrow \begin{pmatrix} 0 \\ 0 \\ \vdots \\ 1 \end{pmatrix}.$$
+# $$ 0 \longrightarrow \begin{pmatrix} 1 & 0 & \cdots & 0 \end{pmatrix},
+#  1 \longrightarrow \begin{pmatrix} 0 & 1 & \cdots  & 0 \end{pmatrix}, \ldots
+#   9 \longrightarrow \begin{pmatrix} 0 & 0 & \cdots & 1 \end{pmatrix}.$$
 #   
 # This is sometimes called "one hot" encoding, since the presence of a defining class is indicated by a binary 1 in a vector and is analogous to the implementation of binary logic in circuits.  In the context of classification, this scheme is called "one vs all" classification and is fairly easy to implement  as an additional layer of our model in TF.  In scikit-learn, one vs all is already build into the multiclassification models so that the end user does not have to perform this additional step.
 # 
@@ -339,13 +346,13 @@ x_train[np.where(x_train != 0)]
 
 # ## TensorFlow
 
-# There is already a tutorial about using TensorFlow to study MNIST at <https://www.tensorflow.org/get_started/mnist/pros>.  In our case,  we have been using the data from the kaggle playground, so we won't follow that tutorial exactly, but it is a good place to start. If you haven't installed tensorflow, be sure and do so using the instructions for your OS at <https://www.tensorflow.org/install/>.
+# There is already a tutorial about using TensorFlow to study MNIST at <https://www.tensorflow.org/get_started/mnist/pros> and we will follow that to some extent, fleshing many details out and adding explanations.   If you haven't installed tensorflow, be sure and do so using the instructions for your OS at <https://www.tensorflow.org/install/>.
 # 
-# TensorFlow (TF) uses a <a herf="https://www.tensorflow.org/get_started/get_started#the_computational_graph">**Computational Graph**</a> model of defining computations.  We can think of each operation as a node of a graph, which is precisely how we organize a neural network. It is worthwhile to describe the detail of a computational graph, since understanding the structure is very important in successful construction of new models.
+# TensorFlow (TF) uses a <a herf="https://www.tensorflow.org/get_started/get_started#the_computational_graph">**Computational Graph**</a> model of defining computations.  We can think of each operation as a node of a graph, which is similar to how we organize a neural network. It is worthwhile to describe the detail of a computational graph, since understanding the structure is very important in successful construction of new models.
 # 
 # When using scikit-learn models, we most likely only have to deal with the data in the form of a design matrix and, for training data, a response vector (or matrix in multivariate or possibly multiclass problems).   The user can ignore many details of how the model functions transform the data and implement the particular machine learning algorithms.  However, since TF is intended to be a much lower-level framework for constructing models, it allows that inputs or intermediate expressions can be tensors of any shape.  
 # 
-# In order to handle this,  TF includes a new class called **Tensor** that is used to pass numpy arrays of any shape from one Operation to another. We can think of these as the lines in the graph. In TF an **Operation** is a class that performs a computation on Tensors.  Operations (also called ops) are the nodes of the graph. TF operations include very simple arithmetic like addition tf.add(a.b) or multiplication tf.matmul(a, b), for tensors a,b. Operations also include neural net activation functions and convolution and pooling operations.
+# In order to handle this,  TF includes a new class called **Tensor** that is used to pass numpy arrays of any shape from one Operation to another. We can think of these as the lines in the graph. In TF an **Operation** is a class that performs a computation on Tensors.  Operations (also called ops) are the nodes of the graph. TF operations include very simple arithmetic like addition tf.add(a, b) or multiplication tf.matmul(a, b), for tensors a, b. Operations also include neural net activation functions and convolution and pooling operations.
 # 
 # In order to specify model parameters, such as weights and biases, TF provides the constructor class **Variable()**. In terms of the computational graph, calling Variable() actually adds two ops. The first is an assign op that assigns the initial value that you specify for the variable, while the second is an op that holds the value of the variable,  which can be changed during learning rounds.
 # 
@@ -400,7 +407,7 @@ n_feat = 784
 x = tf.placeholder(tf.float32, shape=[None, n_feat])
 
 
-# We'll also specify a placeholder for our target output values. We transformed these to one-hot 10d vectors.
+# We'll also specify a placeholder for our target labels. We transformed these to one-hot 10d vectors.
 
 # In[28]:
 
@@ -457,7 +464,8 @@ cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels=y_true, log
 
 # In[33]:
 
-tf.nn.softmax_cross_entropy_with_logits(labels=y_true, logits=z_out)
+tf.nn.softmax_cross_entropy_with_logits(labels=y_true, 
+                                        logits=z_out)
 
 
 # The role of the tf.reduce_mean function is to compute the average cost per example fed into the computational graph.  
@@ -474,7 +482,7 @@ accr = tf.reduce_mean(tf.cast(corr, "float"))
 # 
 # In the second line, we recast our boolean vector to a numerical one and apply reduce_mean to compute the accuracy score. 
 # 
-# Next, we have to specify an **optimizer** operation, which we'll choose to be a simple gradient descent.
+# Next, we have to specify an **optimizer** operation, which we'll choose to be simple gradient descent.
 
 # In[35]:
 
@@ -511,7 +519,7 @@ total_batch = int(n_samp / n_batch)
 total_batch
 
 
-# We want to construct a scheme where we split the training data into 600 unique minibatches, so that we see every training example exactly once in a minimum number of passes.  We expect that the scheme will work best if the minibatches are both randomized and have approximately the same distribution of classes as the training set itself.  We can accomplish this using StratifiedKFold, where we use the "test" partition in each fold as the minibatch. 
+# We want to construct a scheme where we split the training data into 1200 unique minibatches, so that we see every training example exactly once in a minimum number of passes.  We expect that the scheme will work best if the minibatches are both randomized and have approximately the same distribution of classes as the training set itself.  We can accomplish this using StratifiedKFold, where we use the "test" partition in each fold as the minibatch. 
 # 
 # Note:  TF also includes the function tf.train.shuffle_batch to implement batch processing.  It doesn't allow for stratifying class labels, but is an option to consider.
 # 
@@ -526,11 +534,13 @@ skfold = StratifiedKFold(n_splits=total_batch, shuffle=True, random_state=428)
 
 # In[39]:
 
-# Number of epochs to train over. Should be large enough for convergence.  If it is too large, at worst the model
+# Number of epochs to train over. Should be large enough for convergence.  
+# If it is too large, at worst the model
 # might overfit, at best we waste computing time.
 n_epoch = 200
 
-# In order to monitor training progress, as well as tune n_epoch, we will computing appropriate 
+# In order to monitor training progress, as well as tune n_epoch, 
+# we will computing appropriate 
 # metrics at checkpoints
 display_step = 25
 
@@ -542,14 +552,16 @@ for epoch in range(n_epoch):
     # init average cost 
     avg_cost = 0.
     
-    # enumerate(skfold.split(x,y)) returns a triple of the form (fold, train indices, test indices)
+    # skfold.split(x,y) returns a list of pairs of index arrays
+    # of the form (train indices, test indices)
     # minibatch indices are the test indices, labeled batch_idx here.
     # the training indices are not used, we just assign them to dummy_idx
     # fold is the number of the fold in range(total_batch)
     # One loop over the folds is a single epoch.
-    # Note also that we use the ordinal class labels in y_training because StratifiedKFold wouldn't work with the
+    # Note also that we use the ordinal class labels in y_training 
+    # because StratifiedKFold wouldn't work with the
     # one-hot encoding
-    for fold, (dummy_idx, batch_idx) in enumerate(skfold.split(x_train_scaled, y_train)):
+    for dummy_idx, batch_idx in skfold.split(x_train_scaled, y_train):
         # extract design matrix and response array for minibatch
         # here we can use the one-hot response array
         x_batch, y_batch = x_train_scaled[batch_idx], y_train_oh[batch_idx]
@@ -563,17 +575,22 @@ for epoch in range(n_epoch):
     # Display logs per epoch step
     if epoch % display_step == 0:
         # return epoch and average cost
-        print("Epoch: %.4d" % epoch, "cost = %.4f" % avg_cost, "time = %.2f" % (time() - start))
+        print("Epoch: %.4d" % epoch, "cost = %.4f" % avg_cost, 
+              "time = %.2f" % (time() - start))
         # compute accuracy on full training set
-        train_acc = sess.run(accr, feed_dict={x: x_train_scaled, y_true: y_train_oh})
+        train_acc = sess.run(accr, 
+                             feed_dict={x: x_train_scaled, y_true: y_train_oh})
         print ("TRAIN ACCURACY: %.3f" % (train_acc))
         # compute accuracy on full validation set
-        test_acc = sess.run(accr, feed_dict={x: x_test_scaled, y_true: y_test_oh})
+        test_acc = sess.run(accr, 
+                            feed_dict={x: x_test_scaled, y_true: y_test_oh})
         print ("TEST ACCURACY: %.3f" % (test_acc))
 
 # After the full training cycle, return more logs
-train_acc = sess.run(accr, feed_dict={x: x_train_scaled, y_true: y_train_oh})      
-test_acc = sess.run(accr, feed_dict={x: x_test_scaled, y_true: y_test_oh})
+train_acc = sess.run(accr, 
+                     feed_dict={x: x_train_scaled, y_true: y_train_oh})      
+test_acc = sess.run(accr, 
+                    feed_dict={x: x_test_scaled, y_true: y_test_oh})
 print("Optimization finished in %.2f seconds!" % (time() - start)) 
 print ("TRAIN ACCURACY: %.3f" % (train_acc))
 print ("TEST ACCURACY: %.3f" % (test_acc))   
@@ -608,7 +625,7 @@ sess.close()
 # 
 # ![single hidden layer network](single_layer.png)
 # 
-# In this picture, we've drawn each feature as a node of the graph. The lines indicate which features are involved in the definition of each new feature. In the figure, at the left, we have an input layer that take $F$ input features.  The hidden layer has a width $n$.  The lines show that the input features are fully connected to the nodes of the hidden layer.  This means that the weights and biases at the hidden layer
+# In this picture, we've drawn each feature as a node of the graph. The lines indicate which features are involved in the definition of each new feature. In the figure, at the left, we have an input layer that takes $F$ input features.  The hidden layer has a width $n$.  The lines show that the input features are fully connected to the nodes of the hidden layer.  This means that the weights and biases at the hidden layer
 # $$ z^{(1)} = X W^{(1)} + b^{(1)}$$
 # are full and of shape
 # 
@@ -616,7 +633,7 @@ sess.close()
 # * $b^{(1)}$: [# of examples, width]
 # 
 # We can also choose an **activation** function at the hidden layer.  The role of the activation function is to introduce some nonlinearity in the function that the complete network will learn.  In this notebook, we will always use the **Rectified Linear Unit, or ReLU**, activation function, defined by:
-# $$ g(z) = \text{max}(0,z) = \begin{cases} z, & z \geq 0 \\ 0, z < 0. \end{cases}$$
+# $$ g(z) = \text{max}(0,z) = \begin{cases} z, & z \geq 0 \\ 0, & z < 0. \end{cases}$$
 # A plot of ReLU is:
 # 
 # ![ReLU function](relu.png)
@@ -638,7 +655,7 @@ sess.close()
 # $$ \begin{split} 
 # & \tilde{J}(\mathbf{W};\mathbf{x},\mathbf{y}) = J(\mathbf{W};\mathbf{x},\mathbf{y})  + \Omega(\mathbf{W}), \\
 # & \Omega(\mathbf{W})= \begin{cases}
-# \frac{\alpha}{2} (\mathbf{W}^T \mathbf{W} \mathbf{W}), & L^2, \text{(Ridge regression)}, \\
+# \frac{\alpha}{2} (\mathbf{W}^T \mathbf{W} ), & L^2, \text{(Ridge regression)}, \\
 # \alpha \sum_i | W_i |, & L^1,  \text{(LASSO)}. \end{cases} \end{split}$$
 # 
 # Weight decay provides an additional penalty in optimization that depends on the size of the parameters.  For appropriate choice of the hyperparameter $\alpha$, optimization of the new cost will then favor solutions where relatively unimportant parameters take very small values and the important parameters will control the fit to the general trend contained in the training data.  Without weight decay, the unimportant parameters could be tuned at will to drive the fit closer to the training data points and away from the generalized trend of the true sample population.
@@ -657,7 +674,7 @@ sess.close()
 # 
 # #### Back to TensorFlow
 # 
-# Let us build this single hidden layer neural network in TensorFlow, We will start by clearing the previous graph and starting a new interactive session.
+# Let us build this single hidden layer neural network in TensorFlow. We will start by clearing the previous graph and starting a new interactive session.
 
 # In[41]:
 
@@ -698,15 +715,17 @@ def bias_variable(shape):
 
 # These draw the initial weights from a positively truncated normal distribution and set the biases to a small positive constant.  Having a positive bias tends to result in good performance when using ReLU activation functions, which we will do below.
 # 
-# We will start with a hidden layer with 1024 nodes, fully connected to the input layer:
+# We will start with a hidden layer with 784 nodes, fully connected to the input layer. We choose this value because it is equal to the number of input features and it will make it easier to compare the output features with the input features.  
+# 
+# In general, there is no good rule about how many features we need in the hidden layer for a neural network to perform well.  One can make guesses by looking at what worked well on similar problems, but the best practice is to test many different sizes using (cross-)validation until a nearly optimal size is found.   
 
 # In[44]:
 
-width1 = 1024
+width1 = 784
 W_1 = weight_variable([n_feat, width1])
 
 
-# Similarly, we want to define a bias for each node.  
+# We also want to define the same bias for each node.  
 
 # In[45]:
 
@@ -744,7 +763,9 @@ z_out = tf.add(tf.matmul(h_1_drop, W_out), b_out)
 
 # In[49]:
 
-cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels=y_true, logits=z_out))
+cost = tf.reduce_mean(
+        tf.nn.softmax_cross_entropy_with_logits(labels=y_true, 
+                                                logits=z_out))
 corr = tf.equal(tf.argmax(z_out, 1), tf.argmax(y_true, 1))    
 accr = tf.reduce_mean(tf.cast(corr, "float"))
 
@@ -753,7 +774,7 @@ accr = tf.reduce_mean(tf.cast(corr, "float"))
 
 # In[50]:
 
-learning_rate = 0.001
+learning_rate = 0.0001
 optimizer = tf.train.AdamOptimizer(learning_rate).minimize(cost)
 
 
@@ -761,13 +782,11 @@ optimizer = tf.train.AdamOptimizer(learning_rate).minimize(cost)
 
 # In[51]:
 
-# Number of epochs to train over. Should be large enough for convergence.  If it is too large, at worst the model
-# might overfit, at best we waste computing time.
-n_epoch = 130 + 1
+# Number of epochs to train over.
+n_epoch = 140 + 1
 
-# In order to monitor training progress, as well as tune n_epoch, we will computing appropriate 
-# metrics at checkpoints
-display_step = 10
+# We will compute appropriate metrics at checkpoints
+display_step = 15
 
 # initialize variables
 sess.run(tf.global_variables_initializer())
@@ -777,56 +796,65 @@ for epoch in range(n_epoch):
     # init average cost 
     avg_cost = 0.
     
-    # enumerate(skfold.split(x,y)) returns a triple of the form (fold, train indices, test indices)
     # minibatch indices are the test indices, labeled batch_idx here.
     # the training indices are not used, we just assign them to dummy_idx
     # fold is the number of the fold in range(total_batch)
     # One loop over the folds is a single epoch.
-    # Note also that we use the ordinal class labels in y_training because StratifiedKFold wouldn't work with the
-    # one-hot encoding
-    for fold, (dummy_idx, batch_idx) in enumerate(skfold.split(x_train_scaled, y_train)):
+    for dummy_idx, batch_idx in skfold.split(x_train_scaled, y_train):
         # extract design matrix and response array for minibatch
         # here we can use the one-hot response array
         x_batch, y_batch = x_train_scaled[batch_idx], y_train_oh[batch_idx]
         # run backprop and feedforward
         # we assign the cost per example to c
         # Note the feed_dict contains the minibatch data
-        _, c = sess.run([optimizer, cost], feed_dict={x: x_batch, y_true: y_batch, keep_prob: 0.5})
+        _, c = sess.run([optimizer, cost], 
+                        feed_dict={x: x_batch, y_true: y_batch, keep_prob: 0.5})
         # Compute average cost
         avg_cost += c / total_batch
         
     # Display logs per epoch step
     if epoch % display_step == 0:
         # return epoch and average cost
-        print("Epoch: %.4d" % epoch, "cost = %.4f" % avg_cost, "time = %.2f" % (time() - start))
+        print("Epoch: %.4d" % epoch, "cost = %.4f" % avg_cost, 
+              "time = %.2f" % (time() - start))
         # compute accuracy on full training set
-        train_acc = sess.run(accr, feed_dict={x: x_train_scaled, y_true: y_train_oh, keep_prob: 1.})
+        train_acc = sess.run(accr, 
+                             feed_dict={x: x_train_scaled, 
+                                        y_true: y_train_oh, 
+                                        keep_prob: 1.})
         print ("TRAIN ACCURACY: %.4f" % (train_acc))
         # compute accuracy on full validation set
-        test_acc = sess.run(accr, feed_dict={x: x_test_scaled, y_true: y_test_oh, keep_prob: 1.})
+        test_acc = sess.run(accr, 
+                            feed_dict={x: x_test_scaled, 
+                                       y_true: y_test_oh, 
+                                       keep_prob: 1.})
         print ("TEST ACCURACY: %.4f" % (test_acc))
 
 # After the full training cycle, return more logs
-train_acc = sess.run(accr, feed_dict={x: x_train_scaled, y_true: y_train_oh, keep_prob: 1.})      
-test_acc = sess.run(accr, feed_dict={x: x_test_scaled, y_true: y_test_oh, keep_prob: 1.})
+train_acc = sess.run(accr, feed_dict={x: x_train_scaled, 
+                                      y_true: y_train_oh, 
+                                      keep_prob: 1.})      
+test_acc = sess.run(accr, feed_dict={x: x_test_scaled, 
+                                     y_true: y_test_oh, 
+                                     keep_prob: 1.})
 print("Optimization finished in %.2f seconds!" % (time() - start)) 
 print ("TRAIN ACCURACY: %.4f" % (train_acc))
 print ("TEST ACCURACY: %.4f" % (test_acc))   
 
 
-# At 98.6% accuracy, this model is a 1.6% improvement in accuracy over our Random Forest result of 97%.  Each training epoch has taken around 15s, for a total training time of around one-half hour.
+# At a bit better than 98.6% accuracy, this model is a 1.6% improvement in accuracy over our Random Forest result of 97%.  Each training epoch has taken around 15s, for a total training time of a little more than one-half hour.
 # 
 # It might be possible to improve the results of this model by adjusting the parameters.  The width of the hidden layer, the learning rate, the minibatch size, etc. (even the choice of activation functions!) should all be viewed as hyperparameters that should be tuned to improve the accuracy of the model.  In future discussions, we will investigate some effects of hyperparameter tuning in neural networks.  Some issues to be concerned about:
 # 
 # 1. Width and depth of the network determines the **capacity** of the network, in information-theory terms.  Counting independent weight and bias parameters leads to some number $P$ of independent coefficients that must be optimized during training.  If the training data has $N$ examples and $F$ features, then we can think of $NF$ as an upper bound on the number of coefficients we can determine.   Since features can be interdependent or correlated, and examples can overlap, the actual bound $B \leq NF$ is highly dependent on the data.   
 #     * If $B < P$, then the system is underdetermined.  In such a case, **overfitting** is a serious concern and regularization, techniques, like dropout, become very important.
-#     * If $B > P$, then the model might not have enough capacity to generalize well.  
+#     * If $B \gg P$, then the model might not have enough capacity to generalize well.  An obvious exception can be when there is a very strong feature with a simple relationship to the response (linear, power law, etc.).  Then a simple model might be strongly predictive. 
 #     * Adjusting the width and/or depth of the network and examining (cross-)validation error can help to find an optimum capacity for the model.
 # 
-# 2. If the learning rate is too small, there can be several consequences, including:
-#     * The training will take a longer time than necessary, consuming time and other resources we could have used more efficiently.
-#     * We could end up in a local minimum and the step we make in parameter space is not large enough to get us out.
-#     * In our model here, we see that, e.g., at epoch 50, the cost function has actually increased.  This could be a sign that the learning rate is too large.
+# 2. The learning rate controls the step size in parameter space used during gradient descent. 
+#     * If the learning rate is too large, we will overshoot the minimum of the cost function.  Gradient descent might not converge, since the cost function will never be optimized according to whatever tolerance parameter or metric we are considering.
+#     * If the learning rate is too small, the training might take a longer time than necessary, consuming time and other resources we could have used more efficiently.
+#     * If the learning rate is too small, we could end up in a local minimum and the step we make in parameter space is not large enough to get us out.
 #     
 # 3. If the minibatch size is too small, the corresponding step during gradient descent will also be relatively small. We might get stuck in a local minimum.
 # 
@@ -834,15 +862,157 @@ print ("TEST ACCURACY: %.4f" % (test_acc))
 # 
 # For now, we'll look at adding an additional hidden layer to see how that affects the accuracy. 
 # 
-# Before closing the TF session, let's save the class probabilities predicted by this model:
+# Let's save the class probabilities predicted by this model:
 
 # In[52]:
 
 class_prob_singlayer = sess.run(tf.nn.softmax(z_out), 
-                          feed_dict={x: x_test_scaled, y_true: y_test_oh, keep_prob: 1.})
+                          feed_dict={x: x_test_scaled, 
+                                     y_true: y_test_oh, 
+                                     keep_prob: 1.})
 
+
+# We can also compute the features produced by the hidden layer.  Let's do this for a sample of 1s from the training set.
 
 # In[53]:
+
+np.random.seed(253)
+
+# get all indices from y_train where the label is 1
+ones_idx = np.where(y_train == 1)[0]
+
+# pick 10 entries at random
+rand_ones_idx = np.random.choice(ones_idx, 5)
+
+# corresponding design matrix from scaled features
+x_train_ones = x_train_scaled[rand_ones_idx]
+y_train_ones = y_train_oh[rand_ones_idx]
+
+h1_train_ones = sess.run(h_1, feed_dict={x: x_train_ones, 
+                                         y_true: y_train_ones,
+                                         keep_prob: 1.})
+
+
+# Now we will plot the original features on the left and the hidden layer features on the right: 
+
+# In[54]:
+
+fig, axs = plt.subplots(nrows=5, ncols=2, figsize=(10,10))
+
+for i, ax in enumerate(axs.reshape(-1)):
+    if (i % 2 == 0):   # even axes are the original features
+        pixel_mat_in = x_train_ones[i/2].reshape(28,28)
+        ax.imshow(pixel_mat_in, cmap=plt.cm.gray, 
+                  origin='upper', interpolation='nearest')
+        ax.axis('off')
+    if ((i-1) % 2 == 0):   # odd axes are the hidden layer features
+        pixel_mat_hl = h1_train_ones[(i-1)/2].reshape(28,28)
+        ax.imshow(pixel_mat_hl, cmap=plt.cm.gray, 
+                  origin='upper', interpolation='nearest')
+        ax.axis('off')
+# tight_layout gives more spacing between subplots    
+plt.tight_layout()   
+# Tell matplotlib to draw all of the previously generated objects
+plt.show()
+
+
+# We can repeat this for images of 2s:
+
+# In[55]:
+
+# get all indices from y_train where the label is 2
+twos_idx = np.where(y_train == 2)[0]
+
+# pick 10 entries at random
+rand_twos_idx = np.random.choice(twos_idx, 5)
+
+# corresponding design matrix from scaled features
+x_train_twos = x_train_scaled[rand_twos_idx]
+y_train_twos = y_train_oh[rand_twos_idx]
+
+h1_train_twos = sess.run(h_1, feed_dict={x: x_train_twos, 
+                                         y_true: y_train_twos,
+                                         keep_prob: 1.})
+
+fig, axs = plt.subplots(nrows=5, ncols=2, figsize=(10,10))
+
+for i, ax in enumerate(axs.reshape(-1)):
+    if (i % 2 == 0):   # even axes are the original features
+        pixel_mat_in = x_train_twos[i/2].reshape(28,28)
+        ax.imshow(pixel_mat_in, cmap=plt.cm.gray, 
+                  origin='upper', interpolation='nearest')
+        ax.axis('off')
+    if ((i-1) % 2 == 0):   # odd axes are the hidden layer features
+        pixel_mat_hl = h1_train_twos[(i-1)/2].reshape(28,28)
+        ax.imshow(pixel_mat_hl, cmap=plt.cm.gray, 
+                  origin='upper', interpolation='nearest')
+        ax.axis('off')
+# tight_layout gives more spacing between subplots    
+plt.tight_layout()   
+# Tell matplotlib to draw all of the previously generated objects
+plt.show()
+
+
+# We can take the sums of the matrices above and plot the aggregate features for the 1s (in greyscale vs the 2s (in bluescale):
+
+# In[56]:
+
+ones_sum_mat = h1_train_ones.sum(0).reshape(28,28)
+twos_sum_mat = h1_train_twos.sum(0).reshape(28,28)
+
+plt.figure(1)
+plt.imshow(ones_sum_mat, cmap=plt.cm.gray, origin='upper', interpolation='nearest')
+plt.imshow(twos_sum_mat-1, cmap=plt.cm.Blues, origin='upper', interpolation='nearest', alpha=0.5)
+   
+plt.show()
+
+
+# The highlights don't seem to have very much overlap, but there isn't any particular geometric order.  This is because the hidden layer was fully-connected and didn't preserve much information about how the original images were organized (at least in the vertical direction.)
+# 
+# Finally, we can aggregate data from 100 of each digit:
+
+# In[57]:
+
+h1_sum = []
+
+for dig in range(10):
+    idxs = np.where(y_train == dig)[0]
+    rand_idxs = np.random.choice(idxs, 100)
+
+    h1_sum.append(sess.run(h_1, feed_dict={x: x_train_scaled[rand_idxs],
+                                           y_true: y_train_oh[rand_idxs],
+                                           keep_prob: 1.}
+                          ).sum(0).reshape(28,28)
+                   )
+h1_sum = np.array(h1_sum)
+
+# normalize to [0,1]
+for i in range(10):
+    h1_sum[i] = h1_sum[i] / np.amax(h1_sum[i])
+    
+h1_sum.shape
+
+
+# In[58]:
+
+fig, axs = plt.subplots(nrows=2, ncols=5, figsize=(12,12))
+
+for i, ax in enumerate(axs.reshape(-1)):
+    ax.set_title("Digit Label: %d" % i)
+    ax.imshow(h1_sum[i], cmap=plt.cm.gray, 
+              origin='upper', interpolation='nearest')
+    ax.axis('off')
+# tight_layout gives more spacing between subplots    
+plt.tight_layout()   
+# Tell matplotlib to draw all of the previously generated objects
+plt.show()
+
+
+# It's clear that there is substantial variation between the hot spots for different digits, but se can't distinguish the digits from these features by eye.  I found there was considerable overlap when I tried to plot these on the same axes using a colormap, so that the result wasn't very descriptive.
+# 
+# Let's close the session and add a second hidden layer.
+
+# In[59]:
 
 sess.close()
 
@@ -851,7 +1021,7 @@ sess.close()
 
 # We will quickly execute a two-layer perceptron here and then move on to more complicated (and deep) networks.  The command reset_default_graph will reset the graph so that we can start fresh.
 
-# In[54]:
+# In[60]:
 
 tf.reset_default_graph()
 sess = tf.InteractiveSession()
@@ -860,14 +1030,14 @@ sess = tf.InteractiveSession()
 tf.set_random_seed(464)
 
 
-# In[55]:
+# In[61]:
 
 n_feat = 784
 x = tf.placeholder(tf.float32, shape=[None, n_feat])
 n_class = 10
 y_true = tf.placeholder(tf.int32, shape=[None, n_class])
 
-width1 = 1024 
+width1 = 784 
 W_1 = weight_variable([n_feat, width1])
 b_1 = bias_variable([width1])
 h_1 = tf.nn.relu(tf.add(tf.matmul(x, W_1), b_1))
@@ -875,7 +1045,7 @@ h_1 = tf.nn.relu(tf.add(tf.matmul(x, W_1), b_1))
 keep_prob = tf.placeholder(tf.float32)
 h_1_drop = tf.nn.dropout(h_1, keep_prob)
 
-width2 = 1024 
+width2 = 784 
 W_2 = weight_variable([width1, width2])
 b_2 = bias_variable([width2])
 h_2 = tf.nn.relu(tf.add(tf.matmul(h_1_drop, W_2), b_2))
@@ -887,7 +1057,9 @@ b_out = bias_variable([n_class])
 
 z_out = tf.add(tf.matmul(h_2_drop, W_out), b_out)
 
-cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels=y_true, logits=z_out))
+cost = tf.reduce_mean(
+            tf.nn.softmax_cross_entropy_with_logits(labels=y_true, 
+                                                    logits=z_out))
 
 learning_rate = 0.0005
 optimizer = tf.train.AdamOptimizer(learning_rate).minimize(cost)
@@ -898,15 +1070,13 @@ accr = tf.reduce_mean(tf.cast(corr, "float"))
 
 # The hidden layer sizes were chosen in order that the training runs in a reasonably short amount of time.
 
-# In[56]:
+# In[62]:
 
-# Number of epochs to train over. Should be large enough for convergence.  If it is too large, at worst the model
-# might overfit, at best we waste computing time.
-n_epoch = 160 + 1
+# Number of epochs to train over. 
+n_epoch = 190 + 1
 
-# In order to monitor training progress, as well as tune n_epoch, we will computing appropriate 
-# metrics at checkpoints
-display_step = 10
+# Compute appropriate metrics at checkpoints
+display_step = 20
 
 # initialize variables
 sess.run(tf.global_variables_initializer())
@@ -916,55 +1086,128 @@ for epoch in range(n_epoch):
     # init average cost 
     avg_cost = 0.
     
-    # enumerate(skfold.split(x,y)) returns a triple of the form (fold, train indices, test indices)
-    # minibatch indices are the test indices, labeled batch_idx here.
-    # the training indices are not used, we just assign them to dummy_idx
-    # fold is the number of the fold in range(total_batch)
-    # One loop over the folds is a single epoch.
-    # Note also that we use the ordinal class labels in y_training because StratifiedKFold wouldn't work with the
-    # one-hot encoding
-    for fold, (dummy_idx, batch_idx) in enumerate(skfold.split(x_train_scaled, y_train)):
-        # extract design matrix and response array for minibatch
-        # here we can use the one-hot response array
+
+    for dummy_idx, batch_idx in skfold.split(x_train_scaled, y_train):
         x_batch, y_batch = x_train_scaled[batch_idx], y_train_oh[batch_idx]
-        # run backprop and feedforward
-        # we assign the cost per example to c
-        # Note the feed_dict contains the minibatch data
-        _, c = sess.run([optimizer, cost], feed_dict={x: x_batch, y_true: y_batch, keep_prob: 0.5})
+        _, c = sess.run([optimizer, cost], 
+                        feed_dict={x: x_batch, 
+                                   y_true: y_batch, 
+                                   keep_prob: 0.5})
         # Compute average cost
         avg_cost += c / total_batch
         
     # Display logs per epoch step
     if epoch % display_step == 0:
         # return epoch and average cost
-        print("Epoch: %.4d" % epoch, "cost = %.4f" % avg_cost, "time = %.2f" % (time() - start))
+        print("Epoch: %.4d" % epoch, "cost = %.4f" % avg_cost, 
+              "time = %.2f" % (time() - start))
         # compute accuracy on full training set
-        train_acc = sess.run(accr, feed_dict={x: x_train_scaled, y_true: y_train_oh, keep_prob: 1.})
+        train_acc = sess.run(accr, 
+                             feed_dict={x: x_train_scaled, 
+                                        y_true: y_train_oh, 
+                                        keep_prob: 1.})
         print ("TRAIN ACCURACY: %.4f" % (train_acc))
         # compute accuracy on full validation set
-        test_acc = sess.run(accr, feed_dict={x: x_test_scaled, y_true: y_test_oh, keep_prob: 1.})
+        test_acc = sess.run(accr, 
+                            feed_dict={x: x_test_scaled, 
+                                       y_true: y_test_oh, 
+                                       keep_prob: 1.})
         print ("TEST ACCURACY: %.4f" % (test_acc))
 
 # After the full training cycle, return more logs
-train_acc = sess.run(accr, feed_dict={x: x_train_scaled, y_true: y_train_oh, keep_prob: 1.})      
-test_acc = sess.run(accr, feed_dict={x: x_test_scaled, y_true: y_test_oh, keep_prob: 1.})
+train_acc = sess.run(accr, 
+                     feed_dict={x: x_train_scaled, 
+                                y_true: y_train_oh, 
+                                keep_prob: 1.})      
+test_acc = sess.run(accr, 
+                    feed_dict={x: x_test_scaled, 
+                               y_true: y_test_oh, 
+                               keep_prob: 1.})
 print("Optimization finished in %.2f seconds!" % (time() - start)) 
 print("For width1 = %d, width2 = %d, n_epoch = %d,"       % (width1, width2, n_epoch))
 print ("TRAIN ACCURACY: %.4f" % (train_acc))
 print ("TEST ACCURACY: %.4f" % (test_acc))        
 
 
-# At 98.7% test accuracy, this model is only slightly better than the result of our single layer model. This model also takes much longer to train. Each epoch takes nearly twice as long and we needed more of them to reach an optimum result, for a total training time over twice as long as the single layer model. 
+# At 98.7% test accuracy, this model is only slightly better than the result of our single layer model. This model also takes about twice as long to train. 
 # 
-# Again, it is possible that better tunings would improve the result. For instance, at 70 and several later epochs, the cost function has increased, indicating that adjustments to the learning rate should be tested.  However, we will pass to the discussion of convolutional neural networks.
+# Again, it is possible that better tunings would improve the result. For instance, at 80 and several later epochs, the cost function has increased, indicating that adjustments to the learning rate should be tested.  
 
-# In[57]:
+# In[63]:
 
 class_prob_twolayer = sess.run(tf.nn.softmax(z_out), 
                           feed_dict={x: x_test_scaled, y_true: y_test_oh, keep_prob: 1.})
 
 
-# In[58]:
+# We can also visualize the features produced at each hidden layer.
+
+# In[64]:
+
+h1_sum = []
+
+for dig in range(10):
+    idxs = np.where(y_train == dig)[0]
+    rand_idxs = np.random.choice(idxs, 100)
+
+    h1_sum.append(sess.run(h_1, feed_dict={x: x_train_scaled[rand_idxs],
+                                           y_true: y_train_oh[rand_idxs],
+                                           keep_prob: 1.}
+                          ).sum(0).reshape(28,28)
+                   )
+h1_sum = np.array(h1_sum)
+
+# normalize to [0,1]
+for i in range(10):
+    h1_sum[i] = h1_sum[i] / np.amax(h1_sum[i])
+    
+fig, axs = plt.subplots(nrows=2, ncols=5, figsize=(12,12))
+
+for i, ax in enumerate(axs.reshape(-1)):
+    ax.set_title("Digit Label: %d" % i)
+    ax.imshow(h1_sum[i], cmap=plt.cm.gray, 
+              origin='upper', interpolation='nearest')
+    ax.axis('off')
+# tight_layout gives more spacing between subplots    
+plt.tight_layout()   
+# Tell matplotlib to draw all of the previously generated objects
+plt.show()
+
+
+# In[65]:
+
+h2_sum = []
+
+for dig in range(10):
+    idxs = np.where(y_train == dig)[0]
+    rand_idxs = np.random.choice(idxs, 100)
+
+    h2_sum.append(sess.run(h_2, feed_dict={x: x_train_scaled[rand_idxs],
+                                           y_true: y_train_oh[rand_idxs],
+                                           keep_prob: 1.}
+                          ).sum(0).reshape(28,28)
+                   )
+h2_sum = np.array(h2_sum)
+
+# normalize to [0,1]
+for i in range(10):
+    h2_sum[i] = h2_sum[i] / np.amax(h2_sum[i])
+    
+fig, axs = plt.subplots(nrows=2, ncols=5, figsize=(12,12))
+
+for i, ax in enumerate(axs.reshape(-1)):
+    ax.set_title("Digit Label: %d" % i)
+    ax.imshow(h2_sum[i], cmap=plt.cm.gray, 
+              origin='upper', interpolation='nearest')
+    ax.axis('off')
+# tight_layout gives more spacing between subplots    
+plt.tight_layout()   
+# Tell matplotlib to draw all of the previously generated objects
+plt.show()
+
+
+# Again, there are clearly differences, but it is difficult to recognize any order.
+
+# In[66]:
 
 sess.close()
 
@@ -991,14 +1234,14 @@ sess.close()
 # 
 # Let's pick out random sets of 6s, 8s, and 9s from the training data:
 
-# In[59]:
+# In[67]:
 
 sixes_idx = np.random.choice(train_df[train_df['label']==6].index, size=4, replace=False)
 eights_idx = np.random.choice(train_df[train_df['label']==8].index, size=4, replace=False)
 nines_idx = np.random.choice(train_df[train_df['label']==9].index, size=4, replace=False)
 
 
-# In[60]:
+# In[68]:
 
 # generate a 3x4 grid of subplots
 fig, axs = plt.subplots(nrows=3, ncols=4, figsize=(10,10))
@@ -1025,7 +1268,7 @@ plt.show()
 
 # Let's imagine looking at these images through a window of the pixels in the upper half of the image.
 
-# In[61]:
+# In[69]:
 
 # recover the upper 14x28 block from the 28x28 matrix 
 def upper_pixel_mat(row):
@@ -1060,7 +1303,7 @@ plt.show()
 
 # Similarly look through a window in the lower half:
 
-# In[62]:
+# In[70]:
 
 # recover the lower 14x28 block from the 28x28 matrix 
 def lower_pixel_mat(row):
@@ -1114,6 +1357,8 @@ plt.show()
 # 
 # 3. The number of features to compute per sampling.  This is referred to as the **depth**. If depth > 1, then the filter is actually a tensor of shape [width, height, depth].
 # 
+# In our design matrix, the pixel data has been unrolled and the proximity of pixels in the vertical direction has been obscured.  A convolutional filter is designed to sample over nearby pixels and restore information about the local relationships between the features.
+# 
 # Convolutional layers tend to learn geometric shapes.  In the case of the digits, depending on the filter size, these might look like the highlighted shapes:
 # 
 # ![convolutional features](convfeat.png)
@@ -1124,7 +1369,7 @@ plt.show()
 # 
 # We have seen that many of the handwritten digits do contain many features in common, but they tend to be slightly displaced from digit to digit. As an example, consider these 4s:
 
-# In[63]:
+# In[71]:
 
 plt.figure(1)
 plt.imshow(pixel_mat(9), cmap=plt.cm.gray, origin='upper', interpolation='nearest')
@@ -1144,7 +1389,7 @@ plt.show()
 # 
 # Let us use TensorFlow to put a network together that uses convolutional, pooling and conventional feedforward layers. This will be our first example of a **deep network**.
 
-# In[64]:
+# In[72]:
 
 tf.reset_default_graph()
 sess = tf.InteractiveSession()
@@ -1155,7 +1400,7 @@ tf.set_random_seed(464)
 
 # The network will have the same input and output layers as before.
 
-# In[65]:
+# In[73]:
 
 n_feat = 784
 x = tf.placeholder(tf.float32, shape=[None, n_feat])
@@ -1165,28 +1410,28 @@ y_true = tf.placeholder(tf.int32, shape=[None, n_class])
 
 # Our first layer will be 2d convolutional from the TF op tf.nn.conv2d.  Instead of taking a normal design matrix, this op takes an input which is a tensor of shape [batch, in_height, in_width, in_channels], where: 
 # 
-# batch is the number of observations in the data. <BR>
-# (in_height, in_width) are the pixel dimensions of the input images.  In our case these are both = 28.  <BR>
-# in_channels is the number of color channels in the input.  Since our images are greyscale, this is just = 1. <BR>
+# * `batch` is the number of observations in the data. 
+# * `(in_height, in_width)` are the pixel dimensions of the input images.  In our case these are both = 28. 
+# * `in_channels` is the number of color channels in the input.  Since our images are greyscale, this is just = 1.
 # 
 # Therefore, to apply the first convolutional layer, we need to reshape our input as follows:
 
-# In[66]:
+# In[74]:
 
 x_image = tf.reshape(x, [-1,28,28,1])
 
 
 # The layer also applies a filter/kernel of shape [filter_height, filter_width, in_channels, out_channels], where:
 # 
-# (filter_height, filter_width) are the pixel dimensions of the window. <BR>
-# in_channels is again the # of color channels in the input.  <BR>
-# out_channels is the number of features for the layer to output. <BR>
+# * `(filter_height, filter_width)` are the pixel dimensions of the window. 
+# * `in_channels` is again the # of color channels in the input.  
+# * `out_channels` is the number of features for the layer to output. 
 # 
-# The layer samples patches of the image to form: 
+# In detail, the layer 
 # 
-# a tensor X of shape [batch, out_height, out_width, filter_height $*$ filter_width $*$ in_channels]. <BR> 
-# flattens the filter into a tensor W of shape [filter_height $*$ filter_width $*$ in_channels, output_channels].<BR> 
-# computes the matrix product  X.W, which is a tensor of shape [batch, out_height, out_width, output_channels].
+# 1. Samples patches of the image to form a tensor X of shape [batch, out_height, out_width, filter_height $*$ filter_width $*$ in_channels]. 
+# 2. Flattens the filter into a tensor W of shape [filter_height $*$ filter_width $*$ in_channels, output_channels].
+# 3. Computes the matrix product  X.W, which is a tensor of shape [batch, out_height, out_width, output_channels].
 # 
 # We specify the filter by defining a weight tensor of the appropriate shape.  For a 5x5 window, the weights will have shape [5, 5, 1, n_features_out], where n_features_out is the number of features we want the CNN layer to compute. We will compute 4 features in this first layer. 
 # 
@@ -1198,7 +1443,7 @@ x_image = tf.reshape(x, [-1,28,28,1])
 # 
 # Putting all of this together, the layer we want is specified by:
 
-# In[67]:
+# In[75]:
 
 n_convfeat1 = 4
 
@@ -1209,7 +1454,7 @@ CNN1 = tf.nn.conv2d(x_image, W_conv1, strides=[1, 1, 1, 1], padding='SAME')
 h_conv1 = tf.nn.relu(tf.add(CNN1, b_conv1))
 
 
-# In[68]:
+# In[76]:
 
 h_conv1
 
@@ -1225,21 +1470,22 @@ h_conv1
 # 
 # We specify this pooling layer via:
 
-# In[69]:
+# In[77]:
 
-h_pool1 = tf.nn.max_pool(h_conv1, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME')
+h_pool1 = tf.nn.max_pool(h_conv1, ksize=[1, 2, 2, 1], 
+                         strides=[1, 2, 2, 1], padding='SAME')
 
 
-# In[70]:
+# In[78]:
 
 h_pool1
 
 
 # This is a 14x14 image with the same 4 features outputted by the CNN.  
 # 
-# Again following the tutuorial, we wish to introduce additional CNN and pooling layers.  We will again choose the CNN to be 5x5 with unit stride and apply another instance of 2x2 max pooling with stride 2.  The output will be a 7x7 image. Note that the output of the first pooling layer had $14*14*4 = 784$ features per image. This is precisely equal to the number of input features.  In order to retain this information after the 2nd pooling layer, we should compute $784/(7*7) = 16$ features in the 2nd convolutional layer.
+# Again following the tutorial, we wish to introduce additional CNN and pooling layers.  We will again choose the CNN to be 5x5 with unit stride and apply another instance of 2x2 max pooling with stride 2.  The output will be a 7x7 image. Note that the output of the first pooling layer had $14*14*4 = 784$ features per image. This is precisely equal to the number of input features.  In order to retain this information after the 2nd pooling layer, we should compute $784/(7*7) = 16$ features in the 2nd convolutional layer.
 
-# In[71]:
+# In[79]:
 
 n_convfeat2 = 16
 
@@ -1249,15 +1495,16 @@ b_conv2 = bias_variable([n_convfeat2])
 CNN2 = tf.nn.conv2d(h_pool1, W_conv2, strides=[1, 1, 1, 1], padding='SAME')
 h_conv2 = tf.nn.relu(tf.add(CNN2, b_conv2))
 
-h_pool2 = tf.nn.max_pool(h_conv2, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME')
+h_pool2 = tf.nn.max_pool(h_conv2, ksize=[1, 2, 2, 1], 
+                         strides=[1, 2, 2, 1], padding='SAME')
 h_pool2
 
 
-# Our fully connected single layer NN was working pretty well so we will include one as the next layer. We have 784 total features coming in, so we might expect a layer of a similar width will give the best results.  We'll choose a width of 512 which will save some training time.  We will flatten the 7x7 image into a pixel vector to make the computations more convenient.
+# Our fully connected single layer NN was working pretty well so we will include one as the next layer. We have 784 total features coming in, so we might expect a layer of a similar width will give the best results.  We'll choose a width of 784, as in our earlier single layer NN.  We will flatten the 7x7 image into a pixel vector to make the computations more convenient.
 
-# In[72]:
+# In[80]:
 
-width1 = 512
+width1 = 784
 
 W_1 = weight_variable([7 * 7 * n_convfeat2, width1])
 b_1 = bias_variable([width1])
@@ -1269,7 +1516,7 @@ h_1 = tf.nn.relu(tf.add(tf.matmul(h_pool2_flat, W_1), b_1))
 
 # As before,  we'll introduce a dropout layer.
 
-# In[73]:
+# In[81]:
 
 keep_prob = tf.placeholder(tf.float32)
 h_1_drop = tf.nn.dropout(h_1, keep_prob)
@@ -1277,7 +1524,7 @@ h_1_drop = tf.nn.dropout(h_1, keep_prob)
 
 # And output layer.
 
-# In[74]:
+# In[82]:
 
 W_out = weight_variable([width1, n_class])
 b_out = bias_variable([n_class])
@@ -1287,9 +1534,11 @@ z_out = tf.add(tf.matmul(h_1_drop, W_out), b_out)
 
 # The cost, metric and optimizer choices will also be the same.
 
-# In[75]:
+# In[83]:
 
-cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels=y_true, logits=z_out))
+cost = tf.reduce_mean(
+        tf.nn.softmax_cross_entropy_with_logits(
+                        labels=y_true, logits=z_out))
 corr = tf.equal(tf.argmax(z_out, 1), tf.argmax(y_true, 1))    
 accr = tf.reduce_mean(tf.cast(corr, "float"))
 
@@ -1297,9 +1546,9 @@ learning_rate = 0.0001
 optimizer = tf.train.AdamOptimizer(learning_rate).minimize(cost)
 
 
-# The convolutional layers turn out to be quite memory intensive.  To allow us to run in around 8 GB of memory, in addition to the minibatch training, we will also need to compute the accuracy metrics in minibatches. 
+# The convolutional layers can be quite memory intensive, since we are computing some number of features for each pixel in the original image.  To ensure that we can run in around 8 GB of memory, in addition to the minibatch training, we will also compute the accuracy metrics in minibatches. 
 
-# In[76]:
+# In[84]:
 
 n_batch = 50.
 int_batch = int(n_batch)
@@ -1313,14 +1562,12 @@ test_batch = int(n_samp_test / n_batch)
 skfold = StratifiedKFold(n_splits=train_batch, shuffle=True, random_state=428)
 
 
-# In[77]:
+# In[85]:
 
-# Number of epochs to train over. Should be large enough for convergence.  If it is too large, at worst the model
-# might overfit, at best we waste computing time.
+# Number of epochs to train over.
 n_epoch = 100 + 1
 
-# In order to monitor training progress, as well as tune n_epoch, we will computing appropriate 
-# metrics at checkpoints
+# Compute appropriate metrics at checkpoints
 display_step = 10
 
 # initialize variables
@@ -1331,44 +1578,38 @@ for epoch in range(n_epoch):
     # init average cost 
     avg_cost = 0.
     
-    # enumerate(skfold.split(x,y)) returns a triple of the form (fold, train indices, test indices)
-    # minibatch indices are the test indices, labeled batch_idx here.
-    # the training indices are not used, we just assign them to dummy_idx
-    # fold is the number of the fold in range(total_batch)
-    # One loop over the folds is a single epoch.
-    # Note also that we use the ordinal class labels in y_training because StratifiedKFold wouldn't work with the
-    # one-hot encoding
-    for fold, (dummy_idx, batch_idx) in enumerate(skfold.split(x_train_scaled, y_train)):
-        # extract design matrix and response array for minibatch
-        # here we can use the one-hot response array
+    for dummy_idx, batch_idx in skfold.split(x_train_scaled, y_train):
         x_batch, y_batch = x_train_scaled[batch_idx], y_train_oh[batch_idx]
-        # run backprop and feedforward
-        # we assign the cost per example to c
-        # Note the feed_dict contains the minibatch data
-        _, c = sess.run([optimizer, cost], feed_dict={x: x_batch, y_true: y_batch, keep_prob: 0.5})
+        _, c = sess.run([optimizer, cost], 
+                        feed_dict={x: x_batch, 
+                                   y_true: y_batch, 
+                                   keep_prob: 0.5})
         # Compute average cost
         avg_cost += c / train_batch
         
     # Display logs per epoch step
     if epoch % display_step == 0:
         # return epoch and average cost
-        print("Epoch: %.4d" % epoch, "cost = %.4f" % avg_cost, "time = %.2f" % (time() - start))
+        print("Epoch: %.4d" % epoch, "cost = %.4f" % avg_cost, 
+              "time = %.2f" % (time() - start))
         # compute accuracy on full training set, in batches
         train_acc = 0
         for i in range(0, n_samp_train, int_batch):
-            x_batch, y_batch = x_train_scaled[i:i + int_batch], y_train_oh[i:i + int_batch]
+            x_batch, y_batch = x_train_scaled[i:i + int_batch],                                 y_train_oh[i:i + int_batch]
             acc = sess.run(accr,
                             feed_dict={x: x_batch,
-                                y_true: y_batch, keep_prob: 1.})
+                                       y_true: y_batch, 
+                                       keep_prob: 1.})
             train_acc += acc / train_batch
         print ("TRAIN ACCURACY: %.4f" % (train_acc))
         # compute accuracy on full validation set, in batches
         test_acc = 0
         for i in range(0, n_samp_test, int_batch):
-            x_batch, y_batch = x_test_scaled[i:i + int_batch], y_test_oh[i:i + int_batch]
+            x_batch, y_batch = x_test_scaled[i:i + int_batch],                                 y_test_oh[i:i + int_batch]
             acc = sess.run(accr,
                             feed_dict={x: x_batch,
-                                y_true: y_batch, keep_prob: 1.})
+                                       y_true: y_batch, 
+                                       keep_prob: 1.})
             test_acc += acc / test_batch
         print ("TEST ACCURACY: %.4f" % (test_acc))
 
@@ -1376,18 +1617,20 @@ for epoch in range(n_epoch):
 # compute accuracy on full training set, in batches
 train_acc = 0
 for i in range(0, n_samp_train, int_batch):
-    x_batch, y_batch = x_train_scaled[i:i + int_batch], y_train_oh[i:i + int_batch]
+    x_batch, y_batch = x_train_scaled[i:i + int_batch],                         y_train_oh[i:i + int_batch]
     acc = sess.run(accr,
                     feed_dict={x: x_batch,
-                        y_true: y_batch, keep_prob: 1.})
+                               y_true: y_batch, 
+                               keep_prob: 1.})
     train_acc += acc / train_batch
 # compute accuracy on full validation set, in batches
 test_acc = 0
 for i in range(0, n_samp_test, int_batch):
-    x_batch, y_batch = x_test_scaled[i:i + int_batch], y_test_oh[i:i + int_batch]
+    x_batch, y_batch = x_test_scaled[i:i + int_batch],                         y_test_oh[i:i + int_batch]
     acc = sess.run(accr,
                     feed_dict={x: x_batch,
-                        y_true: y_batch, keep_prob: 1.})
+                               y_true: y_batch, 
+                               keep_prob: 1.})
     test_acc += acc / test_batch
     
 print("Optimization finished in %.2f seconds!" % (time() - start)) 
@@ -1408,14 +1651,144 @@ print ("TEST ACCURACY: %.4f" % (test_acc))
 # ```
 # 
 # took around 10 hours to train and had worse performance.  It is possible that this was due to overfitting.
+# 
+# We can save the class probabilities:
 
-# In[78]:
+# In[86]:
 
 class_prob_cnn = sess.run(tf.nn.softmax(z_out), 
                            feed_dict={x: x_test_scaled, y_true: y_test_oh, keep_prob: 1.})
 
 
-# In[79]:
+# We can also look at the features output by each convolutional layer.
+
+# In[87]:
+
+# get all indices from y_train where the label is 2
+twos_idx = np.where(y_train == 2)[0]
+
+# pick 10 entries at random
+rand_twos_idx = np.random.choice(twos_idx, 5)
+
+# corresponding design matrix from scaled features
+x_train_twos = x_train_scaled[rand_twos_idx]
+y_train_twos = y_train_oh[rand_twos_idx]
+
+h1_train_twos = sess.run(h_conv1, feed_dict={x: x_train_twos, 
+                                         y_true: y_train_twos,
+                                         keep_prob: 1.})
+
+h_pool1_train_twos = sess.run(h_pool1, feed_dict={x: x_train_twos, 
+                                         y_true: y_train_twos,
+                                         keep_prob: 1.})
+
+
+h2_train_twos = sess.run(h_conv2, feed_dict={x: x_train_twos, 
+                                         y_true: y_train_twos,
+                                         keep_prob: 1.})
+
+
+# These are plots of the original image, compared to the features output by the 1st convolutional layer.
+
+# In[88]:
+
+fig, axs = plt.subplots(nrows=5, ncols=5, figsize=(10,10))
+
+orig_set = set(range(0,25,5))
+feat0_set = set(range(1,25,5))
+feat1_set = set(range(2,25,5))
+feat2_set = set(range(3,25,5))
+feat3_set = set(range(4,25,5))
+
+for i, ax in enumerate(axs.reshape(-1)):
+    if (i in orig_set):   # these are the original features
+        pixel_mat_in = x_train_twos[i/5].reshape(28,28)
+        ax.imshow(pixel_mat_in, cmap=plt.cm.gray, 
+                  origin='upper', interpolation='nearest')
+        ax.set_title("Original Image")
+        ax.axis('off')
+    if (i in feat0_set):   # next are the 1st conv layer features
+        pixel_mat_h1_f0 = h1_train_twos[(i-1)/5,:,:,0].reshape(28,28)
+        ax.imshow(pixel_mat_h1_f0, cmap=plt.cm.gray, 
+                  origin='upper', interpolation='nearest')
+        ax.set_title("1st Conv, Feat: 0")
+        ax.axis('off')
+    if (i in feat1_set):   # next are the 1st conv layer features
+        pixel_mat_h1_f1 = h1_train_twos[(i-1)/5,:,:,1].reshape(28,28)
+        ax.imshow(pixel_mat_h1_f1, cmap=plt.cm.gray, 
+                  origin='upper', interpolation='nearest')
+        ax.set_title("1st Conv, Feat: 1")
+        ax.axis('off')
+    if (i in feat2_set):   # next are the 1st conv layer features
+        pixel_mat_h1_f2 = h1_train_twos[(i-1)/5,:,:,2].reshape(28,28)
+        ax.imshow(pixel_mat_h1_f2, cmap=plt.cm.gray, 
+                  origin='upper', interpolation='nearest')
+        ax.set_title("1st Conv, Feat: 2")
+        ax.axis('off')
+    if (i in feat3_set):   # next are the 1st conv layer features
+        pixel_mat_h1_f3 = h1_train_twos[(i-1)/5,:,:,3].reshape(28,28)
+        ax.imshow(pixel_mat_h1_f3, cmap=plt.cm.gray, 
+                  origin='upper', interpolation='nearest')
+        ax.set_title("1st Conv, Feat: 3")
+        ax.axis('off')
+# tight_layout gives more spacing between subplots    
+plt.tight_layout()   
+# Tell matplotlib to draw all of the previously generated objects
+plt.show()
+
+
+# These are plots of the 0th feature output by the 1st pooling layer, followed by the first 4 features output by the 2nd convolutional layer.
+
+# In[89]:
+
+fig, axs = plt.subplots(nrows=5, ncols=5, figsize=(10,10))
+
+orig_set = set(range(0,25,5))
+feat0_set = set(range(1,25,5))
+feat1_set = set(range(2,25,5))
+feat2_set = set(range(3,25,5))
+feat3_set = set(range(4,25,5))
+
+for i, ax in enumerate(axs.reshape(-1)):
+    if (i in orig_set):   # these are the original features
+        pixel_mat_in = h_pool1_train_twos[i/5,:,:,0]
+        ax.imshow(pixel_mat_in, cmap=plt.cm.gray, 
+                  origin='upper', interpolation='nearest')
+        ax.set_title("1st Pool, Feat: 0")
+        ax.axis('off')
+    if (i in feat0_set):   # next are the 1st conv layer features
+        pixel_mat_h2_f0 = h2_train_twos[(i-1)/5,:,:,0]
+        ax.imshow(pixel_mat_h2_f0, cmap=plt.cm.gray, 
+                  origin='upper', interpolation='nearest')
+        ax.set_title("1st Conv, Feat: 0")
+        ax.axis('off')
+    if (i in feat1_set):   # next are the 1st conv layer features
+        pixel_mat_h2_f1 = h2_train_twos[(i-1)/5,:,:,1]
+        ax.imshow(pixel_mat_h2_f1, cmap=plt.cm.gray, 
+                  origin='upper', interpolation='nearest')
+        ax.set_title("1st Conv, Feat: 1")
+        ax.axis('off')
+    if (i in feat2_set):   # next are the 1st conv layer features
+        pixel_mat_h2_f2 = h2_train_twos[(i-1)/5,:,:,2]
+        ax.imshow(pixel_mat_h2_f2, cmap=plt.cm.gray, 
+                  origin='upper', interpolation='nearest')
+        ax.set_title("1st Conv, Feat: 2")
+        ax.axis('off')
+    if (i in feat3_set):   # next are the 1st conv layer features
+        pixel_mat_h2_f3 = h2_train_twos[(i-1)/5,:,:,3]
+        ax.imshow(pixel_mat_h2_f3, cmap=plt.cm.gray, 
+                  origin='upper', interpolation='nearest')
+        ax.set_title("1st Conv, Feat: 3")
+        ax.axis('off')
+# tight_layout gives more spacing between subplots    
+plt.tight_layout()   
+# Tell matplotlib to draw all of the previously generated objects
+plt.show()
+
+
+# Compared to the fully-connected layers, it is clear that these features inherit geometric properties from the original image.
+
+# In[90]:
 
 sess.close()
 
@@ -1426,7 +1799,7 @@ sess.close()
 # 
 # First, lets check a random sample of the class probabilites:
 
-# In[80]:
+# In[91]:
 
 idxs = np.random.randint(0, len(class_prob_cnn), 5)
 class_prob_cnn[idxs]
@@ -1434,7 +1807,7 @@ class_prob_cnn[idxs]
 
 # We can use argmax to compute the most probable prediction for each example:
 
-# In[81]:
+# In[92]:
 
 y_pred_cnn = np.argmax(class_prob_cnn, 1)
 y_pred_cnn
@@ -1442,7 +1815,7 @@ y_pred_cnn
 
 # These are to be compared with the list of true labels from y_validation, which we can reobtain by also applying argmax:
 
-# In[82]:
+# In[93]:
 
 y_act = np.argmax(y_test_oh, 1)
 y_act
@@ -1450,7 +1823,7 @@ y_act
 
 # Another useful numpy function is argsort, which returns the indices that would sort an array, from smallest element to largest. In our case, it is more convenient to sort from largest to smallest, in which case we can specify np.argsort(-vec). In the case of our class probability vectors, the first entry in argsort(-vec) will be the argmax, while the next will be the 2nd most probable class, then the 3rd and so on.  It can be useful to know if the true label was given a relatively high probability if the most probable model class was incorrect. For example, we can consider
 
-# In[83]:
+# In[94]:
 
 print(class_prob_cnn[idxs])
 print(np.argsort(-class_prob_cnn[idxs]))
@@ -1459,7 +1832,7 @@ print(np.argmax(class_prob_cnn[idxs], 1))
 
 # It is also interesting to look at the confusion matrix:
 
-# In[84]:
+# In[95]:
 
 from sklearn.metrics import confusion_matrix
 
@@ -1487,7 +1860,7 @@ def plot_confusion_matrix(cm, classes,
     plt.xlabel('Predicted label')
 
 
-# In[85]:
+# In[96]:
 
 conf_mat = confusion_matrix(y_act, y_pred_cnn)
 
@@ -1496,29 +1869,23 @@ plot_confusion_matrix(conf_mat, classes=range(10), title='CNN confusion matrix')
 plt.show()
 
 
-# The model does well, as expected from the accuracy score.  Some observations, though the statistics of errors is based on small samples:
+# The model does well, as expected from the accuracy score. We will look at all examples where the model was confused and then look at a couple in detail.
 # 
-# * 5s are misclassified as 3s.
-# * 8s are misclassified as 9s.  
-# * 9s are misclassified as 1s, 4s, 5s, and 7s.
-# 
-# We will look at all examples where the model was confused and then look at a couple in detail.
-# 
-# In order to compare with the features in the corresponding design matrix, x_validation, we can use the numpy where function to obtain the indices for the events where the prediction was different from the true value:
+# In order to compare with the features in the corresponding design matrix, x_validation, we can use the numpy where function to obtainindices for the events where the prediction was different from the true value:
 
-# In[86]:
+# In[97]:
 
 error_idx = np.where(y_pred_cnn != y_act)[0]
 
 
-# In[87]:
+# In[98]:
 
 error_idx
 
 
 # We will plot all errors, ordered by most probable class label:
 
-# In[88]:
+# In[99]:
 
 def plot_digits_bypred(digit):
     # generate a 4xn grid of subplots, 4 is the number of columns that will reasonably display in typical
@@ -1561,52 +1928,52 @@ def plot_digits_bypred(digit):
     plt.show()
 
 
-# In[89]:
+# In[100]:
 
 plot_digits_bypred(0)
 
 
-# In[90]:
+# In[101]:
 
 plot_digits_bypred(1)
 
 
-# In[91]:
+# In[102]:
 
 plot_digits_bypred(2)
 
 
-# In[92]:
+# In[103]:
 
 plot_digits_bypred(3)
 
 
-# In[93]:
+# In[104]:
 
 plot_digits_bypred(4)
 
 
-# In[94]:
+# In[105]:
 
 plot_digits_bypred(5)
 
 
-# In[95]:
+# In[106]:
 
 plot_digits_bypred(6)
 
 
-# In[96]:
+# In[107]:
 
 plot_digits_bypred(7)
 
 
-# In[97]:
+# In[108]:
 
 plot_digits_bypred(8)
 
 
-# In[98]:
+# In[109]:
 
 plot_digits_bypred(9)
 
@@ -1615,7 +1982,7 @@ plot_digits_bypred(9)
 # 
 # For instance, for the following digit image, the CNN predicted "3" vs the true value of 5.
 
-# In[99]:
+# In[110]:
 
 idx = 2035
 # this is the true class label
@@ -1643,7 +2010,7 @@ plt.show()
 
 # For the converse identification problem, we can look at the following example:
 
-# In[113]:
+# In[111]:
 
 idx = 1901
 # this is the true class label
@@ -1669,7 +2036,7 @@ plt.show()
 
 # Here a human might guess 4 fairly often as well.  The loop of the 9 is broken.  The bottom of the loop and the lower stem make a right angle, like most 4s.  
 
-# In[115]:
+# In[112]:
 
 100 * class_prob_cnn[idx]
 
