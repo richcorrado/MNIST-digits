@@ -627,7 +627,7 @@ sess.close()
 # 
 # ![single hidden layer network](single_layer.png)
 # 
-# In this picture, we've drawn each feature as a node of the graph. The lines indicate which features are involved in the definition of each new feature. In the figure, at the left, we have an input layer that takes $F$ input features.  The hidden layer has a width $n$.  The lines show that the input features are fully connected to the nodes of the hidden layer.  This means that the weights and biases at the hidden layer
+# In this picture, we've drawn each feature as a node of the graph. The lines indicate which old features are involved in the definition of each new feature. In the figure, at the left, we have an input layer that takes $F$ input features.  The hidden layer has a width $n$ and computes $n$ new features.  The lines show that the input features are fully connected to the nodes of the hidden layer.  This means that the weights and biases at the hidden layer
 # $$ z^{(1)} = X W^{(1)} + b^{(1)}$$
 # are full and of shape
 # 
