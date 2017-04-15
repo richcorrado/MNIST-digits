@@ -214,9 +214,11 @@ accuracy_score(y_test, y_rf_pred)
 # 
 # In preparation for this, we will encode the class labels as 10d vectors rather than as integers,
 # 
-# $$ 0 \longrightarrow \begin{pmatrix} 1 & 0 & \cdots & 0 \end{pmatrix},
-#  1 \longrightarrow \begin{pmatrix} 0 & 1 & \cdots  & 0 \end{pmatrix}, \ldots
-#   9 \longrightarrow \begin{pmatrix} 0 & 0 & \cdots & 1 \end{pmatrix}.$$
+# $$ \begin{split} 
+# & 0 \longrightarrow ( 1, 0, \ldots,  0), \\
+# & 1 \longrightarrow (0, 1, 0, \cdots,  0), \\
+# & \ldots,  \\
+# & 9\longrightarrow ( 0, 0, \cdots,  0,1) \end{split}$$
 #   
 # This is sometimes called "one hot" encoding, since the presence of a defining class is indicated by a binary 1 in a vector and is analogous to the implementation of binary logic in circuits.  In the context of classification, this scheme is called "one vs all" classification and is fairly easy to implement  as an additional layer of our model in TF.  In scikit-learn, one vs all is already build into the multiclassification models so that the end user does not have to perform this additional step.
 # 
