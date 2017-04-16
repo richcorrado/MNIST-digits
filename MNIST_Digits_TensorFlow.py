@@ -628,11 +628,15 @@ sess.close()
 # ![single hidden layer network](single_layer.png)
 # 
 # In this picture, we've drawn each feature as a node of the graph. The lines indicate which old features are involved in the definition of each new feature. In the figure, at the left, we have an input layer that takes $F$ input features.  The hidden layer has a width $n$ and computes $n$ new features.  The lines show that the input features are fully connected to the nodes of the hidden layer.  This means that the weights and biases at the hidden layer
-# $$ z^{(1)} = X W^{(1)} + b^{(1)}$$
+# $$ \mathbf{f} = \mathbf{XW}  + \mathbf{b}$$
 # are full and of shape
 # 
-# * $W^{(1)}$: [# of input features, width]
-# * $b^{(1)}$: [# of examples, width]
+# * $\mathbf{W}$: [# of input features, width]
+# * $\mathbf{b}$: [# of examples, width]
+# 
+# For a single example, we have for each hidden layer feature that
+# $$ f_i = \sum_{a=0}^{F-1} W_{ai} + b_i $$
+# and none of the $W_{ai}$ are restricted to be zero.
 # 
 # We can also choose an **activation** function at the hidden layer.  The role of the activation function is to introduce some nonlinearity in the function that the complete network will learn.  In this notebook, we will always use the **Rectified Linear Unit, or ReLU**, activation function, defined by:
 # $$ g(z) = \text{max}(0,z) = \begin{cases} z, & z \geq 0 \\ 0, & z < 0. \end{cases}$$
