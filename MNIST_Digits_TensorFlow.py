@@ -628,15 +628,15 @@ sess.close()
 # ![single hidden layer network](single_layer.png)
 # 
 # In this picture, we've drawn each feature as a node of the graph. The lines indicate which old features are involved in the definition of each new feature. In the figure, at the left, we have an input layer that takes $F$ input features.  The hidden layer has a width $n$ and computes $n$ new features.  The lines show that the input features are fully connected to the nodes of the hidden layer.  This means that the weights and biases at the hidden layer
-# $$ \mathbf{f} = \mathbf{XW}  + \mathbf{b}$$
+# $$ \mathbf{z}^{(1)} = \mathbf{X} \mathbf{W}^{(1)}  + \mathbf{b}^{(1)}$$
 # are full and of shape
 # 
-# * $\mathbf{W}$: [# of input features, width]
-# * $\mathbf{b}$: [# of examples, width]
+# * $\mathbf{W}^{(1)}$: [# of input features, width]
+# * $\mathbf{b}^{(1)}$: [# of examples, width]
 # 
 # For a single example, we have for each hidden layer feature that
-# $$ f_i = \sum_{a=0}^{F-1} W_{ai} + b_i $$
-# and none of the $W_{ai}$ are restricted to be zero.
+# $$ z_i^{(1)} = \sum_{a=0}^{F-1} W_{ai}^{(1)} + b_i^{(1)} $$
+# and none of the $W_{ai}^{(1)}$ are restricted to be zero.
 # 
 # We can also choose an **activation** function at the hidden layer.  The role of the activation function is to introduce some nonlinearity in the function that the complete network will learn.  In this notebook, we will always use the **Rectified Linear Unit, or ReLU**, activation function, defined by:
 # $$ g(z) = \text{max}(0,z) = \begin{cases} z, & z \geq 0 \\ 0, & z < 0. \end{cases}$$
@@ -644,14 +644,17 @@ sess.close()
 # 
 # ![ReLU function](relu.png)
 # 
+# We say that ReLU is nonlinear because, e.g.,
+# $$ g(2-3) = 0 \neq g(2) - g(3) = -1.$$
+# 
 # We can say that the features computed by the hidden layer are 
-# $$ f^{(1)} = g\left( X W^{(1)} + b^{(1)}\right) .$$
+# $$ \mathbf{f}^{(1)} = g\left( \mathbf{X} \mathbf{W}^{(1)}  + \mathbf{b}^{(1)}\right) .$$
 # 
 # Finally, the output layer introduces another set of weights and biases to compute the output logits:
-# $$ z_\text{out} = f^{(1)} W + b.$$
+# $$ \mathbf{z}_\text{out} = \mathbf{f}^{(1)} \mathbf{W} + \mathbf{b}.$$
 # As in the case of our logistic regression model, it is not strictly necessary to explicitly apply the softmax function for many of the computations in TensorFlow.  In the case where we do, we can refer to the output layer as a "softmax layer", since the softmax function is taking the role of an activation function.   In this notebook, we won't apply softmax as part of the computational graph.
 # 
-# #### Dropout Regularization
+# ### Dropout Regularization
 # 
 # In machine learning, one must be continuously vigilant against the competing problems of **underfitting** and **overfitting**.   Underfitting typically occurs because the model is too simplistic and doesn't allow enough variation to fit the trend described by the training data.  This is also called the **bias** problem, because the hypothesis function $y = f(x)$ typically represents an erroneous assumption about the relationship between the response and the features.  Overfitting occurs when the model is too complex relative to the training data.  It can therefore be possible to achieve a very low training error, but the resulting model fails to generalize well to new data: the validation or test error will be relatively large compared to the training error.  This is also called the **variance** problem, since small changes to the training data will tend to lead to large changes in the learned model.
 # 
@@ -666,7 +669,29 @@ sess.close()
 # 
 # Weight decay provides an additional penalty in optimization that depends on the size of the parameters.  For appropriate choice of the hyperparameter $\alpha$, optimization of the new cost will then favor solutions where relatively unimportant parameters take very small values and the important parameters will control the fit to the general trend contained in the training data.  Without weight decay, the unimportant parameters could be tuned at will to drive the fit closer to the training data points and away from the generalized trend of the true sample population.
 # 
+# #### Ensemble methods
+# 
 # Weight decay is a suitable regularization technique for neural networks, but we want to introduce another form of regularization called **dropout**.   Dropout is related to another approach to the variance problem called **bootstrap aggregation** or **bagging**.  Bagging is an **ensemble** method where the predictions of many models are used to make a single prediction, either by averaging, majority vote or some other criterion.   While any single model may be prone to overfit, the ensemble prediction is expected to be closer to the "true" value.  Statistically, the quality of the ensemble is controlled by how independent the individual models are from one another.
+# 
+# To see how using an ensemble of models can reduce the variance of a prediction, suppose that we have $n$ independent measurements $X_1, \ldots, X_n$ drawn from a normal distribution with mean $\mu$ and variance $\sigma^2$.  The sample mean is the expected value of the mean $\bar{X}$,
+# $$ \begin{split} E(\bar{X}) & = E\left( \frac{1}{n} (X_1 + \cdots + X_n) \right)\\
+# & = \frac{1}{n} \bigl(E(X_1) + \cdots + E(X_n)\bigr) \\
+# & = \frac{1}{n} ( n \mu ) = \mu .\end{split} $$
+# 
+# The variance of the sample mean is
+# $$ \begin{split} \text{Var}(\bar{X}) & = \text{Var}\left( \frac{1}{n} (X_1 + \cdots + X_n) \right)\\
+# & = \frac{1}{n^2} \bigl(\text{Var}(X_1) + \cdots + \text{Var}(X_n)\bigr) \\
+# & = \frac{1}{n^2} ( n \sigma^2 )  \\
+# & = \frac{\sigma^2}{n}.\end{split} $$
+# This leads to the notion that we can reduce the variance in a sample mean by increasing the size of the sample.
+# 
+# Ensemble methods in machine learning work on the same principal, though typically model predictions are not completely independent because they are being made with the same input data.  Nevertheless, we expect that the variance of the mean of $n$ predictions $\hat{y}_i$ will be something like
+# $$ \text{Var}(\bar{\hat{y}})  = \frac{1}{k} \text{Var}(\hat{y})$$
+# for some $ 1 < k < n$.   By averaging the results of several models, we should be able to reduce the variance of the predictions and obtain a more accurate result.
+# 
+# In fact, the Random Forest model leverages this feature of ensembles to great effect.
+# 
+# #### Back to dropout
 # 
 # To explain dropout, consider our single hidden layer model.  The width of the hidden layer is a hyperparameter and we would consider models of different widths to be different models.  These models might not be completely independent, since after training, the weights might end up taking similar values.  This is very much to be expected if some input features are highly correlated with certain output responses.
 # 
