@@ -609,25 +609,25 @@ sess.close()
 
 # ## Single Hidden Layer Neural Network
 # 
-# We'll start with the simplest type of neural network, which is a fully-connected single hidden layer. This is the simplest of a class of models called feedforward neural networks or multilayer perceptrons (MLP).
+# We'll start with the simplest type of neural network, which is a **fully-connected** single hidden layer. This is the simplest of a class of models called **feedforward neural networks** or **multilayer perceptrons** (MLP).
 # 
 # We'll introduce the structure of a neural network by expanding upon that of the logistic regression model we just discussed.  That model could be understood in terms of: 
 # 
-# 1. An input layer, whose role was to feed the input design matrix into the model.  
-# 2. An output layer, consisting of a linear transformation of the input features into the logits which were in 1-1 correspondence with the model response, namely the class labels.
+# 1. An **input layer**, whose role was to feed the input design matrix into the model.  
+# 2. An **output layer**, consisting of a linear transformation of the input features into the logits which were in 1-1 correspondence with the model response, namely the class labels.
 # 
-# The nontrivial part of the model was assigned to the output layer, where the input features were transformed into the class labels.    We can understand this to a prototype for how to interpret a more general layer of a neural network.  Each layer takes as input some features and then applies some mathematical function to them to generate some new features as output.  In a typical case, our function will be a composition of a linear function, depending on some weights and biases,
+# The nontrivial part of the model was assigned to the output layer, where the input features were transformed into the class labels.    We can understand this to a prototype for how to interpret a more general layer of a neural network.  Each layer takes as input some features and then applies some mathematical function to them to generate some **new features as output**.  In a typical case, our function will be a **composition** of a **linear function**, depending on some weights and biases,
 # $$ \mathbf{z^{(i)}} = \mathbf{f}^{(i-1)} \mathbf{W}^{(i)} + \mathbf{b}^{(i)},$$
-# and another function, possibly nonlinear, called the activation function:
+# and another function, usually nonlinear, called the **activation function**:
 # $$ \mathbf{f}^{(i)} = g^{(i)}(\mathbf{z}^{(i)}).$$
-# These are called the **hidden layers** because their associated output features are hidden as composites of the actual function computed by the complete network:
+# These are called the **hidden layers** because the features that they compute are hidden as composites of the actual function computed by the complete network:
 # $$ \mathbf{y} = F(\mathbf{x}) = f^{(M)} \circ \cdots \circ f^{(1)}(\mathbf{x}).$$
 # 
 # A graphical depiction of a neural network with a single hidden layer is:
 # 
 # ![single hidden layer network](single_layer.png)
 # 
-# In this picture, we've drawn each feature as a node of the graph. The lines indicate which old features are involved in the definition of each new feature. In the figure, at the left, we have an input layer that takes $F$ input features.  The hidden layer has a width $n$ and computes $n$ new features.  The lines show that the input features are fully connected to the nodes of the hidden layer.  This means that the weights and biases at the hidden layer
+# In this picture, we've drawn each feature as a node of the graph. The lines indicate which old features are involved in the definition of each new feature. In the figure, at the left we have an input layer that takes $F$ input features.  The hidden layer has a **width** $n$ and computes $n$ new features.  The lines show that the input features are **fully connected** to the nodes of the hidden layer.  This means that the weights and biases at the hidden layer
 # $$ \mathbf{z}^{(1)} = \mathbf{X} \mathbf{W}^{(1)}  + \mathbf{b}^{(1)}$$
 # are full and of shape
 # 
@@ -638,7 +638,7 @@ sess.close()
 # $$ z_i^{(1)} = \sum_{a=0}^{F-1} W_{ai}^{(1)} + b_i^{(1)} $$
 # and none of the $W_{ai}^{(1)}$ are restricted to be zero.
 # 
-# We can also choose an **activation** function at the hidden layer.  The role of the activation function is to introduce some nonlinearity in the function that the complete network will learn.  In this notebook, we will always use the **Rectified Linear Unit, or ReLU**, activation function, defined by:
+# We can also choose an **activation function** at the hidden layer.  The role of the activation function is to introduce some **nonlinearity** in the function that the complete network will learn.  In this notebook, we will always use the **Rectified Linear Unit, or ReLU**, activation function, defined by:
 # $$ g(z) = \text{max}(0,z) = \begin{cases} z, & z \geq 0 \\ 0, & z < 0. \end{cases}$$
 # A plot of ReLU is:
 # 
@@ -647,7 +647,7 @@ sess.close()
 # We say that ReLU is nonlinear because, e.g.,
 # $$ g(2-3) = 0 \neq g(2) - g(3) = -1.$$
 # 
-# We can say that the features computed by the hidden layer are 
+# Putting these together, the features computed by the hidden layer are 
 # $$ \mathbf{f}^{(1)} = g\left( \mathbf{X} \mathbf{W}^{(1)}  + \mathbf{b}^{(1)}\right) .$$
 # 
 # Finally, the output layer introduces another set of weights and biases to compute the output logits:
@@ -1243,6 +1243,21 @@ plt.show()
 sess.close()
 
 
+# ## Deep Learning/Networks
+# 
+# Recall that a neural network is designed to compute a composition of functions to approximate the true relationship between the input features and the response:
+# 
+# $$ \mathbf{y} = F(\mathbf{x}) = f^{(M)} \circ \cdots \circ f^{(1)}(\mathbf{x}).$$
+# 
+# There are two very important parameters defining a given fully-connected feedforward network:
+# 
+# 1. **Depth**: the number of hidden layers.
+# 2. **Width**: the number of features computed by each hidden layer.
+# 
+# Mathematically it can be shown that for appropriate choice of activation function, even a NN with a single hidden layer can approximate any function that we could reasonably expect to encounter in a real-world machine learning problems (Borel measurable). The approximation error can be made arbitrarily small if the width of the hidden layer is allowed to be arbitrarily large. This is known as the **universal approximation theorem**.  However, an arbitrarily wide NN will have many free parameters and will be prone to **overfitting** unless we also have an appropriately large and diverse training set.  
+# 
+# By contrast, by adding many hidden layers, we might expect that the nature of the composition above allows us to learn larger classes of functions, even for much smaller widths than required by the universal approximation theorem.  In other terms, the **capacity** of a deep network might scale with the depth faster than the number of parameters does.  Empirically, for a wide variety of problems, deep networks indeed seem to generalize better to new data than do very wide shallow networks.
+
 # ## Convolutional Deep Network
 
 # In this section, we'll build a network with convolutional and pooling layers, closely resembling the one in the Deep MNIST example from the TF tutorial.
@@ -1791,25 +1806,25 @@ for i, ax in enumerate(axs.reshape(-1)):
         pixel_mat_h2_f0 = h2_train_twos[(i-1)/5,:,:,0]
         ax.imshow(pixel_mat_h2_f0, cmap=plt.cm.gray, 
                   origin='upper', interpolation='nearest')
-        ax.set_title("1st Conv, Feat: 0")
+        ax.set_title("2nd Conv, Feat: 0")
         ax.axis('off')
     if (i in feat1_set):   # next are the 1st conv layer features
         pixel_mat_h2_f1 = h2_train_twos[(i-1)/5,:,:,1]
         ax.imshow(pixel_mat_h2_f1, cmap=plt.cm.gray, 
                   origin='upper', interpolation='nearest')
-        ax.set_title("1st Conv, Feat: 1")
+        ax.set_title("2nd Conv, Feat: 1")
         ax.axis('off')
     if (i in feat2_set):   # next are the 1st conv layer features
         pixel_mat_h2_f2 = h2_train_twos[(i-1)/5,:,:,2]
         ax.imshow(pixel_mat_h2_f2, cmap=plt.cm.gray, 
                   origin='upper', interpolation='nearest')
-        ax.set_title("1st Conv, Feat: 2")
+        ax.set_title("2nd Conv, Feat: 2")
         ax.axis('off')
     if (i in feat3_set):   # next are the 1st conv layer features
         pixel_mat_h2_f3 = h2_train_twos[(i-1)/5,:,:,3]
         ax.imshow(pixel_mat_h2_f3, cmap=plt.cm.gray, 
                   origin='upper', interpolation='nearest')
-        ax.set_title("1st Conv, Feat: 3")
+        ax.set_title("2nd Conv, Feat: 3")
         ax.axis('off')
 # tight_layout gives more spacing between subplots    
 plt.tight_layout()   
