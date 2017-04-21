@@ -13694,14 +13694,14 @@ are full and of shape</p>
 <li>$\mathbf{b}^{(1)}$: [# of examples, width]</li>
 </ul>
 <p>For a single example, we have for each hidden layer feature that
-$$ z_i^{(1)} = \sum_{a=0}^{F-1} W_{ai}^{(1)} + b_i^{(1)} $$
+$$ z_i^{(1)} = \sum_{a=0}^{F-1} X_a W_{ai}^{(1)} + b_i^{(1)} $$
 and none of the $W_{ai}^{(1)}$ are restricted to be zero.</p>
 <p>We can also choose an <strong>activation function</strong> at the hidden layer.  The role of the activation function is to introduce some <strong>nonlinearity</strong> in the function that the complete network will learn.  In this notebook, we will always use the <strong>Rectified Linear Unit, or ReLU</strong>, activation function, defined by:
 $$ g(z) = \text{max}(0,z) = \begin{cases} z, & z \geq 0 \\ 0, & z < 0. \end{cases}$$
 A plot of ReLU is:</p>
 <p><img src="relu.png" alt="ReLU function"></p>
 <p>We say that ReLU is nonlinear because, e.g.,
-$$ g(2-3) = 0 \neq g(2) - g(3) = -1.$$</p>
+$$ g(2-3) = 0 \neq g(2) + g(-3) = 2.$$</p>
 <p>Putting these together, the features computed by the hidden layer are 
 $$ \mathbf{f}^{(1)} = g\left( \mathbf{X} \mathbf{W}^{(1)}  + \mathbf{b}^{(1)}\right) .$$</p>
 <p>Finally, the output layer introduces another set of weights and biases to compute the output logits:
@@ -14123,7 +14123,7 @@ TEST ACCURACY: 0.9862
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>At a bit better than 98.6% accuracy, this model is a 1.6% improvement in accuracy over our Random Forest result of 97%.  Each training epoch has taken around 15s, for a total training time of a little more than one-half hour.</p>
+<p>At a bit better than 98.6% accuracy, this model is a 1.6% improvement in accuracy over our Random Forest result of 97%.  In more dramatic terms, the error rate of 3% for the Random Forest model was more than cut in half to 1.4% for this NN. Each training epoch has taken around 15s, for a total training time of a little more than one-half hour.</p>
 <p>It might be possible to improve the results of this model by adjusting the parameters.  The width of the hidden layer, the learning rate, the minibatch size, etc. (even the choice of activation functions!) should all be viewed as hyperparameters that should be tuned to improve the accuracy of the model.  In future discussions, we will investigate some effects of hyperparameter tuning in neural networks.  Some issues to be concerned about:</p>
 <ol>
 <li><p>Width and depth of the network determines the <strong>capacity</strong> of the network, in information-theory terms.  Counting independent weight and bias parameters leads to some number $P$ of independent coefficients that must be optimized during training.  If the training data has $N$ examples and $F$ features, then we can think of $NF$ as an upper bound on the number of coefficients we can determine.   Since features can be interdependent or correlated, and examples can overlap, the actual bound $B \leq NF$ is highly dependent on the data.</p>
@@ -18724,7 +18724,7 @@ TEST ACCURACY: 0.9929
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Each epoch of deep and backprop training is taking around 30s, which is 2x that of the two layer model and 4x that of the single layer model. Total training time is about one hour. At 99.3% accuracy, this is our best model so far.</p>
+<p>Each epoch of deep and backprop training is taking around 30s, which is 2x that of the two layer model and 4x that of the single layer model. Total training time is about one hour. At 99.3% accuracy, this is our best model so far.  The 1.4% error rate of the fully-connected networks has been cut in half to 0.7% for this deep CNN.</p>
 <p>Finally, we'll note that a model with far more features:</p>
 
 <pre><code>Optimization finished in 37388.73 seconds!

@@ -635,7 +635,7 @@ sess.close()
 # * $\mathbf{b}^{(1)}$: [# of examples, width]
 # 
 # For a single example, we have for each hidden layer feature that
-# $$ z_i^{(1)} = \sum_{a=0}^{F-1} W_{ai}^{(1)} + b_i^{(1)} $$
+# $$ z_i^{(1)} = \sum_{a=0}^{F-1} X_a W_{ai}^{(1)} + b_i^{(1)} $$
 # and none of the $W_{ai}^{(1)}$ are restricted to be zero.
 # 
 # We can also choose an **activation function** at the hidden layer.  The role of the activation function is to introduce some **nonlinearity** in the function that the complete network will learn.  In this notebook, we will always use the **Rectified Linear Unit, or ReLU**, activation function, defined by:
@@ -645,7 +645,7 @@ sess.close()
 # ![ReLU function](relu.png)
 # 
 # We say that ReLU is nonlinear because, e.g.,
-# $$ g(2-3) = 0 \neq g(2) - g(3) = -1.$$
+# $$ g(2-3) = 0 \neq g(2) + g(-3) = 2.$$
 # 
 # Putting these together, the features computed by the hidden layer are 
 # $$ \mathbf{f}^{(1)} = g\left( \mathbf{X} \mathbf{W}^{(1)}  + \mathbf{b}^{(1)}\right) .$$
@@ -873,7 +873,7 @@ print ("TRAIN ACCURACY: %.4f" % (train_acc))
 print ("TEST ACCURACY: %.4f" % (test_acc))   
 
 
-# At a bit better than 98.6% accuracy, this model is a 1.6% improvement in accuracy over our Random Forest result of 97%.  Each training epoch has taken around 15s, for a total training time of a little more than one-half hour.
+# At a bit better than 98.6% accuracy, this model is a 1.6% improvement in accuracy over our Random Forest result of 97%.  In more dramatic terms, the error rate of 3% for the Random Forest model was more than cut in half to 1.4% for this NN. Each training epoch has taken around 15s, for a total training time of a little more than one-half hour.
 # 
 # It might be possible to improve the results of this model by adjusting the parameters.  The width of the hidden layer, the learning rate, the minibatch size, etc. (even the choice of activation functions!) should all be viewed as hyperparameters that should be tuned to improve the accuracy of the model.  In future discussions, we will investigate some effects of hyperparameter tuning in neural networks.  Some issues to be concerned about:
 # 
@@ -1685,7 +1685,7 @@ print ("TRAIN ACCURACY: %.4f" % (train_acc))
 print ("TEST ACCURACY: %.4f" % (test_acc))   
 
 
-# Each epoch of deep and backprop training is taking around 30s, which is 2x that of the two layer model and 4x that of the single layer model. Total training time is about one hour. At 99.3% accuracy, this is our best model so far.  
+# Each epoch of deep and backprop training is taking around 30s, which is 2x that of the two layer model and 4x that of the single layer model. Total training time is about one hour. At 99.3% accuracy, this is our best model so far.  The 1.4% error rate of the fully-connected networks has been cut in half to 0.7% for this deep CNN.
 # 
 # Finally, we'll note that a model with far more features:
 # 
