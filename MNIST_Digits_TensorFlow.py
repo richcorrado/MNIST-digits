@@ -46,7 +46,7 @@ import matplotlib.pylab as plt
 from matplotlib.pylab import rcParams
 from matplotlib import pyplot
 rcParams['figure.figsize'] = 12, 4
-get_ipython().magic(u'matplotlib inline')
+get_ipython().magic('matplotlib inline')
 
 from sklearn.model_selection import StratifiedKFold, StratifiedShuffleSplit
 from sklearn.metrics import accuracy_score
@@ -179,7 +179,7 @@ y_tune = y_train[tune_idx]
 
 # In[10]:
 
-get_ipython().magic(u'time rs.fit(x_tune, y_tune)')
+get_ipython().magic('time rs.fit(x_tune, y_tune)')
 
 
 # This finds a best candidate in around 10 minutes.   Random search over the entire dataset would take around 1.5 hours.
@@ -1397,13 +1397,19 @@ plt.show()
 # 
 # It is not to hard to guess that the convolutional network will have the hyperparameters:
 # 
-# 1. The shape [width, height] of the window employed to sample groups of pixels.  The window is also referred to as the **filter**.
+# 1. The shape [width, height] of the window employed to sample groups of pixels.  The window is also referred to as the **filter**.  
 # 
 # 2. The number of pixels in each direction to move the window between samplings.  This is called the **stride**.
 # 
-# 3. The number of features to compute per sampling.  This is referred to as the **depth**. If depth > 1, then the filter is actually a tensor of shape [width, height, depth].
+# 3. The number of independent filters used in the layer.  Each independent filter is a collection of weights that are shared at each patch.  By including extra filters, we can learn additional features from each patch.  This is sometimes referred to as the **depth** of the convolutional layer, but should not be confused with the depth of the network taken as a whole. If depth > 1, then the filter is actually a tensor of shape [width, height, depth].
 # 
 # In our design matrix, the pixel data has been unrolled and the proximity of pixels in the vertical direction has been obscured.  A convolutional filter is designed to sample over nearby pixels and restore information about the local relationships between the features.
+# 
+# More specifically, in terms of the restriction conditions discussed previously, from a fully-connected layer to the convolutional layer:
+# 
+# * The use of the window imposes the condition that we compute new features based on a subset of the input features.
+# 
+# * The sharing of the same filter weights implements the symmetry condition.
 # 
 # Convolutional layers tend to learn geometric shapes.  In the case of the digits, depending on the filter size, these might look like the highlighted shapes:
 # 
@@ -1471,7 +1477,7 @@ x_image = tf.reshape(x, [-1,28,28,1])
 # 
 # * `(filter_height, filter_width)` are the pixel dimensions of the window. 
 # * `in_channels` is again the # of color channels in the input.  
-# * `out_channels` is the number of features for the layer to output. 
+# * `out_channels` is the number of features for the layer to output per patch. 
 # 
 # In detail, the layer 
 # 

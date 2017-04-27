@@ -11835,20 +11835,20 @@ div#notebook {
 <div class="prompt input_prompt">In&nbsp;[1]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="n">pd</span><span class="o">.</span><span class="n">set_option</span><span class="p">(</span><span class="s1">&#39;display.precision&#39;</span><span class="p">,</span><span class="mi">5</span><span class="p">)</span>
 <span class="n">pd</span><span class="o">.</span><span class="n">set_option</span><span class="p">(</span><span class="s1">&#39;display.max_colwidth&#39;</span><span class="p">,</span><span class="mi">100</span><span class="p">)</span>
 
-<span class="kn">import</span> <span class="nn">matplotlib.pylab</span> <span class="kn">as</span> <span class="nn">plt</span>
-<span class="kn">from</span> <span class="nn">matplotlib.pylab</span> <span class="kn">import</span> <span class="n">rcParams</span>
-<span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pylab</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">matplotlib.pylab</span> <span class="k">import</span> <span class="n">rcParams</span>
+<span class="kn">from</span> <span class="nn">matplotlib</span> <span class="k">import</span> <span class="n">pyplot</span>
 <span class="n">rcParams</span><span class="p">[</span><span class="s1">&#39;figure.figsize&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">4</span>
 <span class="o">%</span><span class="k">matplotlib</span> inline
 
-<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">StratifiedKFold</span><span class="p">,</span> <span class="n">StratifiedShuffleSplit</span>
-<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">accuracy_score</span>
-<span class="kn">from</span> <span class="nn">time</span> <span class="kn">import</span> <span class="n">time</span>
+<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="k">import</span> <span class="n">StratifiedKFold</span><span class="p">,</span> <span class="n">StratifiedShuffleSplit</span>
+<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="k">import</span> <span class="n">accuracy_score</span>
+<span class="kn">from</span> <span class="nn">time</span> <span class="k">import</span> <span class="n">time</span>
 <span class="kn">import</span> <span class="nn">scipy</span>
 </pre></div>
 
@@ -11872,13 +11872,13 @@ div#notebook {
 <div class="prompt input_prompt">In&nbsp;[2]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">column_names</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;label&#39;</span><span class="p">]</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">column_names</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;label&#39;</span><span class="p">]</span>
 
 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">784</span><span class="p">):</span>
     <span class="n">column_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;pixel&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
     
-<span class="n">train_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;./input/mnist_train.csv&quot;</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="n">column_names</span><span class="p">)</span>
-<span class="n">test_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;./input/mnist_test.csv&quot;</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="n">column_names</span><span class="p">)</span>
+<span class="n">train_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;./input/mnist_train.csv&quot;</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="n">column_names</span><span class="p">)</span>
+<span class="n">test_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;./input/mnist_test.csv&quot;</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="n">column_names</span><span class="p">)</span>
 </pre></div>
 
 </div>
@@ -11903,7 +11903,7 @@ div#notebook {
 <div class="prompt input_prompt">In&nbsp;[3]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="c1"># recover the 28x28 matrix from a row of train_df</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># recover the 28x28 matrix from a row of train_df</span>
 <span class="k">def</span> <span class="nf">pixel_mat</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">df</span><span class="o">=</span><span class="n">train_df</span><span class="p">):</span>
     <span class="c1"># we&#39;re working with train_df so we want to drop the label column</span>
     <span class="n">vec</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="s1">&#39;label&#39;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">row</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
@@ -11951,8 +11951,8 @@ div#notebook {
 <div class="prompt input_prompt">In&nbsp;[4]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="c1"># generate a list of 16 random rows which are our digits</span>
-<span class="n">rand_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">train_df</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># generate a list of 16 random rows which are our digits</span>
+<span class="n">rand_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">train_df</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 <span class="n">plot_digits</span><span class="p">(</span><span class="n">rand_idx</span><span class="p">)</span>
 </pre></div>
 
@@ -12349,15 +12349,15 @@ f3RQAAAAAElFTkSuQmCC
 <div class="prompt input_prompt">In&nbsp;[5]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">x_train</span> <span class="o">=</span> <span class="n">train_df</span><span class="o">.</span><span class="n">drop</span><span class="p">([</span><span class="s1">&#39;label&#39;</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">values</span>
-<span class="k">print</span><span class="p">(</span><span class="n">x_train</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">x_train</span> <span class="o">=</span> <span class="n">train_df</span><span class="o">.</span><span class="n">drop</span><span class="p">([</span><span class="s1">&#39;label&#39;</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">values</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">x_train</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
 <span class="n">y_train</span> <span class="o">=</span> <span class="n">train_df</span><span class="p">[</span><span class="s1">&#39;label&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
-<span class="k">print</span><span class="p">(</span><span class="n">y_train</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">y_train</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
 
 <span class="n">x_test</span> <span class="o">=</span> <span class="n">test_df</span><span class="o">.</span><span class="n">drop</span><span class="p">([</span><span class="s1">&#39;label&#39;</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">values</span>
-<span class="k">print</span><span class="p">(</span><span class="n">x_test</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">x_test</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
 <span class="n">y_test</span> <span class="o">=</span> <span class="n">test_df</span><span class="p">[</span><span class="s1">&#39;label&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
-<span class="k">print</span><span class="p">(</span><span class="n">y_test</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">y_test</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
 </pre></div>
 
 </div>
@@ -12399,7 +12399,7 @@ f3RQAAAAAElFTkSuQmCC
 <div class="prompt input_prompt">In&nbsp;[6]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.ensemble</span> <span class="kn">import</span> <span class="n">RandomForestClassifier</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.ensemble</span> <span class="k">import</span> <span class="n">RandomForestClassifier</span>
 <span class="n">rf_clf</span> <span class="o">=</span> <span class="n">RandomForestClassifier</span><span class="p">(</span><span class="n">n_jobs</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">random_state</span> <span class="o">=</span> <span class="mi">32</span><span class="p">)</span>
 </pre></div>
 
@@ -12423,7 +12423,7 @@ f3RQAAAAAElFTkSuQmCC
 <div class="prompt input_prompt">In&nbsp;[7]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">kfold</span> <span class="o">=</span> <span class="n">StratifiedKFold</span><span class="p">(</span><span class="n">n_splits</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">7</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">kfold</span> <span class="o">=</span> <span class="n">StratifiedKFold</span><span class="p">(</span><span class="n">n_splits</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">7</span><span class="p">)</span>
 </pre></div>
 
 </div>
@@ -12446,11 +12446,11 @@ f3RQAAAAAElFTkSuQmCC
 <div class="prompt input_prompt">In&nbsp;[8]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">rf_param</span> <span class="o">=</span>  <span class="p">{</span><span class="s1">&#39;n_estimators&#39;</span><span class="p">:</span> <span class="n">scipy</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">150</span><span class="p">,</span><span class="mi">400</span><span class="p">),</span> 
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">rf_param</span> <span class="o">=</span>  <span class="p">{</span><span class="s1">&#39;n_estimators&#39;</span><span class="p">:</span> <span class="n">scipy</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">150</span><span class="p">,</span><span class="mi">400</span><span class="p">),</span> 
              <span class="s1">&#39;max_depth&#39;</span><span class="p">:</span> <span class="n">scipy</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span><span class="mi">28</span><span class="p">),</span> 
              <span class="s1">&#39;max_features&#39;</span><span class="p">:</span> <span class="n">scipy</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span><span class="mi">40</span><span class="p">)}</span>
 
-<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">RandomizedSearchCV</span>
+<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="k">import</span> <span class="n">RandomizedSearchCV</span>
 <span class="n">rs</span> <span class="o">=</span> <span class="n">RandomizedSearchCV</span><span class="p">(</span><span class="n">rf_clf</span><span class="p">,</span> <span class="n">param_distributions</span><span class="o">=</span><span class="n">rf_param</span><span class="p">,</span> 
                         <span class="n">scoring</span> <span class="o">=</span> <span class="s1">&#39;accuracy&#39;</span><span class="p">,</span> <span class="n">n_jobs</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> 
                         <span class="n">n_iter</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">cv</span><span class="o">=</span><span class="n">kfold</span><span class="p">)</span> 
@@ -12476,7 +12476,7 @@ f3RQAAAAAElFTkSuQmCC
 <div class="prompt input_prompt">In&nbsp;[9]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">tuning_split</span> <span class="o">=</span> <span class="n">StratifiedShuffleSplit</span><span class="p">(</span><span class="n">n_splits</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">train_size</span><span class="o">=</span><span class="mf">0.10</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">96</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">tuning_split</span> <span class="o">=</span> <span class="n">StratifiedShuffleSplit</span><span class="p">(</span><span class="n">n_splits</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">train_size</span><span class="o">=</span><span class="mf">0.10</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">96</span><span class="p">)</span>
 <span class="n">tune_idx</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">tuning_split</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">x_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">))[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
 
 <span class="n">x_tune</span> <span class="o">=</span> <span class="n">x_train</span><span class="p">[</span><span class="n">tune_idx</span><span class="p">]</span>
@@ -12493,7 +12493,7 @@ f3RQAAAAAElFTkSuQmCC
 <div class="prompt input_prompt">In&nbsp;[10]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="o">%</span><span class="k">time</span> rs.fit(x_tune, y_tune)
+<div class=" highlight hl-ipython3"><pre><span></span><span class="o">%</span><span class="k">time</span> rs.fit(x_tune, y_tune)
 </pre></div>
 
 </div>
@@ -12556,7 +12556,7 @@ Wall time: 11min 6s
 <div class="prompt input_prompt">In&nbsp;[11]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">rf_clf_rs</span> <span class="o">=</span> <span class="n">rs</span><span class="o">.</span><span class="n">best_estimator_</span> 
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">rf_clf_rs</span> <span class="o">=</span> <span class="n">rs</span><span class="o">.</span><span class="n">best_estimator_</span> 
 <span class="n">rf_clf_rs</span>
 </pre></div>
 
@@ -12603,7 +12603,7 @@ Wall time: 11min 6s
 <div class="prompt input_prompt">In&nbsp;[12]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">rf_clf_rs</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">x_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">rf_clf_rs</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">x_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
 <span class="n">y_rf_pred</span> <span class="o">=</span> <span class="n">rf_clf_rs</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">x_test</span><span class="p">)</span>
 </pre></div>
 
@@ -12617,7 +12617,7 @@ Wall time: 11min 6s
 <div class="prompt input_prompt">In&nbsp;[13]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">accuracy_score</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="k">import</span> <span class="n">accuracy_score</span>
 <span class="n">accuracy_score</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_rf_pred</span><span class="p">)</span>
 </pre></div>
 
@@ -12686,7 +12686,7 @@ $$ \begin{split}
 <div class="prompt input_prompt">In&nbsp;[14]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">LabelBinarizer</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="k">import</span> <span class="n">LabelBinarizer</span>
 </pre></div>
 
 </div>
@@ -12699,7 +12699,7 @@ $$ \begin{split}
 <div class="prompt input_prompt">In&nbsp;[15]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">lb</span> <span class="o">=</span> <span class="n">LabelBinarizer</span><span class="p">()</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">lb</span> <span class="o">=</span> <span class="n">LabelBinarizer</span><span class="p">()</span>
 </pre></div>
 
 </div>
@@ -12712,7 +12712,7 @@ $$ \begin{split}
 <div class="prompt input_prompt">In&nbsp;[16]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">lb</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">y_train</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">lb</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">y_train</span><span class="p">)</span>
 </pre></div>
 
 </div>
@@ -12753,7 +12753,7 @@ $$ \begin{split}
 <div class="prompt input_prompt">In&nbsp;[17]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
 </pre></div>
 
 </div>
@@ -12794,7 +12794,7 @@ $$ \begin{split}
 <div class="prompt input_prompt">In&nbsp;[18]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">lb</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">))</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">lb</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">))</span>
 </pre></div>
 
 </div>
@@ -12845,7 +12845,7 @@ $$ \begin{split}
 <div class="prompt input_prompt">In&nbsp;[19]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">y_train_oh</span> <span class="o">=</span> <span class="n">lb</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">y_train</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">y_train_oh</span> <span class="o">=</span> <span class="n">lb</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">y_train</span><span class="p">)</span>
 <span class="n">y_test_oh</span> <span class="o">=</span> <span class="n">lb</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">y_test</span><span class="p">)</span>
 </pre></div>
 
@@ -12890,7 +12890,7 @@ $$ x_\text{scaled} = \frac{ x }{ \text{max}( |x_\text{min}|,|x_\text{max}|)} $$<
 <div class="prompt input_prompt">In&nbsp;[20]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">MaxAbsScaler</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="k">import</span> <span class="n">MaxAbsScaler</span>
 </pre></div>
 
 </div>
@@ -12913,7 +12913,7 @@ $$ x_\text{scaled} = \frac{ x }{ \text{max}( |x_\text{min}|,|x_\text{max}|)} $$<
 <div class="prompt input_prompt">In&nbsp;[21]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">training_scaler</span> <span class="o">=</span> <span class="n">MaxAbsScaler</span><span class="p">()</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">training_scaler</span> <span class="o">=</span> <span class="n">MaxAbsScaler</span><span class="p">()</span>
 </pre></div>
 
 </div>
@@ -12936,7 +12936,7 @@ $$ x_\text{scaled} = \frac{ x }{ \text{max}( |x_\text{min}|,|x_\text{max}|)} $$<
 <div class="prompt input_prompt">In&nbsp;[22]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">training_scaler</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">x_train</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">training_scaler</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">x_train</span><span class="p">)</span>
 </pre></div>
 
 </div>
@@ -12977,7 +12977,7 @@ $$ x_\text{scaled} = \frac{ x }{ \text{max}( |x_\text{min}|,|x_\text{max}|)} $$<
 <div class="prompt input_prompt">In&nbsp;[23]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">x_train_scaled</span> <span class="o">=</span> <span class="n">training_scaler</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">x_train</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">x_train_scaled</span> <span class="o">=</span> <span class="n">training_scaler</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">x_train</span><span class="p">)</span>
 <span class="n">x_test_scaled</span> <span class="o">=</span> <span class="n">training_scaler</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">x_test</span><span class="p">)</span>
 </pre></div>
 
@@ -13001,7 +13001,7 @@ $$ x_\text{scaled} = \frac{ x }{ \text{max}( |x_\text{min}|,|x_\text{max}|)} $$<
 <div class="prompt input_prompt">In&nbsp;[24]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">x_train_scaled</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">x_train_scaled</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)]</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">x_train_scaled</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">x_train_scaled</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)]</span>
 </pre></div>
 
 </div>
@@ -13033,7 +13033,7 @@ $$ x_\text{scaled} = \frac{ x }{ \text{max}( |x_\text{min}|,|x_\text{max}|)} $$<
 <div class="prompt input_prompt">In&nbsp;[25]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">x_train</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">x_train</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)]</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">x_train</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">x_train</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)]</span>
 </pre></div>
 
 </div>
@@ -13130,7 +13130,7 @@ $$ x_\text{scaled} = \frac{ x }{ \text{max}( |x_\text{min}|,|x_\text{max}|)} $$<
 <div class="prompt input_prompt">In&nbsp;[26]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="kn">import</span> <span class="nn">tensorflow</span> <span class="kn">as</span> <span class="nn">tf</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">tensorflow</span> <span class="k">as</span> <span class="nn">tf</span>
 <span class="n">sess</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">InteractiveSession</span><span class="p">()</span>
 
 <span class="c1"># set random seed</span>
@@ -13158,8 +13158,8 @@ $$ x_\text{scaled} = \frac{ x }{ \text{max}( |x_\text{min}|,|x_\text{max}|)} $$<
 <div class="prompt input_prompt">In&nbsp;[27]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">n_feat</span> <span class="o">=</span> <span class="mi">784</span>
-<span class="n">x</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">placeholder</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">[</span><span class="bp">None</span><span class="p">,</span> <span class="n">n_feat</span><span class="p">])</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">n_feat</span> <span class="o">=</span> <span class="mi">784</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">placeholder</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="n">n_feat</span><span class="p">])</span>
 </pre></div>
 
 </div>
@@ -13182,8 +13182,8 @@ $$ x_\text{scaled} = \frac{ x }{ \text{max}( |x_\text{min}|,|x_\text{max}|)} $$<
 <div class="prompt input_prompt">In&nbsp;[28]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">n_class</span> <span class="o">=</span> <span class="mi">10</span>
-<span class="n">y_true</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">placeholder</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">int32</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">[</span><span class="bp">None</span><span class="p">,</span> <span class="n">n_class</span><span class="p">])</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">n_class</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="n">y_true</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">placeholder</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">int32</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="n">n_class</span><span class="p">])</span>
 </pre></div>
 
 </div>
@@ -13209,7 +13209,7 @@ $$ p_{i, c} = \text{softmax}(z_i)_c = \frac{\exp (z_{i,c})}{\sum_{c'} \exp (z_{i
 <div class="prompt input_prompt">In&nbsp;[29]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">W</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">Variable</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">n_feat</span><span class="p">,</span> <span class="n">n_class</span><span class="p">]))</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">W</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">Variable</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">n_feat</span><span class="p">,</span> <span class="n">n_class</span><span class="p">]))</span>
 <span class="n">b</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">Variable</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">n_class</span><span class="p">]))</span>
 </pre></div>
 
@@ -13234,7 +13234,7 @@ $$ p_{i, c} = \text{softmax}(z_i)_c = \frac{\exp (z_{i,c})}{\sum_{c'} \exp (z_{i
 <div class="prompt input_prompt">In&nbsp;[30]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">z_out</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">W</span><span class="p">),</span> <span class="n">b</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">z_out</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">W</span><span class="p">),</span> <span class="n">b</span><span class="p">)</span>
 </pre></div>
 
 </div>
@@ -13257,7 +13257,7 @@ $$ p_{i, c} = \text{softmax}(z_i)_c = \frac{\exp (z_{i,c})}{\sum_{c'} \exp (z_{i
 <div class="prompt input_prompt">In&nbsp;[31]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">z_out</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">z_out</span>
 </pre></div>
 
 </div>
@@ -13298,7 +13298,7 @@ $$ p_{i, c} = \text{softmax}(z_i)_c = \frac{\exp (z_{i,c})}{\sum_{c'} \exp (z_{i
 <div class="prompt input_prompt">In&nbsp;[32]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">cost</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reduce_mean</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">softmax_cross_entropy_with_logits</span><span class="p">(</span><span class="n">labels</span><span class="o">=</span><span class="n">y_true</span><span class="p">,</span> <span class="n">logits</span><span class="o">=</span><span class="n">z_out</span><span class="p">))</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">cost</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reduce_mean</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">softmax_cross_entropy_with_logits</span><span class="p">(</span><span class="n">labels</span><span class="o">=</span><span class="n">y_true</span><span class="p">,</span> <span class="n">logits</span><span class="o">=</span><span class="n">z_out</span><span class="p">))</span>
 </pre></div>
 
 </div>
@@ -13322,7 +13322,7 @@ $$ J_i = \sum_c y_{ic} \ln \text{softmax}(\mathbf{z}_i)_c, $$<p>which can be con
 <div class="prompt input_prompt">In&nbsp;[33]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">tf</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">softmax_cross_entropy_with_logits</span><span class="p">(</span><span class="n">labels</span><span class="o">=</span><span class="n">y_true</span><span class="p">,</span> 
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">tf</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">softmax_cross_entropy_with_logits</span><span class="p">(</span><span class="n">labels</span><span class="o">=</span><span class="n">y_true</span><span class="p">,</span> 
                                         <span class="n">logits</span><span class="o">=</span><span class="n">z_out</span><span class="p">)</span>
 </pre></div>
 
@@ -13365,7 +13365,7 @@ $$ J_i = \sum_c y_{ic} \ln \text{softmax}(\mathbf{z}_i)_c, $$<p>which can be con
 <div class="prompt input_prompt">In&nbsp;[34]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">corr</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">equal</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">z_out</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">tf</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>    
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">corr</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">equal</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">z_out</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">tf</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>    
 <span class="n">accr</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reduce_mean</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">corr</span><span class="p">,</span> <span class="s2">&quot;float&quot;</span><span class="p">))</span>
 </pre></div>
 
@@ -13391,7 +13391,7 @@ $$ J_i = \sum_c y_{ic} \ln \text{softmax}(\mathbf{z}_i)_c, $$<p>which can be con
 <div class="prompt input_prompt">In&nbsp;[35]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">learning_rate</span> <span class="o">=</span> <span class="mf">0.01</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">learning_rate</span> <span class="o">=</span> <span class="mf">0.01</span>
 <span class="n">optimizer</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">GradientDescentOptimizer</span><span class="p">(</span><span class="n">learning_rate</span><span class="p">)</span><span class="o">.</span><span class="n">minimize</span><span class="p">(</span><span class="n">cost</span><span class="p">)</span>
 </pre></div>
 
@@ -13424,7 +13424,7 @@ $$ J_i = \sum_c y_{ic} \ln \text{softmax}(\mathbf{z}_i)_c, $$<p>which can be con
 <div class="prompt input_prompt">In&nbsp;[36]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">n_samp</span> <span class="o">=</span> <span class="n">x_train_scaled</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">n_samp</span> <span class="o">=</span> <span class="n">x_train_scaled</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 <span class="n">n_samp</span>
 </pre></div>
 
@@ -13466,7 +13466,7 @@ $$ J_i = \sum_c y_{ic} \ln \text{softmax}(\mathbf{z}_i)_c, $$<p>which can be con
 <div class="prompt input_prompt">In&nbsp;[37]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">n_batch</span> <span class="o">=</span> <span class="mf">50.</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">n_batch</span> <span class="o">=</span> <span class="mf">50.</span>
 <span class="n">total_batch</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">n_samp</span> <span class="o">/</span> <span class="n">n_batch</span><span class="p">)</span>
 <span class="n">total_batch</span>
 </pre></div>
@@ -13511,7 +13511,7 @@ $$ J_i = \sum_c y_{ic} \ln \text{softmax}(\mathbf{z}_i)_c, $$<p>which can be con
 <div class="prompt input_prompt">In&nbsp;[38]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">skfold</span> <span class="o">=</span> <span class="n">StratifiedKFold</span><span class="p">(</span><span class="n">n_splits</span><span class="o">=</span><span class="n">total_batch</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">428</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">skfold</span> <span class="o">=</span> <span class="n">StratifiedKFold</span><span class="p">(</span><span class="n">n_splits</span><span class="o">=</span><span class="n">total_batch</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">428</span><span class="p">)</span>
 </pre></div>
 
 </div>
@@ -13534,7 +13534,7 @@ $$ J_i = \sum_c y_{ic} \ln \text{softmax}(\mathbf{z}_i)_c, $$<p>which can be con
 <div class="prompt input_prompt">In&nbsp;[39]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="c1"># Number of epochs to train over. Should be large enough for convergence.  </span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Number of epochs to train over. Should be large enough for convergence.  </span>
 <span class="c1"># If it is too large, at worst the model</span>
 <span class="c1"># might overfit, at best we waste computing time.</span>
 <span class="n">n_epoch</span> <span class="o">=</span> <span class="mi">200</span>
@@ -13575,25 +13575,25 @@ $$ J_i = \sum_c y_{ic} \ln \text{softmax}(\mathbf{z}_i)_c, $$<p>which can be con
     <span class="c1"># Display logs per epoch step</span>
     <span class="k">if</span> <span class="n">epoch</span> <span class="o">%</span> <span class="n">display_step</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
         <span class="c1"># return epoch and average cost</span>
-        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Epoch: </span><span class="si">%.4d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">epoch</span><span class="p">,</span> <span class="s2">&quot;cost = </span><span class="si">%.4f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">avg_cost</span><span class="p">,</span> 
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Epoch: </span><span class="si">%.4d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">epoch</span><span class="p">,</span> <span class="s2">&quot;cost = </span><span class="si">%.4f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">avg_cost</span><span class="p">,</span> 
               <span class="s2">&quot;time = </span><span class="si">%.2f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start</span><span class="p">))</span>
         <span class="c1"># compute accuracy on full training set</span>
         <span class="n">train_acc</span> <span class="o">=</span> <span class="n">sess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">accr</span><span class="p">,</span> 
                              <span class="n">feed_dict</span><span class="o">=</span><span class="p">{</span><span class="n">x</span><span class="p">:</span> <span class="n">x_train_scaled</span><span class="p">,</span> <span class="n">y_true</span><span class="p">:</span> <span class="n">y_train_oh</span><span class="p">})</span>
-        <span class="k">print</span> <span class="p">(</span><span class="s2">&quot;TRAIN ACCURACY: </span><span class="si">%.3f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">train_acc</span><span class="p">))</span>
+        <span class="nb">print</span> <span class="p">(</span><span class="s2">&quot;TRAIN ACCURACY: </span><span class="si">%.3f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">train_acc</span><span class="p">))</span>
         <span class="c1"># compute accuracy on full validation set</span>
         <span class="n">test_acc</span> <span class="o">=</span> <span class="n">sess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">accr</span><span class="p">,</span> 
                             <span class="n">feed_dict</span><span class="o">=</span><span class="p">{</span><span class="n">x</span><span class="p">:</span> <span class="n">x_test_scaled</span><span class="p">,</span> <span class="n">y_true</span><span class="p">:</span> <span class="n">y_test_oh</span><span class="p">})</span>
-        <span class="k">print</span> <span class="p">(</span><span class="s2">&quot;TEST ACCURACY: </span><span class="si">%.3f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">test_acc</span><span class="p">))</span>
+        <span class="nb">print</span> <span class="p">(</span><span class="s2">&quot;TEST ACCURACY: </span><span class="si">%.3f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">test_acc</span><span class="p">))</span>
 
 <span class="c1"># After the full training cycle, return more logs</span>
 <span class="n">train_acc</span> <span class="o">=</span> <span class="n">sess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">accr</span><span class="p">,</span> 
                      <span class="n">feed_dict</span><span class="o">=</span><span class="p">{</span><span class="n">x</span><span class="p">:</span> <span class="n">x_train_scaled</span><span class="p">,</span> <span class="n">y_true</span><span class="p">:</span> <span class="n">y_train_oh</span><span class="p">})</span>      
 <span class="n">test_acc</span> <span class="o">=</span> <span class="n">sess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">accr</span><span class="p">,</span> 
                     <span class="n">feed_dict</span><span class="o">=</span><span class="p">{</span><span class="n">x</span><span class="p">:</span> <span class="n">x_test_scaled</span><span class="p">,</span> <span class="n">y_true</span><span class="p">:</span> <span class="n">y_test_oh</span><span class="p">})</span>
-<span class="k">print</span><span class="p">(</span><span class="s2">&quot;Optimization finished in </span><span class="si">%.2f</span><span class="s2"> seconds!&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start</span><span class="p">))</span> 
-<span class="k">print</span> <span class="p">(</span><span class="s2">&quot;TRAIN ACCURACY: </span><span class="si">%.3f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">train_acc</span><span class="p">))</span>
-<span class="k">print</span> <span class="p">(</span><span class="s2">&quot;TEST ACCURACY: </span><span class="si">%.3f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">test_acc</span><span class="p">))</span>   
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Optimization finished in </span><span class="si">%.2f</span><span class="s2"> seconds!&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start</span><span class="p">))</span> 
+<span class="nb">print</span> <span class="p">(</span><span class="s2">&quot;TRAIN ACCURACY: </span><span class="si">%.3f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">train_acc</span><span class="p">))</span>
+<span class="nb">print</span> <span class="p">(</span><span class="s2">&quot;TEST ACCURACY: </span><span class="si">%.3f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">test_acc</span><span class="p">))</span>   
 </pre></div>
 
 </div>
@@ -13659,7 +13659,7 @@ TEST ACCURACY: 0.925
 <div class="prompt input_prompt">In&nbsp;[40]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">sess</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">sess</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 </pre></div>
 
 </div>
@@ -13746,7 +13746,7 @@ for some $ 1 < k < n$.   By averaging the results of several models, we should b
 <div class="prompt input_prompt">In&nbsp;[41]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">tf</span><span class="o">.</span><span class="n">reset_default_graph</span><span class="p">()</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">tf</span><span class="o">.</span><span class="n">reset_default_graph</span><span class="p">()</span>
 <span class="n">sess</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">InteractiveSession</span><span class="p">()</span>
 
 <span class="c1"># set random seed</span>
@@ -13773,11 +13773,11 @@ for some $ 1 < k < n$.   By averaging the results of several models, we should b
 <div class="prompt input_prompt">In&nbsp;[42]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">n_feat</span> <span class="o">=</span> <span class="mi">784</span>
-<span class="n">x</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">placeholder</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">[</span><span class="bp">None</span><span class="p">,</span> <span class="n">n_feat</span><span class="p">])</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">n_feat</span> <span class="o">=</span> <span class="mi">784</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">placeholder</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="n">n_feat</span><span class="p">])</span>
 
 <span class="n">n_class</span> <span class="o">=</span> <span class="mi">10</span>
-<span class="n">y_true</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">placeholder</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">int32</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">[</span><span class="bp">None</span><span class="p">,</span> <span class="n">n_class</span><span class="p">])</span>
+<span class="n">y_true</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">placeholder</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">int32</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="n">n_class</span><span class="p">])</span>
 </pre></div>
 
 </div>
@@ -13802,7 +13802,7 @@ for some $ 1 < k < n$.   By averaging the results of several models, we should b
 <div class="prompt input_prompt">In&nbsp;[43]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="k">def</span> <span class="nf">weight_variable</span><span class="p">(</span><span class="n">shape</span><span class="p">):</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">weight_variable</span><span class="p">(</span><span class="n">shape</span><span class="p">):</span>
   <span class="n">initial</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">truncated_normal</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="n">stddev</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
   <span class="k">return</span> <span class="n">tf</span><span class="o">.</span><span class="n">Variable</span><span class="p">(</span><span class="n">initial</span><span class="p">)</span>
 
@@ -13833,7 +13833,7 @@ for some $ 1 < k < n$.   By averaging the results of several models, we should b
 <div class="prompt input_prompt">In&nbsp;[44]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">width1</span> <span class="o">=</span> <span class="mi">784</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">width1</span> <span class="o">=</span> <span class="mi">784</span>
 <span class="n">W_1</span> <span class="o">=</span> <span class="n">weight_variable</span><span class="p">([</span><span class="n">n_feat</span><span class="p">,</span> <span class="n">width1</span><span class="p">])</span>
 </pre></div>
 
@@ -13857,7 +13857,7 @@ for some $ 1 < k < n$.   By averaging the results of several models, we should b
 <div class="prompt input_prompt">In&nbsp;[45]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">b_1</span> <span class="o">=</span> <span class="n">bias_variable</span><span class="p">([</span><span class="n">width1</span><span class="p">])</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">b_1</span> <span class="o">=</span> <span class="n">bias_variable</span><span class="p">([</span><span class="n">width1</span><span class="p">])</span>
 </pre></div>
 
 </div>
@@ -13880,7 +13880,7 @@ for some $ 1 < k < n$.   By averaging the results of several models, we should b
 <div class="prompt input_prompt">In&nbsp;[46]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">h_1</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">W_1</span><span class="p">),</span> <span class="n">b_1</span><span class="p">))</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">h_1</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">W_1</span><span class="p">),</span> <span class="n">b_1</span><span class="p">))</span>
 </pre></div>
 
 </div>
@@ -13904,7 +13904,7 @@ for some $ 1 < k < n$.   By averaging the results of several models, we should b
 <div class="prompt input_prompt">In&nbsp;[47]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">keep_prob</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">placeholder</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">keep_prob</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">placeholder</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
 <span class="n">h_1_drop</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">dropout</span><span class="p">(</span><span class="n">h_1</span><span class="p">,</span> <span class="n">keep_prob</span><span class="p">)</span>
 </pre></div>
 
@@ -13928,7 +13928,7 @@ for some $ 1 < k < n$.   By averaging the results of several models, we should b
 <div class="prompt input_prompt">In&nbsp;[48]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">W_out</span> <span class="o">=</span> <span class="n">weight_variable</span><span class="p">([</span><span class="n">width1</span><span class="p">,</span> <span class="n">n_class</span><span class="p">])</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">W_out</span> <span class="o">=</span> <span class="n">weight_variable</span><span class="p">([</span><span class="n">width1</span><span class="p">,</span> <span class="n">n_class</span><span class="p">])</span>
 <span class="n">b_out</span> <span class="o">=</span> <span class="n">bias_variable</span><span class="p">([</span><span class="n">n_class</span><span class="p">])</span>
 
 <span class="n">z_out</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">h_1_drop</span><span class="p">,</span> <span class="n">W_out</span><span class="p">),</span> <span class="n">b_out</span><span class="p">)</span>
@@ -13954,7 +13954,7 @@ for some $ 1 < k < n$.   By averaging the results of several models, we should b
 <div class="prompt input_prompt">In&nbsp;[49]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">cost</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reduce_mean</span><span class="p">(</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">cost</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reduce_mean</span><span class="p">(</span>
         <span class="n">tf</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">softmax_cross_entropy_with_logits</span><span class="p">(</span><span class="n">labels</span><span class="o">=</span><span class="n">y_true</span><span class="p">,</span> 
                                                 <span class="n">logits</span><span class="o">=</span><span class="n">z_out</span><span class="p">))</span>
 <span class="n">corr</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">equal</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">z_out</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">tf</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>    
@@ -13981,7 +13981,7 @@ for some $ 1 < k < n$.   By averaging the results of several models, we should b
 <div class="prompt input_prompt">In&nbsp;[50]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">learning_rate</span> <span class="o">=</span> <span class="mf">0.0001</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">learning_rate</span> <span class="o">=</span> <span class="mf">0.0001</span>
 <span class="n">optimizer</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">AdamOptimizer</span><span class="p">(</span><span class="n">learning_rate</span><span class="p">)</span><span class="o">.</span><span class="n">minimize</span><span class="p">(</span><span class="n">cost</span><span class="p">)</span>
 </pre></div>
 
@@ -14005,7 +14005,7 @@ for some $ 1 < k < n$.   By averaging the results of several models, we should b
 <div class="prompt input_prompt">In&nbsp;[51]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="c1"># Number of epochs to train over.</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Number of epochs to train over.</span>
 <span class="n">n_epoch</span> <span class="o">=</span> <span class="mi">140</span> <span class="o">+</span> <span class="mi">1</span>
 
 <span class="c1"># We will compute appropriate metrics at checkpoints</span>
@@ -14038,20 +14038,20 @@ for some $ 1 < k < n$.   By averaging the results of several models, we should b
     <span class="c1"># Display logs per epoch step</span>
     <span class="k">if</span> <span class="n">epoch</span> <span class="o">%</span> <span class="n">display_step</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
         <span class="c1"># return epoch and average cost</span>
-        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Epoch: </span><span class="si">%.4d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">epoch</span><span class="p">,</span> <span class="s2">&quot;cost = </span><span class="si">%.4f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">avg_cost</span><span class="p">,</span> 
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Epoch: </span><span class="si">%.4d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">epoch</span><span class="p">,</span> <span class="s2">&quot;cost = </span><span class="si">%.4f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">avg_cost</span><span class="p">,</span> 
               <span class="s2">&quot;time = </span><span class="si">%.2f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start</span><span class="p">))</span>
         <span class="c1"># compute accuracy on full training set</span>
         <span class="n">train_acc</span> <span class="o">=</span> <span class="n">sess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">accr</span><span class="p">,</span> 
                              <span class="n">feed_dict</span><span class="o">=</span><span class="p">{</span><span class="n">x</span><span class="p">:</span> <span class="n">x_train_scaled</span><span class="p">,</span> 
                                         <span class="n">y_true</span><span class="p">:</span> <span class="n">y_train_oh</span><span class="p">,</span> 
                                         <span class="n">keep_prob</span><span class="p">:</span> <span class="mf">1.</span><span class="p">})</span>
-        <span class="k">print</span> <span class="p">(</span><span class="s2">&quot;TRAIN ACCURACY: </span><span class="si">%.4f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">train_acc</span><span class="p">))</span>
+        <span class="nb">print</span> <span class="p">(</span><span class="s2">&quot;TRAIN ACCURACY: </span><span class="si">%.4f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">train_acc</span><span class="p">))</span>
         <span class="c1"># compute accuracy on full validation set</span>
         <span class="n">test_acc</span> <span class="o">=</span> <span class="n">sess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">accr</span><span class="p">,</span> 
                             <span class="n">feed_dict</span><span class="o">=</span><span class="p">{</span><span class="n">x</span><span class="p">:</span> <span class="n">x_test_scaled</span><span class="p">,</span> 
                                        <span class="n">y_true</span><span class="p">:</span> <span class="n">y_test_oh</span><span class="p">,</span> 
                                        <span class="n">keep_prob</span><span class="p">:</span> <span class="mf">1.</span><span class="p">})</span>
-        <span class="k">print</span> <span class="p">(</span><span class="s2">&quot;TEST ACCURACY: </span><span class="si">%.4f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">test_acc</span><span class="p">))</span>
+        <span class="nb">print</span> <span class="p">(</span><span class="s2">&quot;TEST ACCURACY: </span><span class="si">%.4f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">test_acc</span><span class="p">))</span>
 
 <span class="c1"># After the full training cycle, return more logs</span>
 <span class="n">train_acc</span> <span class="o">=</span> <span class="n">sess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">accr</span><span class="p">,</span> <span class="n">feed_dict</span><span class="o">=</span><span class="p">{</span><span class="n">x</span><span class="p">:</span> <span class="n">x_train_scaled</span><span class="p">,</span> 
@@ -14060,9 +14060,9 @@ for some $ 1 < k < n$.   By averaging the results of several models, we should b
 <span class="n">test_acc</span> <span class="o">=</span> <span class="n">sess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">accr</span><span class="p">,</span> <span class="n">feed_dict</span><span class="o">=</span><span class="p">{</span><span class="n">x</span><span class="p">:</span> <span class="n">x_test_scaled</span><span class="p">,</span> 
                                      <span class="n">y_true</span><span class="p">:</span> <span class="n">y_test_oh</span><span class="p">,</span> 
                                      <span class="n">keep_prob</span><span class="p">:</span> <span class="mf">1.</span><span class="p">})</span>
-<span class="k">print</span><span class="p">(</span><span class="s2">&quot;Optimization finished in </span><span class="si">%.2f</span><span class="s2"> seconds!&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start</span><span class="p">))</span> 
-<span class="k">print</span> <span class="p">(</span><span class="s2">&quot;TRAIN ACCURACY: </span><span class="si">%.4f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">train_acc</span><span class="p">))</span>
-<span class="k">print</span> <span class="p">(</span><span class="s2">&quot;TEST ACCURACY: </span><span class="si">%.4f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">test_acc</span><span class="p">))</span>   
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Optimization finished in </span><span class="si">%.2f</span><span class="s2"> seconds!&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start</span><span class="p">))</span> 
+<span class="nb">print</span> <span class="p">(</span><span class="s2">&quot;TRAIN ACCURACY: </span><span class="si">%.4f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">train_acc</span><span class="p">))</span>
+<span class="nb">print</span> <span class="p">(</span><span class="s2">&quot;TEST ACCURACY: </span><span class="si">%.4f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">test_acc</span><span class="p">))</span>   
 </pre></div>
 
 </div>
@@ -14156,7 +14156,7 @@ TEST ACCURACY: 0.9862
 <div class="prompt input_prompt">In&nbsp;[52]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">class_prob_singlayer</span> <span class="o">=</span> <span class="n">sess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">softmax</span><span class="p">(</span><span class="n">z_out</span><span class="p">),</span> 
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">class_prob_singlayer</span> <span class="o">=</span> <span class="n">sess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">softmax</span><span class="p">(</span><span class="n">z_out</span><span class="p">),</span> 
                           <span class="n">feed_dict</span><span class="o">=</span><span class="p">{</span><span class="n">x</span><span class="p">:</span> <span class="n">x_test_scaled</span><span class="p">,</span> 
                                      <span class="n">y_true</span><span class="p">:</span> <span class="n">y_test_oh</span><span class="p">,</span> 
                                      <span class="n">keep_prob</span><span class="p">:</span> <span class="mf">1.</span><span class="p">})</span>
@@ -14182,7 +14182,7 @@ TEST ACCURACY: 0.9862
 <div class="prompt input_prompt">In&nbsp;[53]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">253</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">253</span><span class="p">)</span>
 
 <span class="c1"># get all indices from y_train where the label is 1</span>
 <span class="n">ones_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">y_train</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
@@ -14219,7 +14219,7 @@ TEST ACCURACY: 0.9862
 <div class="prompt input_prompt">In&nbsp;[54]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">))</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">))</span>
 
 <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">ax</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">axs</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)):</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">i</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>   <span class="c1"># even axes are the original features</span>
@@ -14567,7 +14567,7 @@ Lcz8JfAAAAAJSURBVACAGf8fhznV8Bz/1dAAAAAASUVORK5CYII=
 <div class="prompt input_prompt">In&nbsp;[55]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="c1"># get all indices from y_train where the label is 2</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># get all indices from y_train where the label is 2</span>
 <span class="n">twos_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">y_train</span> <span class="o">==</span> <span class="mi">2</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
 
 <span class="c1"># pick 10 entries at random</span>
@@ -14930,7 +14930,7 @@ AABmULQAAGb8P0E3YmgbMqdjAAAAAElFTkSuQmCC
 <div class="prompt input_prompt">In&nbsp;[56]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">ones_sum_mat</span> <span class="o">=</span> <span class="n">h1_train_ones</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">28</span><span class="p">,</span><span class="mi">28</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">ones_sum_mat</span> <span class="o">=</span> <span class="n">h1_train_ones</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">28</span><span class="p">,</span><span class="mi">28</span><span class="p">)</span>
 <span class="n">twos_sum_mat</span> <span class="o">=</span> <span class="n">h1_train_twos</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">28</span><span class="p">,</span><span class="mi">28</span><span class="p">)</span>
 
 <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
@@ -15101,7 +15101,7 @@ SUVORK5CYII=
 <div class="prompt input_prompt">In&nbsp;[57]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">h1_sum</span> <span class="o">=</span> <span class="p">[]</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">h1_sum</span> <span class="o">=</span> <span class="p">[]</span>
 
 <span class="k">for</span> <span class="n">dig</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
     <span class="n">idxs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">y_train</span> <span class="o">==</span> <span class="n">dig</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
@@ -15149,7 +15149,7 @@ SUVORK5CYII=
 <div class="prompt input_prompt">In&nbsp;[58]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span><span class="mi">12</span><span class="p">))</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span><span class="mi">12</span><span class="p">))</span>
 
 <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">ax</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">axs</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)):</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Digit Label: </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">i</span><span class="p">)</span>
@@ -15835,7 +15835,7 @@ yQAAAABJRU5ErkJggg==
 <div class="prompt input_prompt">In&nbsp;[59]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">sess</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">sess</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 </pre></div>
 
 </div>
@@ -15867,7 +15867,7 @@ yQAAAABJRU5ErkJggg==
 <div class="prompt input_prompt">In&nbsp;[60]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">tf</span><span class="o">.</span><span class="n">reset_default_graph</span><span class="p">()</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">tf</span><span class="o">.</span><span class="n">reset_default_graph</span><span class="p">()</span>
 <span class="n">sess</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">InteractiveSession</span><span class="p">()</span>
 
 <span class="c1"># set random seed</span>
@@ -15884,10 +15884,10 @@ yQAAAABJRU5ErkJggg==
 <div class="prompt input_prompt">In&nbsp;[61]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">n_feat</span> <span class="o">=</span> <span class="mi">784</span>
-<span class="n">x</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">placeholder</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">[</span><span class="bp">None</span><span class="p">,</span> <span class="n">n_feat</span><span class="p">])</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">n_feat</span> <span class="o">=</span> <span class="mi">784</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">placeholder</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="n">n_feat</span><span class="p">])</span>
 <span class="n">n_class</span> <span class="o">=</span> <span class="mi">10</span>
-<span class="n">y_true</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">placeholder</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">int32</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">[</span><span class="bp">None</span><span class="p">,</span> <span class="n">n_class</span><span class="p">])</span>
+<span class="n">y_true</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">placeholder</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">int32</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="n">n_class</span><span class="p">])</span>
 
 <span class="n">width1</span> <span class="o">=</span> <span class="mi">784</span> 
 <span class="n">W_1</span> <span class="o">=</span> <span class="n">weight_variable</span><span class="p">([</span><span class="n">n_feat</span><span class="p">,</span> <span class="n">width1</span><span class="p">])</span>
@@ -15940,7 +15940,7 @@ yQAAAABJRU5ErkJggg==
 <div class="prompt input_prompt">In&nbsp;[62]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="c1"># Number of epochs to train over. </span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Number of epochs to train over. </span>
 <span class="n">n_epoch</span> <span class="o">=</span> <span class="mi">190</span> <span class="o">+</span> <span class="mi">1</span>
 
 <span class="c1"># Compute appropriate metrics at checkpoints</span>
@@ -15967,20 +15967,20 @@ yQAAAABJRU5ErkJggg==
     <span class="c1"># Display logs per epoch step</span>
     <span class="k">if</span> <span class="n">epoch</span> <span class="o">%</span> <span class="n">display_step</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
         <span class="c1"># return epoch and average cost</span>
-        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Epoch: </span><span class="si">%.4d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">epoch</span><span class="p">,</span> <span class="s2">&quot;cost = </span><span class="si">%.4f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">avg_cost</span><span class="p">,</span> 
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Epoch: </span><span class="si">%.4d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">epoch</span><span class="p">,</span> <span class="s2">&quot;cost = </span><span class="si">%.4f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">avg_cost</span><span class="p">,</span> 
               <span class="s2">&quot;time = </span><span class="si">%.2f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start</span><span class="p">))</span>
         <span class="c1"># compute accuracy on full training set</span>
         <span class="n">train_acc</span> <span class="o">=</span> <span class="n">sess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">accr</span><span class="p">,</span> 
                              <span class="n">feed_dict</span><span class="o">=</span><span class="p">{</span><span class="n">x</span><span class="p">:</span> <span class="n">x_train_scaled</span><span class="p">,</span> 
                                         <span class="n">y_true</span><span class="p">:</span> <span class="n">y_train_oh</span><span class="p">,</span> 
                                         <span class="n">keep_prob</span><span class="p">:</span> <span class="mf">1.</span><span class="p">})</span>
-        <span class="k">print</span> <span class="p">(</span><span class="s2">&quot;TRAIN ACCURACY: </span><span class="si">%.4f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">train_acc</span><span class="p">))</span>
+        <span class="nb">print</span> <span class="p">(</span><span class="s2">&quot;TRAIN ACCURACY: </span><span class="si">%.4f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">train_acc</span><span class="p">))</span>
         <span class="c1"># compute accuracy on full validation set</span>
         <span class="n">test_acc</span> <span class="o">=</span> <span class="n">sess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">accr</span><span class="p">,</span> 
                             <span class="n">feed_dict</span><span class="o">=</span><span class="p">{</span><span class="n">x</span><span class="p">:</span> <span class="n">x_test_scaled</span><span class="p">,</span> 
                                        <span class="n">y_true</span><span class="p">:</span> <span class="n">y_test_oh</span><span class="p">,</span> 
                                        <span class="n">keep_prob</span><span class="p">:</span> <span class="mf">1.</span><span class="p">})</span>
-        <span class="k">print</span> <span class="p">(</span><span class="s2">&quot;TEST ACCURACY: </span><span class="si">%.4f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">test_acc</span><span class="p">))</span>
+        <span class="nb">print</span> <span class="p">(</span><span class="s2">&quot;TEST ACCURACY: </span><span class="si">%.4f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">test_acc</span><span class="p">))</span>
 
 <span class="c1"># After the full training cycle, return more logs</span>
 <span class="n">train_acc</span> <span class="o">=</span> <span class="n">sess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">accr</span><span class="p">,</span> 
@@ -15991,11 +15991,11 @@ yQAAAABJRU5ErkJggg==
                     <span class="n">feed_dict</span><span class="o">=</span><span class="p">{</span><span class="n">x</span><span class="p">:</span> <span class="n">x_test_scaled</span><span class="p">,</span> 
                                <span class="n">y_true</span><span class="p">:</span> <span class="n">y_test_oh</span><span class="p">,</span> 
                                <span class="n">keep_prob</span><span class="p">:</span> <span class="mf">1.</span><span class="p">})</span>
-<span class="k">print</span><span class="p">(</span><span class="s2">&quot;Optimization finished in </span><span class="si">%.2f</span><span class="s2"> seconds!&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start</span><span class="p">))</span> 
-<span class="k">print</span><span class="p">(</span><span class="s2">&quot;For width1 = </span><span class="si">%d</span><span class="s2">, width2 = </span><span class="si">%d</span><span class="s2">, n_epoch = </span><span class="si">%d</span><span class="s2">,&quot;</span> \
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Optimization finished in </span><span class="si">%.2f</span><span class="s2"> seconds!&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start</span><span class="p">))</span> 
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;For width1 = </span><span class="si">%d</span><span class="s2">, width2 = </span><span class="si">%d</span><span class="s2">, n_epoch = </span><span class="si">%d</span><span class="s2">,&quot;</span> \
       <span class="o">%</span> <span class="p">(</span><span class="n">width1</span><span class="p">,</span> <span class="n">width2</span><span class="p">,</span> <span class="n">n_epoch</span><span class="p">))</span>
-<span class="k">print</span> <span class="p">(</span><span class="s2">&quot;TRAIN ACCURACY: </span><span class="si">%.4f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">train_acc</span><span class="p">))</span>
-<span class="k">print</span> <span class="p">(</span><span class="s2">&quot;TEST ACCURACY: </span><span class="si">%.4f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">test_acc</span><span class="p">))</span>        
+<span class="nb">print</span> <span class="p">(</span><span class="s2">&quot;TRAIN ACCURACY: </span><span class="si">%.4f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">train_acc</span><span class="p">))</span>
+<span class="nb">print</span> <span class="p">(</span><span class="s2">&quot;TEST ACCURACY: </span><span class="si">%.4f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">test_acc</span><span class="p">))</span>        
 </pre></div>
 
 </div>
@@ -16068,7 +16068,7 @@ TEST ACCURACY: 0.9866
 <div class="prompt input_prompt">In&nbsp;[63]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">class_prob_twolayer</span> <span class="o">=</span> <span class="n">sess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">softmax</span><span class="p">(</span><span class="n">z_out</span><span class="p">),</span> 
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">class_prob_twolayer</span> <span class="o">=</span> <span class="n">sess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">softmax</span><span class="p">(</span><span class="n">z_out</span><span class="p">),</span> 
                           <span class="n">feed_dict</span><span class="o">=</span><span class="p">{</span><span class="n">x</span><span class="p">:</span> <span class="n">x_test_scaled</span><span class="p">,</span> <span class="n">y_true</span><span class="p">:</span> <span class="n">y_test_oh</span><span class="p">,</span> <span class="n">keep_prob</span><span class="p">:</span> <span class="mf">1.</span><span class="p">})</span>
 </pre></div>
 
@@ -16092,7 +16092,7 @@ TEST ACCURACY: 0.9866
 <div class="prompt input_prompt">In&nbsp;[64]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">h1_sum</span> <span class="o">=</span> <span class="p">[]</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">h1_sum</span> <span class="o">=</span> <span class="p">[]</span>
 
 <span class="k">for</span> <span class="n">dig</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
     <span class="n">idxs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">y_train</span> <span class="o">==</span> <span class="n">dig</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
@@ -16687,7 +16687,7 @@ U/X71ekAAAAASUVORK5CYII=
 <div class="prompt input_prompt">In&nbsp;[65]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">h2_sum</span> <span class="o">=</span> <span class="p">[]</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">h2_sum</span> <span class="o">=</span> <span class="p">[]</span>
 
 <span class="k">for</span> <span class="n">dig</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
     <span class="n">idxs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">y_train</span> <span class="o">==</span> <span class="n">dig</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
@@ -17270,7 +17270,7 @@ AAAAABH5H8+P7vJ+Qz8JAAAAAElFTkSuQmCC
 <div class="prompt input_prompt">In&nbsp;[66]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">sess</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">sess</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 </pre></div>
 
 </div>
@@ -17333,9 +17333,9 @@ where $D$ is some subset of the index set for the incoming features $\mathbf{f}^
 <div class="prompt input_prompt">In&nbsp;[67]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">sixes_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">train_df</span><span class="p">[</span><span class="n">train_df</span><span class="p">[</span><span class="s1">&#39;label&#39;</span><span class="p">]</span><span class="o">==</span><span class="mi">6</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
-<span class="n">eights_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">train_df</span><span class="p">[</span><span class="n">train_df</span><span class="p">[</span><span class="s1">&#39;label&#39;</span><span class="p">]</span><span class="o">==</span><span class="mi">8</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
-<span class="n">nines_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">train_df</span><span class="p">[</span><span class="n">train_df</span><span class="p">[</span><span class="s1">&#39;label&#39;</span><span class="p">]</span><span class="o">==</span><span class="mi">9</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">sixes_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">train_df</span><span class="p">[</span><span class="n">train_df</span><span class="p">[</span><span class="s1">&#39;label&#39;</span><span class="p">]</span><span class="o">==</span><span class="mi">6</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">eights_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">train_df</span><span class="p">[</span><span class="n">train_df</span><span class="p">[</span><span class="s1">&#39;label&#39;</span><span class="p">]</span><span class="o">==</span><span class="mi">8</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">nines_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">train_df</span><span class="p">[</span><span class="n">train_df</span><span class="p">[</span><span class="s1">&#39;label&#39;</span><span class="p">]</span><span class="o">==</span><span class="mi">9</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </pre></div>
 
 </div>
@@ -17348,7 +17348,7 @@ where $D$ is some subset of the index set for the incoming features $\mathbf{f}^
 <div class="prompt input_prompt">In&nbsp;[68]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="c1"># generate a 3x4 grid of subplots</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># generate a 3x4 grid of subplots</span>
 <span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">))</span>
 
 <span class="c1"># each row will be 6s, 8s, or 9s</span>
@@ -17641,7 +17641,7 @@ REsAAAAASUVORK5CYII=
 <div class="prompt input_prompt">In&nbsp;[69]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="c1"># recover the upper 14x28 block from the 28x28 matrix </span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># recover the upper 14x28 block from the 28x28 matrix </span>
 <span class="k">def</span> <span class="nf">upper_pixel_mat</span><span class="p">(</span><span class="n">row</span><span class="p">):</span>
     <span class="c1"># we&#39;re working with train_df so we want to drop the label column</span>
     <span class="n">vec</span> <span class="o">=</span> <span class="n">train_df</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="s1">&#39;label&#39;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">row</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
@@ -17816,7 +17816,7 @@ gg==
 <div class="prompt input_prompt">In&nbsp;[70]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="c1"># recover the lower 14x28 block from the 28x28 matrix </span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># recover the lower 14x28 block from the 28x28 matrix </span>
 <span class="k">def</span> <span class="nf">lower_pixel_mat</span><span class="p">(</span><span class="n">row</span><span class="p">):</span>
     <span class="c1"># we&#39;re working with train_df so we want to drop the label column</span>
     <span class="n">vec</span> <span class="o">=</span> <span class="n">train_df</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="s1">&#39;label&#39;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">row</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
@@ -18041,10 +18041,17 @@ oSADAEBCQQYAgISCDAAACQUZAAASCjIAACQUZAAASCjIAACQUJABACChIAMAQEJBBgCAhIIMAACJ
 </li>
 <li><p>The number of pixels in each direction to move the window between samplings.  This is called the <strong>stride</strong>.</p>
 </li>
-<li><p>The number of features to compute per sampling.  This is referred to as the <strong>depth</strong>. If depth &gt; 1, then the filter is actually a tensor of shape [width, height, depth].</p>
+<li><p>The number of independent filters used in the layer.  Each independent filter is a collection of weights that are shared at each patch.  By including extra filters, we can learn additional features from each patch.  This is sometimes referred to as the <strong>depth</strong> of the convolutional layer, but should not be confused with the depth of the network taken as a whole. If depth &gt; 1, then the filter is actually a tensor of shape [width, height, depth].</p>
 </li>
 </ol>
 <p>In our design matrix, the pixel data has been unrolled and the proximity of pixels in the vertical direction has been obscured.  A convolutional filter is designed to sample over nearby pixels and restore information about the local relationships between the features.</p>
+<p>More specifically, in terms of the restriction conditions discussed previously, from a fully-connected layer to the convolutional layer:</p>
+<ul>
+<li><p>The use of the window imposes the condition that we compute new features based on a subset of the input features.</p>
+</li>
+<li><p>The sharing of the same filter weights implements the symmetry condition.</p>
+</li>
+</ul>
 <p>Convolutional layers tend to learn geometric shapes.  In the case of the digits, depending on the filter size, these might look like the highlighted shapes:</p>
 <p><img src="convfeat.png" alt="convolutional features"></p>
 <p>Because using the filter is equivalent to sharing weights,  the convolutional layer learns these features wherever they might be found in the image.  The <strong>parameter sharing</strong> introduces a degree of <strong>translational invariance</strong> to the learning algorithm.  Because of the stride, we also retain information in the computed features about where in a particular image a feature is found.   We learn a set of important features that might be present in many types of digits, then the appearance and location in a particular digit helps the network classify that digit.</p>
@@ -18058,7 +18065,7 @@ oSADAEBCQQYAgISCDAAACQUZAAASCjIAACQUZAAASCjIAACQUJABACChIAMAQEJBBgCAhIIMAACJ
 <div class="prompt input_prompt">In&nbsp;[71]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">pixel_mat</span><span class="p">(</span><span class="mi">9</span><span class="p">),</span> <span class="n">cmap</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">cm</span><span class="o">.</span><span class="n">gray</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;upper&#39;</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="s1">&#39;nearest&#39;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">pixel_mat</span><span class="p">(</span><span class="mi">59943</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">cm</span><span class="o">.</span><span class="n">Blues</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;upper&#39;</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="s1">&#39;nearest&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
    
@@ -18180,7 +18187,7 @@ h+ADCRF8ICGCDyRE8IGECD6QEMEHEiL4QEL/DwWaTDxzXRCAAAAAAElFTkSuQmCC
 <div class="prompt input_prompt">In&nbsp;[72]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">tf</span><span class="o">.</span><span class="n">reset_default_graph</span><span class="p">()</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">tf</span><span class="o">.</span><span class="n">reset_default_graph</span><span class="p">()</span>
 <span class="n">sess</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">InteractiveSession</span><span class="p">()</span>
 
 <span class="c1"># set random seed</span>
@@ -18207,10 +18214,10 @@ h+ADCRF8ICGCDyRE8IGECD6QEMEHEiL4QEL/DwWaTDxzXRCAAAAAAElFTkSuQmCC
 <div class="prompt input_prompt">In&nbsp;[73]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">n_feat</span> <span class="o">=</span> <span class="mi">784</span>
-<span class="n">x</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">placeholder</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">[</span><span class="bp">None</span><span class="p">,</span> <span class="n">n_feat</span><span class="p">])</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">n_feat</span> <span class="o">=</span> <span class="mi">784</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">placeholder</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="n">n_feat</span><span class="p">])</span>
 <span class="n">n_class</span> <span class="o">=</span> <span class="mi">10</span>
-<span class="n">y_true</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">placeholder</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">int32</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">[</span><span class="bp">None</span><span class="p">,</span> <span class="n">n_class</span><span class="p">])</span>
+<span class="n">y_true</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">placeholder</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">int32</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="n">n_class</span><span class="p">])</span>
 </pre></div>
 
 </div>
@@ -18239,7 +18246,7 @@ h+ADCRF8ICGCDyRE8IGECD6QEMEHEiL4QEL/DwWaTDxzXRCAAAAAAElFTkSuQmCC
 <div class="prompt input_prompt">In&nbsp;[74]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">x_image</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">28</span><span class="p">,</span><span class="mi">28</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">x_image</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">28</span><span class="p">,</span><span class="mi">28</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span>
 </pre></div>
 
 </div>
@@ -18256,7 +18263,7 @@ h+ADCRF8ICGCDyRE8IGECD6QEMEHEiL4QEL/DwWaTDxzXRCAAAAAAElFTkSuQmCC
 <ul>
 <li><code>(filter_height, filter_width)</code> are the pixel dimensions of the window. </li>
 <li><code>in_channels</code> is again the # of color channels in the input.  </li>
-<li><code>out_channels</code> is the number of features for the layer to output. </li>
+<li><code>out_channels</code> is the number of features for the layer to output per patch. </li>
 </ul>
 <p>In detail, the layer</p>
 <ol>
@@ -18278,7 +18285,7 @@ h+ADCRF8ICGCDyRE8IGECD6QEMEHEiL4QEL/DwWaTDxzXRCAAAAAAElFTkSuQmCC
 <div class="prompt input_prompt">In&nbsp;[75]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">n_convfeat1</span> <span class="o">=</span> <span class="mi">4</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">n_convfeat1</span> <span class="o">=</span> <span class="mi">4</span>
 
 <span class="n">W_conv1</span> <span class="o">=</span> <span class="n">weight_variable</span><span class="p">([</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">n_convfeat1</span><span class="p">])</span>
 <span class="n">b_conv1</span> <span class="o">=</span> <span class="n">bias_variable</span><span class="p">([</span><span class="n">n_convfeat1</span><span class="p">])</span>
@@ -18297,7 +18304,7 @@ h+ADCRF8ICGCDyRE8IGECD6QEMEHEiL4QEL/DwWaTDxzXRCAAAAAAElFTkSuQmCC
 <div class="prompt input_prompt">In&nbsp;[76]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">h_conv1</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">h_conv1</span>
 </pre></div>
 
 </div>
@@ -18343,7 +18350,7 @@ h+ADCRF8ICGCDyRE8IGECD6QEMEHEiL4QEL/DwWaTDxzXRCAAAAAAElFTkSuQmCC
 <div class="prompt input_prompt">In&nbsp;[77]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">h_pool1</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">max_pool</span><span class="p">(</span><span class="n">h_conv1</span><span class="p">,</span> <span class="n">ksize</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> 
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">h_pool1</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">max_pool</span><span class="p">(</span><span class="n">h_conv1</span><span class="p">,</span> <span class="n">ksize</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> 
                          <span class="n">strides</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">padding</span><span class="o">=</span><span class="s1">&#39;SAME&#39;</span><span class="p">)</span>
 </pre></div>
 
@@ -18357,7 +18364,7 @@ h+ADCRF8ICGCDyRE8IGECD6QEMEHEiL4QEL/DwWaTDxzXRCAAAAAAElFTkSuQmCC
 <div class="prompt input_prompt">In&nbsp;[78]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">h_pool1</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">h_pool1</span>
 </pre></div>
 
 </div>
@@ -18399,7 +18406,7 @@ h+ADCRF8ICGCDyRE8IGECD6QEMEHEiL4QEL/DwWaTDxzXRCAAAAAAElFTkSuQmCC
 <div class="prompt input_prompt">In&nbsp;[79]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">n_convfeat2</span> <span class="o">=</span> <span class="mi">16</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">n_convfeat2</span> <span class="o">=</span> <span class="mi">16</span>
 
 <span class="n">W_conv2</span> <span class="o">=</span> <span class="n">weight_variable</span><span class="p">([</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="n">n_convfeat1</span><span class="p">,</span> <span class="n">n_convfeat2</span><span class="p">])</span>
 <span class="n">b_conv2</span> <span class="o">=</span> <span class="n">bias_variable</span><span class="p">([</span><span class="n">n_convfeat2</span><span class="p">])</span>
@@ -18450,7 +18457,7 @@ h+ADCRF8ICGCDyRE8IGECD6QEMEHEiL4QEL/DwWaTDxzXRCAAAAAAElFTkSuQmCC
 <div class="prompt input_prompt">In&nbsp;[80]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">width1</span> <span class="o">=</span> <span class="mi">784</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">width1</span> <span class="o">=</span> <span class="mi">784</span>
 
 <span class="n">W_1</span> <span class="o">=</span> <span class="n">weight_variable</span><span class="p">([</span><span class="mi">7</span> <span class="o">*</span> <span class="mi">7</span> <span class="o">*</span> <span class="n">n_convfeat2</span><span class="p">,</span> <span class="n">width1</span><span class="p">])</span>
 <span class="n">b_1</span> <span class="o">=</span> <span class="n">bias_variable</span><span class="p">([</span><span class="n">width1</span><span class="p">])</span>
@@ -18480,7 +18487,7 @@ h+ADCRF8ICGCDyRE8IGECD6QEMEHEiL4QEL/DwWaTDxzXRCAAAAAAElFTkSuQmCC
 <div class="prompt input_prompt">In&nbsp;[81]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">keep_prob</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">placeholder</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">keep_prob</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">placeholder</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
 <span class="n">h_1_drop</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">dropout</span><span class="p">(</span><span class="n">h_1</span><span class="p">,</span> <span class="n">keep_prob</span><span class="p">)</span>
 </pre></div>
 
@@ -18504,7 +18511,7 @@ h+ADCRF8ICGCDyRE8IGECD6QEMEHEiL4QEL/DwWaTDxzXRCAAAAAAElFTkSuQmCC
 <div class="prompt input_prompt">In&nbsp;[82]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">W_out</span> <span class="o">=</span> <span class="n">weight_variable</span><span class="p">([</span><span class="n">width1</span><span class="p">,</span> <span class="n">n_class</span><span class="p">])</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">W_out</span> <span class="o">=</span> <span class="n">weight_variable</span><span class="p">([</span><span class="n">width1</span><span class="p">,</span> <span class="n">n_class</span><span class="p">])</span>
 <span class="n">b_out</span> <span class="o">=</span> <span class="n">bias_variable</span><span class="p">([</span><span class="n">n_class</span><span class="p">])</span>
 
 <span class="n">z_out</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">h_1_drop</span><span class="p">,</span> <span class="n">W_out</span><span class="p">),</span> <span class="n">b_out</span><span class="p">)</span>
@@ -18530,7 +18537,7 @@ h+ADCRF8ICGCDyRE8IGECD6QEMEHEiL4QEL/DwWaTDxzXRCAAAAAAElFTkSuQmCC
 <div class="prompt input_prompt">In&nbsp;[83]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">cost</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reduce_mean</span><span class="p">(</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">cost</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reduce_mean</span><span class="p">(</span>
         <span class="n">tf</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">softmax_cross_entropy_with_logits</span><span class="p">(</span>
                         <span class="n">labels</span><span class="o">=</span><span class="n">y_true</span><span class="p">,</span> <span class="n">logits</span><span class="o">=</span><span class="n">z_out</span><span class="p">))</span>
 <span class="n">corr</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">equal</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">z_out</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">tf</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>    
@@ -18560,7 +18567,7 @@ h+ADCRF8ICGCDyRE8IGECD6QEMEHEiL4QEL/DwWaTDxzXRCAAAAAAElFTkSuQmCC
 <div class="prompt input_prompt">In&nbsp;[84]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">n_batch</span> <span class="o">=</span> <span class="mf">50.</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">n_batch</span> <span class="o">=</span> <span class="mf">50.</span>
 <span class="n">int_batch</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">n_batch</span><span class="p">)</span>
 
 <span class="n">n_samp_train</span> <span class="o">=</span> <span class="n">x_train_scaled</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
@@ -18569,7 +18576,7 @@ h+ADCRF8ICGCDyRE8IGECD6QEMEHEiL4QEL/DwWaTDxzXRCAAAAAAElFTkSuQmCC
 <span class="n">train_batch</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">n_samp_train</span> <span class="o">/</span> <span class="n">n_batch</span><span class="p">)</span>
 <span class="n">test_batch</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">n_samp_test</span> <span class="o">/</span> <span class="n">n_batch</span><span class="p">)</span>
 
-<span class="n">skfold</span> <span class="o">=</span> <span class="n">StratifiedKFold</span><span class="p">(</span><span class="n">n_splits</span><span class="o">=</span><span class="n">train_batch</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">428</span><span class="p">)</span>
+<span class="n">skfold</span> <span class="o">=</span> <span class="n">StratifiedKFold</span><span class="p">(</span><span class="n">n_splits</span><span class="o">=</span><span class="n">train_batch</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">428</span><span class="p">)</span>
 </pre></div>
 
 </div>
@@ -18582,7 +18589,7 @@ h+ADCRF8ICGCDyRE8IGECD6QEMEHEiL4QEL/DwWaTDxzXRCAAAAAAElFTkSuQmCC
 <div class="prompt input_prompt">In&nbsp;[85]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="c1"># Number of epochs to train over.</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Number of epochs to train over.</span>
 <span class="n">n_epoch</span> <span class="o">=</span> <span class="mi">100</span> <span class="o">+</span> <span class="mi">1</span>
 
 <span class="c1"># Compute appropriate metrics at checkpoints</span>
@@ -18608,7 +18615,7 @@ h+ADCRF8ICGCDyRE8IGECD6QEMEHEiL4QEL/DwWaTDxzXRCAAAAAAElFTkSuQmCC
     <span class="c1"># Display logs per epoch step</span>
     <span class="k">if</span> <span class="n">epoch</span> <span class="o">%</span> <span class="n">display_step</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
         <span class="c1"># return epoch and average cost</span>
-        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Epoch: </span><span class="si">%.4d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">epoch</span><span class="p">,</span> <span class="s2">&quot;cost = </span><span class="si">%.4f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">avg_cost</span><span class="p">,</span> 
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Epoch: </span><span class="si">%.4d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">epoch</span><span class="p">,</span> <span class="s2">&quot;cost = </span><span class="si">%.4f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">avg_cost</span><span class="p">,</span> 
               <span class="s2">&quot;time = </span><span class="si">%.2f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start</span><span class="p">))</span>
         <span class="c1"># compute accuracy on full training set, in batches</span>
         <span class="n">train_acc</span> <span class="o">=</span> <span class="mi">0</span>
@@ -18620,7 +18627,7 @@ h+ADCRF8ICGCDyRE8IGECD6QEMEHEiL4QEL/DwWaTDxzXRCAAAAAAElFTkSuQmCC
                                        <span class="n">y_true</span><span class="p">:</span> <span class="n">y_batch</span><span class="p">,</span> 
                                        <span class="n">keep_prob</span><span class="p">:</span> <span class="mf">1.</span><span class="p">})</span>
             <span class="n">train_acc</span> <span class="o">+=</span> <span class="n">acc</span> <span class="o">/</span> <span class="n">train_batch</span>
-        <span class="k">print</span> <span class="p">(</span><span class="s2">&quot;TRAIN ACCURACY: </span><span class="si">%.4f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">train_acc</span><span class="p">))</span>
+        <span class="nb">print</span> <span class="p">(</span><span class="s2">&quot;TRAIN ACCURACY: </span><span class="si">%.4f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">train_acc</span><span class="p">))</span>
         <span class="c1"># compute accuracy on full validation set, in batches</span>
         <span class="n">test_acc</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n_samp_test</span><span class="p">,</span> <span class="n">int_batch</span><span class="p">):</span>
@@ -18631,7 +18638,7 @@ h+ADCRF8ICGCDyRE8IGECD6QEMEHEiL4QEL/DwWaTDxzXRCAAAAAAElFTkSuQmCC
                                        <span class="n">y_true</span><span class="p">:</span> <span class="n">y_batch</span><span class="p">,</span> 
                                        <span class="n">keep_prob</span><span class="p">:</span> <span class="mf">1.</span><span class="p">})</span>
             <span class="n">test_acc</span> <span class="o">+=</span> <span class="n">acc</span> <span class="o">/</span> <span class="n">test_batch</span>
-        <span class="k">print</span> <span class="p">(</span><span class="s2">&quot;TEST ACCURACY: </span><span class="si">%.4f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">test_acc</span><span class="p">))</span>
+        <span class="nb">print</span> <span class="p">(</span><span class="s2">&quot;TEST ACCURACY: </span><span class="si">%.4f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">test_acc</span><span class="p">))</span>
 
 <span class="c1"># After the full training cycle, return more logs</span>
 <span class="c1"># compute accuracy on full training set, in batches</span>
@@ -18655,11 +18662,11 @@ h+ADCRF8ICGCDyRE8IGECD6QEMEHEiL4QEL/DwWaTDxzXRCAAAAAAElFTkSuQmCC
                                <span class="n">keep_prob</span><span class="p">:</span> <span class="mf">1.</span><span class="p">})</span>
     <span class="n">test_acc</span> <span class="o">+=</span> <span class="n">acc</span> <span class="o">/</span> <span class="n">test_batch</span>
     
-<span class="k">print</span><span class="p">(</span><span class="s2">&quot;Optimization finished in </span><span class="si">%.2f</span><span class="s2"> seconds!&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start</span><span class="p">))</span> 
-<span class="k">print</span><span class="p">(</span><span class="s2">&quot;For n_convfeat1 = </span><span class="si">%d</span><span class="s2">, n_convfeat2 = </span><span class="si">%d</span><span class="s2">, width1 = </span><span class="si">%d</span><span class="s2">, n_epoch = </span><span class="si">%d</span><span class="s2">,&quot;</span> \
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Optimization finished in </span><span class="si">%.2f</span><span class="s2"> seconds!&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start</span><span class="p">))</span> 
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;For n_convfeat1 = </span><span class="si">%d</span><span class="s2">, n_convfeat2 = </span><span class="si">%d</span><span class="s2">, width1 = </span><span class="si">%d</span><span class="s2">, n_epoch = </span><span class="si">%d</span><span class="s2">,&quot;</span> \
       <span class="o">%</span> <span class="p">(</span><span class="n">n_convfeat1</span><span class="p">,</span> <span class="n">n_convfeat2</span><span class="p">,</span> <span class="n">width1</span><span class="p">,</span> <span class="n">n_epoch</span><span class="p">))</span>
-<span class="k">print</span> <span class="p">(</span><span class="s2">&quot;TRAIN ACCURACY: </span><span class="si">%.4f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">train_acc</span><span class="p">))</span>
-<span class="k">print</span> <span class="p">(</span><span class="s2">&quot;TEST ACCURACY: </span><span class="si">%.4f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">test_acc</span><span class="p">))</span>   
+<span class="nb">print</span> <span class="p">(</span><span class="s2">&quot;TRAIN ACCURACY: </span><span class="si">%.4f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">train_acc</span><span class="p">))</span>
+<span class="nb">print</span> <span class="p">(</span><span class="s2">&quot;TEST ACCURACY: </span><span class="si">%.4f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">test_acc</span><span class="p">))</span>   
 </pre></div>
 
 </div>
@@ -18742,7 +18749,7 @@ TEST ACCURACY: 0.992</code></pre>
 <div class="prompt input_prompt">In&nbsp;[86]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">class_prob_cnn</span> <span class="o">=</span> <span class="n">sess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">softmax</span><span class="p">(</span><span class="n">z_out</span><span class="p">),</span> 
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">class_prob_cnn</span> <span class="o">=</span> <span class="n">sess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">softmax</span><span class="p">(</span><span class="n">z_out</span><span class="p">),</span> 
                            <span class="n">feed_dict</span><span class="o">=</span><span class="p">{</span><span class="n">x</span><span class="p">:</span> <span class="n">x_test_scaled</span><span class="p">,</span> <span class="n">y_true</span><span class="p">:</span> <span class="n">y_test_oh</span><span class="p">,</span> <span class="n">keep_prob</span><span class="p">:</span> <span class="mf">1.</span><span class="p">})</span>
 </pre></div>
 
@@ -18766,7 +18773,7 @@ TEST ACCURACY: 0.992</code></pre>
 <div class="prompt input_prompt">In&nbsp;[87]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="c1"># get all indices from y_train where the label is 2</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># get all indices from y_train where the label is 2</span>
 <span class="n">twos_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">y_train</span> <span class="o">==</span> <span class="mi">2</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
 
 <span class="c1"># pick 10 entries at random</span>
@@ -18810,7 +18817,7 @@ TEST ACCURACY: 0.992</code></pre>
 <div class="prompt input_prompt">In&nbsp;[88]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">))</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">))</span>
 
 <span class="n">orig_set</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">25</span><span class="p">,</span><span class="mi">5</span><span class="p">))</span>
 <span class="n">feat0_set</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">25</span><span class="p">,</span><span class="mi">5</span><span class="p">))</span>
@@ -19629,7 +19636,7 @@ FrwAAAAoNBa8AAAAKDQWvAAAACi0/w/Sg3rmjeNNyQAAAABJRU5ErkJggg==
 <div class="prompt input_prompt">In&nbsp;[89]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">))</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">))</span>
 
 <span class="n">orig_set</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">25</span><span class="p">,</span><span class="mi">5</span><span class="p">))</span>
 <span class="n">feat0_set</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">25</span><span class="p">,</span><span class="mi">5</span><span class="p">))</span>
@@ -20246,7 +20253,7 @@ CwAAgChQ+AIAACAKFL4AAACIAoUvAAAAokDhCwAAgCj8f8mWQqkNmTO3AAAAAElFTkSuQmCC
 <div class="prompt input_prompt">In&nbsp;[90]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">sess</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">sess</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 </pre></div>
 
 </div>
@@ -20279,7 +20286,7 @@ CwAAgChQ+AIAACAKFL4AAACIAoUvAAAAokDhCwAAgCj8f8mWQqkNmTO3AAAAAElFTkSuQmCC
 <div class="prompt input_prompt">In&nbsp;[91]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">idxs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">class_prob_cnn</span><span class="p">),</span> <span class="mi">5</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">idxs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">class_prob_cnn</span><span class="p">),</span> <span class="mi">5</span><span class="p">)</span>
 <span class="n">class_prob_cnn</span><span class="p">[</span><span class="n">idxs</span><span class="p">]</span>
 </pre></div>
 
@@ -20340,7 +20347,7 @@ CwAAgChQ+AIAACAKFL4AAACIAoUvAAAAokDhCwAAgCj8f8mWQqkNmTO3AAAAAElFTkSuQmCC
 <div class="prompt input_prompt">In&nbsp;[92]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">y_pred_cnn</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">class_prob_cnn</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">y_pred_cnn</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">class_prob_cnn</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
 <span class="n">y_pred_cnn</span>
 </pre></div>
 
@@ -20382,7 +20389,7 @@ CwAAgChQ+AIAACAKFL4AAACIAoUvAAAAokDhCwAAgCj8f8mWQqkNmTO3AAAAAElFTkSuQmCC
 <div class="prompt input_prompt">In&nbsp;[93]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">y_act</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">y_test_oh</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">y_act</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">y_test_oh</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
 <span class="n">y_act</span>
 </pre></div>
 
@@ -20424,9 +20431,9 @@ CwAAgChQ+AIAACAKFL4AAACIAoUvAAAAokDhCwAAgCj8f8mWQqkNmTO3AAAAAElFTkSuQmCC
 <div class="prompt input_prompt">In&nbsp;[94]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="k">print</span><span class="p">(</span><span class="n">class_prob_cnn</span><span class="p">[</span><span class="n">idxs</span><span class="p">])</span>
-<span class="k">print</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="o">-</span><span class="n">class_prob_cnn</span><span class="p">[</span><span class="n">idxs</span><span class="p">]))</span>
-<span class="k">print</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">class_prob_cnn</span><span class="p">[</span><span class="n">idxs</span><span class="p">],</span> <span class="mi">1</span><span class="p">))</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">class_prob_cnn</span><span class="p">[</span><span class="n">idxs</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="o">-</span><span class="n">class_prob_cnn</span><span class="p">[</span><span class="n">idxs</span><span class="p">]))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">class_prob_cnn</span><span class="p">[</span><span class="n">idxs</span><span class="p">],</span> <span class="mi">1</span><span class="p">))</span>
 </pre></div>
 
 </div>
@@ -20485,12 +20492,12 @@ CwAAgChQ+AIAACAKFL4AAACIAoUvAAAAokDhCwAAgCj8f8mWQqkNmTO3AAAAAElFTkSuQmCC
 <div class="prompt input_prompt">In&nbsp;[95]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">confusion_matrix</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="k">import</span> <span class="n">confusion_matrix</span>
 
 <span class="kn">import</span> <span class="nn">itertools</span>
 
 <span class="k">def</span> <span class="nf">plot_confusion_matrix</span><span class="p">(</span><span class="n">cm</span><span class="p">,</span> <span class="n">classes</span><span class="p">,</span>
-                          <span class="n">normalize</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+                          <span class="n">normalize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                           <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Confusion matrix&#39;</span><span class="p">,</span>
                           <span class="n">cmap</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">cm</span><span class="o">.</span><span class="n">Blues</span><span class="p">):</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">cm</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="s1">&#39;nearest&#39;</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">)</span>
@@ -20521,7 +20528,7 @@ CwAAgChQ+AIAACAKFL4AAACIAoUvAAAAokDhCwAAgCj8f8mWQqkNmTO3AAAAAElFTkSuQmCC
 <div class="prompt input_prompt">In&nbsp;[96]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">conf_mat</span> <span class="o">=</span> <span class="n">confusion_matrix</span><span class="p">(</span><span class="n">y_act</span><span class="p">,</span> <span class="n">y_pred_cnn</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">conf_mat</span> <span class="o">=</span> <span class="n">confusion_matrix</span><span class="p">(</span><span class="n">y_act</span><span class="p">,</span> <span class="n">y_pred_cnn</span><span class="p">)</span>
 
 <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span><span class="mi">6</span><span class="p">))</span>
 <span class="n">plot_confusion_matrix</span><span class="p">(</span><span class="n">conf_mat</span><span class="p">,</span> <span class="n">classes</span><span class="o">=</span><span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">),</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;CNN confusion matrix&#39;</span><span class="p">)</span>
@@ -20888,7 +20895,7 @@ XSajlFJK1WUySimlVN3fDFzizhUUHZcAAAAASUVORK5CYII=
 <div class="prompt input_prompt">In&nbsp;[97]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">error_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">y_pred_cnn</span> <span class="o">!=</span> <span class="n">y_act</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">error_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">y_pred_cnn</span> <span class="o">!=</span> <span class="n">y_act</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
 </pre></div>
 
 </div>
@@ -20901,7 +20908,7 @@ XSajlFJK1WUySimlVN3fDFzizhUUHZcAAAAASUVORK5CYII=
 <div class="prompt input_prompt">In&nbsp;[98]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">error_idx</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">error_idx</span>
 </pre></div>
 
 </div>
@@ -20948,7 +20955,7 @@ XSajlFJK1WUySimlVN3fDFzizhUUHZcAAAAASUVORK5CYII=
 <div class="prompt input_prompt">In&nbsp;[99]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="k">def</span> <span class="nf">plot_digits_bypred</span><span class="p">(</span><span class="n">digit</span><span class="p">):</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">plot_digits_bypred</span><span class="p">(</span><span class="n">digit</span><span class="p">):</span>
     <span class="c1"># generate a 4xn grid of subplots, 4 is the number of columns that will reasonably display in typical</span>
     <span class="c1"># overhead projector resolution at the size we&#39;re making the images </span>
     <span class="n">pred_dig</span> <span class="o">=</span> <span class="n">digit</span>
@@ -20999,7 +21006,7 @@ XSajlFJK1WUySimlVN3fDFzizhUUHZcAAAAASUVORK5CYII=
 <div class="prompt input_prompt">In&nbsp;[100]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">plot_digits_bypred</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">plot_digits_bypred</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 </pre></div>
 
 </div>
@@ -21334,7 +21341,7 @@ AIBo0PwCAAAgGv8f9oi27VzosywAAAAASUVORK5CYII=
 <div class="prompt input_prompt">In&nbsp;[101]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">plot_digits_bypred</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">plot_digits_bypred</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
 </pre></div>
 
 </div>
@@ -21580,7 +21587,7 @@ AIBmCL8AADRD+AUAoBnCLwAAzRB+AQBoxv8DmSToZH+Hm04AAAAASUVORK5CYII=
 <div class="prompt input_prompt">In&nbsp;[102]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">plot_digits_bypred</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">plot_digits_bypred</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
 </pre></div>
 
 </div>
@@ -21756,7 +21763,7 @@ KH4BAAAQDYpfAAAARIPiFwAAANGg+AUAAEA0KH4BAAAQjf8PjQ0bvpKqJ6oAAAAASUVORK5CYII=
 <div class="prompt input_prompt">In&nbsp;[103]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">plot_digits_bypred</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">plot_digits_bypred</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
 </pre></div>
 
 </div>
@@ -22067,7 +22074,7 @@ AKLx/wF86jsuoENGtAAAAABJRU5ErkJggg==
 <div class="prompt input_prompt">In&nbsp;[104]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">plot_digits_bypred</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">plot_digits_bypred</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
 </pre></div>
 
 </div>
@@ -22330,7 +22337,7 @@ m7rnS8wgAAAAAElFTkSuQmCC
 <div class="prompt input_prompt">In&nbsp;[105]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">plot_digits_bypred</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">plot_digits_bypred</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
 </pre></div>
 
 </div>
@@ -22739,7 +22746,7 @@ RU5ErkJggg==
 <div class="prompt input_prompt">In&nbsp;[106]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">plot_digits_bypred</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">plot_digits_bypred</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span>
 </pre></div>
 
 </div>
@@ -23002,7 +23009,7 @@ TkSuQmCC
 <div class="prompt input_prompt">In&nbsp;[107]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">plot_digits_bypred</span><span class="p">(</span><span class="mi">7</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">plot_digits_bypred</span><span class="p">(</span><span class="mi">7</span><span class="p">)</span>
 </pre></div>
 
 </div>
@@ -23345,7 +23352,7 @@ JIPiFwAAAMmg+AUAAEAyKH4BAACQDIpfAAAAJOP/AxxUEFgL/bEdAAAAAElFTkSuQmCC
 <div class="prompt input_prompt">In&nbsp;[108]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">plot_digits_bypred</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">plot_digits_bypred</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span>
 </pre></div>
 
 </div>
@@ -23753,7 +23760,7 @@ tvT4LgAAAABJRU5ErkJggg==
 <div class="prompt input_prompt">In&nbsp;[109]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">plot_digits_bypred</span><span class="p">(</span><span class="mi">9</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">plot_digits_bypred</span><span class="p">(</span><span class="mi">9</span><span class="p">)</span>
 </pre></div>
 
 </div>
@@ -24212,7 +24219,7 @@ AMGg+AUAAEAwKH4BAAAQDIpfAAAABIPiFwAAAMGg+AUAAEAwKH4BAAAQDIpfAAAABIPiFwAAAMGg
 <div class="prompt input_prompt">In&nbsp;[110]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">idx</span> <span class="o">=</span> <span class="mi">2035</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">idx</span> <span class="o">=</span> <span class="mi">2035</span>
 <span class="c1"># this is the true class label</span>
 <span class="n">true_y</span> <span class="o">=</span> <span class="n">y_act</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
 <span class="c1"># this is the vector of model class probabilities</span>
@@ -24377,7 +24384,7 @@ rkJggg==
 <div class="prompt input_prompt">In&nbsp;[111]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">idx</span> <span class="o">=</span> <span class="mi">1901</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">idx</span> <span class="o">=</span> <span class="mi">1901</span>
 <span class="c1"># this is the true class label</span>
 <span class="n">true_y</span> <span class="o">=</span> <span class="n">y_act</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
 <span class="c1"># this is the vector of model class probabilities</span>
@@ -24530,7 +24537,7 @@ SUVORK5CYII=
 <div class="prompt input_prompt">In&nbsp;[112]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="mi">100</span> <span class="o">*</span> <span class="n">class_prob_cnn</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="mi">100</span> <span class="o">*</span> <span class="n">class_prob_cnn</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
 </pre></div>
 
 </div>
